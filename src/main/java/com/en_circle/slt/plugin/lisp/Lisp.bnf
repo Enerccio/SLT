@@ -1,0 +1,35 @@
+{
+  parserClass="com.en_circle.slt.plugin.lisp.LispParser"
+  parserUtilClass="com.en_circle.slt.plugin.lisp.LispParserUtil"
+
+  extends="com.intellij.extapi.psi.ASTWrapperPsiElement"
+
+  psiClassPrefix="Lisp"
+  psiImplClassSuffix="Impl"
+  psiPackage="com.en_circle.slt.plugin.lisp.psi"
+  psiImplPackage="com.en_circle.slt.plugin.lisp.impl"
+
+  elementTypeHolderClass="com.en_circle.slt.plugin.lisp.psi.LispTypes"
+  elementTypeClass="com.en_circle.slt.plugin.lisp.psi.LispElementType"
+  tokenTypeClass="com.en_circle.slt.plugin.lisp.psi.LispTokenType"
+
+  psiImplUtilClass="com.en_circle.slt.plugin.lisp.psi.impl.LispPsiImplUtil"
+}
+
+lispFile ::= sexpr*
+
+sexpr ::= sugar* (pair|list|atom|COMMENT)
+
+list ::= LPARAM sexpr* RPARAM
+
+pair ::= LPARAM sexpr+ DOT sexpr RPARAM
+
+sugar ::= (QUOTE | BACKQUOTE | (COMMA AMPERSAND?))
+
+atom ::= number | string | symbol
+
+number ::= NUMBER_TOKEN
+
+string ::= STRING_TOKEN
+
+symbol ::= IDENTIFIER_TOKEN
