@@ -1,13 +1,12 @@
 package com.en_circle.slt.plugin.view;
 
 import com.en_circle.slt.plugin.swank.SwankServer.SwankServerOutput;
-import com.en_circle.slt.plugin.swank.SwankStreamController.SwankStreamControllerUpdateListener;
-
-import javax.swing.*;
+import com.intellij.ui.tabs.TabInfo;
 
 public interface SltComponent {
 
-    JComponent create();
+    TabInfo create();
+    TabInfo getTabInfo();
 
     void onPreStart();
     void onPostStart();
@@ -18,4 +17,5 @@ public interface SltComponent {
     void onPostStop();
 
     String getTitle();
+
 }

@@ -12,7 +12,7 @@ public class LispInteger extends LispAtom<BigInteger> {
     }
 
     @Override
-    protected BigInteger getValue() {
+    public BigInteger getValue() {
         return value;
     }
 

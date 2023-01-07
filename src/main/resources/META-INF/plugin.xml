@@ -34,6 +34,9 @@
 
         <lang.commenter language="Common Lisp" implementationClass="com.en_circle.slt.plugin.SltCommenter"/>
 
+        <lang.parserDefinition language="Common Lisp"
+                               implementationClass="com.en_circle.slt.plugin.SltCommonLispParserDefinition"/>
+
         <applicationConfigurable instance="com.en_circle.slt.plugin.settings.SltSettingsConfigurable"/>
 
         <toolWindow factoryClass="com.en_circle.slt.plugin.SltProcessWindowFactory" id="Common Lisp"
@@ -46,5 +49,10 @@
             <add-to-group group-id="NewGroup" anchor="before" relative-to-action="NewHtmlFile" />
         </action>
 
+        <action id="com.en_circle.slt.plugin.actions.EvalRegionAction"
+                icon="/icons/fileicon.svg"
+                class="com.en_circle.slt.plugin.actions.EvalRegionAction" text="Evaluate Selected Region">
+            <add-to-group group-id="EditorPopupMenu" anchor="last"/>
+        </action>
     </actions>
 </idea-plugin>

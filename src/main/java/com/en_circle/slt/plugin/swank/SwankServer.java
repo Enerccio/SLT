@@ -1,9 +1,9 @@
 package com.en_circle.slt.plugin.swank;
 
 import com.en_circle.slt.plugin.swank.SwankStreamController.WaitForOccurrence;
+import com.intellij.openapi.application.ApplicationManager;
 import org.apache.commons.io.FileUtils;
 
-import javax.swing.*;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -73,9 +73,9 @@ public class SwankServer {
             errorController.addUpdateListener(wait);
             if (listener != null) {
                 errorController.addUpdateListener(data ->
-                        SwingUtilities.invokeLater(() -> listener.onOutputChanged(SwankServerOutput.STDERR, data)));
+                        ApplicationManager.getApplication().invokeLater(() -> listener.onOutputChanged(SwankServerOutput.STDERR, data)));
                 outputController.addUpdateListener(data ->
-                        SwingUtilities.invokeLater(() -> listener.onOutputChanged(SwankServerOutput.STDOUT, data)));
+                        ApplicationManager.getApplication().invokeLater(() -> listener.onOutputChanged(SwankServerOutput.STDOUT, data)));
             }
 
             errorController.start();

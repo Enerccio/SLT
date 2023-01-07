@@ -4,6 +4,7 @@ import com.en_circle.slt.plugin.swank.SwankServer.SwankServerOutput;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.*;
 import com.intellij.ui.components.JBScrollPane;
+import com.intellij.ui.tabs.TabInfo;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 
@@ -14,10 +15,13 @@ import java.awt.*;
 public class SltOutputHandlerComponent implements SltComponent {
 
     private final SwankServerOutput output;
+    private final JPanel dataContainer;
     private JTextArea area;
+    private TabInfo tabInfo;
 
     public SltOutputHandlerComponent(SltCoreWindow coreWindow, SwankServerOutput output) {
         this.output = output;
+        this.dataContainer = new JPanel(new BorderLayout());
     }
 
     public SwankServerOutput getOutput() {
@@ -25,15 +29,13 @@ public class SltOutputHandlerComponent implements SltComponent {
     }
 
     @Override
-    public JComponent create() {
+    public TabInfo create() {
         area = new JTextArea();
         area.setEditable(false);
         DefaultCaret caret = (DefaultCaret) area.getCaret();
         caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
 
         JBScrollPane scrollPane = new JBScrollPane(area);
-
-        JPanel dataContainer = new JPanel(new BorderLayout());
         dataContainer.add(scrollPane, BorderLayout.CENTER);
 
         DefaultActionGroup controlGroup = new DefaultActionGroup();
@@ -80,7 +82,14 @@ public class SltOutputHandlerComponent implements SltComponent {
 
         });
 
-        return dataContainer;
+        tabInfo = new TabInfo(dataContainer);
+        tabInfo.setText(getTitle());
+        return tabInfo;
+    }
+
+    @Override
+    public TabInfo getTabInfo() {
+        return tabInfo;
     }
 
     @Override
@@ -119,4 +128,5 @@ public class SltOutputHandlerComponent implements SltComponent {
     public String getTitle() {
         return getOutput() == SwankServerOutput.STDERR ? "Error Output" : "Standard Output";
     }
+
 }

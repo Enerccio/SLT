@@ -7,7 +7,7 @@ public class LispSymbol extends LispAtom<String> {
     }
 
     @Override
-    protected String getValue() {
+    public String getValue() {
         return textValue;
     }
 

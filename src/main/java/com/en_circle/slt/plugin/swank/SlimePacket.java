@@ -5,6 +5,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 
 public class SlimePacket {
@@ -56,21 +57,39 @@ public class SlimePacket {
         return new SlimePacket(formatted);
     }
 
-    public static SlimePacket swankEval(String sexpression, int continuation) {
-        return swankEval(sexpression, "cl-user", continuation);
+    public static SlimePacket swankInteractiveEval(String sexpression, BigInteger continuation) {
+        return swankInteractiveEval(sexpression, "cl-user", continuation);
     }
 
-    public static SlimePacket swankEval(String sexpression, String packageName, int continuation) {
-        return swankEval(sexpression, packageName, "T", continuation);
+    public static SlimePacket swankInteractiveEval(String sexpression, String packageName, BigInteger continuation) {
+        return swankInteractiveEval(sexpression, packageName, "T", continuation);
     }
 
-    public static SlimePacket swankEval(String sexpression, String packageName, String thread, int continuation) {
+    public static SlimePacket swankInteractiveEval(String sexpression, String packageName, String thread, BigInteger continuation) {
         packageName = StringUtils.replace(packageName, "\\", "\\\\");
         packageName = StringUtils.replace(packageName, "\"", "\\\"");
         sexpression = StringUtils.replace(sexpression, "\\", "\\\\");
         sexpression = StringUtils.replace(sexpression, "\"", "\\\"");
-        String formatted = String.format("(:emacs-rex (swank:listener-eval  \"%s\") \"%s\" %s %s)",
+        String formatted = String.format("(:emacs-rex (swank:interactive-eval \"%s\") \"%s\" %s %s)",
                 sexpression, packageName, thread, continuation);
+        return new SlimePacket(formatted);
+    }
+
+    public static SlimePacket evalRegion(String region, BigInteger continuation) {
+        return evalRegion(region, "cl-user", "T", continuation);
+    }
+
+    public static SlimePacket evalRegion(String region, String packageName, BigInteger continuation) {
+        return evalRegion(region, packageName, "T", continuation);
+    }
+
+    public static SlimePacket evalRegion(String region, String packageName, String thread, BigInteger continuation) {
+        packageName = StringUtils.replace(packageName, "\\", "\\\\");
+        packageName = StringUtils.replace(packageName, "\"", "\\\"");
+        region = StringUtils.replace(region, "\\", "\\\\");
+        region = StringUtils.replace(region, "\"", "\\\"");
+        String formatted = String.format("(:emacs-rex (swank:interactive-eval-region \"%s\") \"%s\" %s %s)",
+                region, packageName, thread, continuation);
         return new SlimePacket(formatted);
     }
 

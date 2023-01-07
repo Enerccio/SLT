@@ -8,7 +8,7 @@ public abstract class LispAtom<T> implements LispElement {
         this.textValue = value;
     }
 
-    protected abstract T getValue();
+    public abstract T getValue();
 
     @Override
     public String toString() {

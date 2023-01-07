@@ -51,8 +51,8 @@ public class LispUtils {
         @Override
         public void visitNumber(@NotNull LispNumber o) {
             super.visitNumber(o);
-            LispDouble lispDouble = new LispDouble(o.getText());
-            stack.peek().add(lispDouble);
+            LispInteger lispInteger = new LispInteger(o.getText());
+            stack.peek().add(lispInteger);
         }
 
         @Override

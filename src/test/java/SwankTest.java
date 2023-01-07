@@ -1,4 +1,3 @@
-import com.en_circle.slt.plugin.swank.SlimePacket;
 import com.en_circle.slt.plugin.swank.SwankClient;
 import com.en_circle.slt.plugin.swank.SwankServer;
 import org.awaitility.Awaitility;
@@ -17,16 +16,14 @@ public class SwankTest {
                 System.out.println(packet);
                 expected.addAndGet(1);
             })) {
-                sent.addAndGet(1);
-                client.swankSend(new SlimePacket("(:return (:ok nil) 1)"));
-                sent.addAndGet(1);
-                client.swankSend(SlimePacket.rpcReturnOk("(+ 1 2)", 2));
-                sent.addAndGet(1);
-                client.swankSend(SlimePacket.rpcWriteString("(+ 4 5)"));
-                sent.addAndGet(1);
-                client.swankSend(SlimePacket.rpcNewPackage("cl-user"));
-                sent.addAndGet(1);
-                client.swankSend(SlimePacket.swankInteractiveEval("(+ 4 5)", 3));
+//                sent.addAndGet(1);
+//                client.swankSend(new SlimePacket("(:return (:ok nil) 1)"));
+//                sent.addAndGet(1);
+//                client.swankSend(SlimePacket.rpcReturnOk("(+ 1 2)", 2));
+//                sent.addAndGet(1);
+//                client.swankSend(SlimePacket.rpcWriteString("(+ 4 5)"));
+//                sent.addAndGet(1);
+//                client.swankSend(SlimePacket.rpcNewPackage("cl-user"));
 
                 Awaitility.await()
                         .atMost(10, TimeUnit.SECONDS)

@@ -12,7 +12,7 @@ public class LispDouble extends LispAtom<BigDecimal> {
     }
 
     @Override
-    protected BigDecimal getValue() {
+    public BigDecimal getValue() {
         return value;
     }
 

@@ -1,9 +1,12 @@
 package com.en_circle.slt.plugin.swank;
 
+import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.ConnectException;
 import java.net.Socket;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class SwankClient implements AutoCloseable, Runnable {
@@ -16,7 +19,10 @@ public class SwankClient implements AutoCloseable, Runnable {
     private final SwankReply callback;
     private final Thread readThread;
 
+    private ExecutorService swankExecutor;
+
     public SwankClient(String host, int port, SwankReply callback) {
+        this.swankExecutor = Executors.newCachedThreadPool();
         this.host = host;
         this.port = port;
         this.callback = callback;
@@ -39,13 +45,21 @@ public class SwankClient implements AutoCloseable, Runnable {
         connection.setKeepAlive(true);
     }
 
-    public void swankSend(SlimePacket value) throws Exception {
-        checkConnection();
-        value.writeTo(connection.getOutputStream());
+    public void swankSend(SlimePacket value) {
+        swankExecutor.submit(() -> {
+            try {
+                checkConnection();
+                value.writeTo(connection.getOutputStream());
+            } catch (Exception ignored) {
+                // TODO: maybe log
+            }
+        });
     }
 
     @Override
     public void close() throws Exception {
+        swankExecutor.shutdown();
+
         if (connection != null) {
             connection.close();
         }
@@ -66,8 +80,10 @@ public class SwankClient implements AutoCloseable, Runnable {
                 callback.onSwankMessage(packet);
             } catch (ConnectException | InterruptedException e) {
                 return;
-            } catch (IOException ignored) {
-
+            } catch (IOException e) {
+                if (e instanceof EOFException) {
+                    return;
+                }
             } catch (Exception e) {
                 e.printStackTrace();
             }

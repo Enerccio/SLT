@@ -18,6 +18,7 @@ public class SwankStreamController extends Thread {
 
     public SwankStreamController(InputStream inputStream) {
         this.inputStream = inputStream;
+        setName("SwanStreamController reader " + inputStream);
         setDaemon(true);
     }
 
