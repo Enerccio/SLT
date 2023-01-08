@@ -39,7 +39,7 @@
 
         <applicationConfigurable instance="com.en_circle.slt.plugin.settings.SltSettingsConfigurable"/>
 
-        <toolWindow factoryClass="com.en_circle.slt.plugin.SltProcessWindowFactory" id="Common Lisp"
+        <toolWindow factoryClass="com.en_circle.slt.plugin.SltWindowFactory" id="Common Lisp"
                     anchor="bottom" icon="/icons/fileicon.svg"/>
     </extensions>
 
@@ -54,5 +54,12 @@
                 class="com.en_circle.slt.plugin.actions.EvalRegionAction" text="Evaluate Selected Region">
             <add-to-group group-id="EditorPopupMenu" anchor="last"/>
         </action>
+
+        <action id="com.en_circle.slt.plugin.actions.EvalPreviousFormAction"
+                icon="/icons/fileicon.svg"
+                class="com.en_circle.slt.plugin.actions.EvalRegionAction" text="Evaluate Previous Form">
+            <add-to-group group-id="EditorPopupMenu" anchor="after" relative-to-action="com.en_circle.slt.plugin.actions.EvalRegionAction" />
+        </action>
     </actions>
+
 </idea-plugin>

@@ -4,6 +4,7 @@ import com.en_circle.slt.plugin.SltSBCL;
 import com.en_circle.slt.plugin.SltSBCL.SBCLServerListener;
 import com.en_circle.slt.plugin.swank.SwankServer;
 import com.en_circle.slt.plugin.swank.SwankServer.SwankServerOutput;
+import com.en_circle.slt.plugin.view.console.SltConsole;
 import com.intellij.icons.AllIcons;
 import com.intellij.icons.AllIcons.Actions;
 import com.intellij.icons.AllIcons.General;
@@ -30,6 +31,7 @@ public class SltCoreWindow implements SBCLServerListener {
     private final JPanel content;
     private final JBTabsImpl tabs;
     private final List<SltComponent> components = Collections.synchronizedList(new ArrayList<>());
+    private final SltGeneralLog generalLog;
 
 
     public SltCoreWindow(ToolWindow toolWindow) {
@@ -41,6 +43,9 @@ public class SltCoreWindow implements SBCLServerListener {
         content = new JPanel(new BorderLayout());
         components.add(new SltOutputHandlerComponent(this, SwankServerOutput.STDOUT));
         components.add(new SltOutputHandlerComponent(this, SwankServerOutput.STDERR));
+        generalLog = new SltGeneralLog();
+        components.add(generalLog);
+        SltSBCL.getInstance().setRequestResponseLogger(generalLog);
 
         createSbclControls();
 
@@ -108,7 +113,7 @@ public class SltCoreWindow implements SBCLServerListener {
     }
 
     private void addRepl() {
-        SltConsole console = new SltConsole(this);
+        SltConsole console = new SltConsole(this.project);
         components.add(console);
         tabs.addTab(console.create());
         console.getTabInfo().setTabLabelActions(new DefaultActionGroup(new AnAction("Close", "", Actions.Close) {

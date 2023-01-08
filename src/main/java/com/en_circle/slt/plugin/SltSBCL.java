@@ -1,6 +1,7 @@
 package com.en_circle.slt.plugin;
 
 import com.en_circle.slt.plugin.swank.SlimeListener;
+import com.en_circle.slt.plugin.swank.SlimeListener.RequestResponseLogger;
 import com.en_circle.slt.plugin.swank.SlimeRequest;
 import com.en_circle.slt.plugin.swank.SwankClient;
 import com.en_circle.slt.plugin.swank.SwankServer;
@@ -23,6 +24,7 @@ public class SltSBCL {
     private SwankClient client;
     private SlimeListener slimeListener;
     private Project project;
+    private RequestResponseLogger logger;
     private final List<SBCLServerListener> serverListeners = Collections.synchronizedList(new ArrayList<>());
 
     public void start() throws Exception {
@@ -37,12 +39,16 @@ public class SltSBCL {
                     }
                 });
 
-        slimeListener = new SlimeListener(project, true);
+        slimeListener = new SlimeListener(project, true, logger);
         client = new SwankClient("127.0.0.1", SltState.getInstance().port, slimeListener);
 
         for (SBCLServerListener listener : serverListeners) {
             listener.onPostStart();
         }
+    }
+
+    public void setRequestResponseLogger(RequestResponseLogger logger) {
+        this.logger = logger;
     }
 
     public void sendToSbcl(SlimeRequest request) throws Exception {
@@ -89,6 +95,7 @@ public class SltSBCL {
     }
 
     public interface SBCLServerListener extends SwankServerListener {
+
         void onPreStart();
         void onPostStart();
         void onPreStop();

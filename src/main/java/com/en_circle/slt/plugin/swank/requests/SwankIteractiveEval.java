@@ -31,7 +31,7 @@ public class SwankIteractiveEval extends SlimeRequest {
     public void processReply(LispList data) {
         if (isOk(data)) {
             String returnedText = ((LispString) data.getItems().get(1)).getValue();
-            callback.onResult(returnedText);
+            callback.onResult(returnedText.substring(4, returnedText.length()-1));
         }
     }
 

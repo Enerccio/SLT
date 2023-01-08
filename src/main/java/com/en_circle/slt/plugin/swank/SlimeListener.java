@@ -30,16 +30,21 @@ public class SlimeListener implements SwankClient.SwankReply {
     private final Project project;
     private final boolean fromUi;
     private final Map<BigInteger, SlimeRequest> requests = Collections.synchronizedMap(new HashMap<>());
+    private final RequestResponseLogger logger;
 
-    public SlimeListener(Project project, boolean fromUi) {
+    public SlimeListener(Project project, boolean fromUi, RequestResponseLogger logger) {
         this.project = project;
         this.fromUi = fromUi;
+        this.logger = logger;
     }
 
     public void call(SlimeRequest request, SwankClient client) {
         BigInteger requestId = nextRpc();
         requests.put(requestId, request);
         SlimePacket packet = request.createPacket(requestId);
+        if (logger != null) {
+            logger.logRequest(packet.getSentData());
+        }
         client.swankSend(packet);
     }
 
@@ -55,6 +60,10 @@ public class SlimeListener implements SwankClient.SwankReply {
     }
 
     private void resolve(String data) {
+        if (logger != null) {
+            logger.logResponse(data);
+        }
+
         PsiFile source;
         if (project == null) {
             LispCoreProjectEnvironment projectEnvironment = new LispCoreProjectEnvironment();
@@ -96,6 +105,13 @@ public class SlimeListener implements SwankClient.SwankReply {
         } finally {
             requests.remove(replyId.getValue());
         }
+    }
+
+    public interface RequestResponseLogger {
+
+        void logRequest(String request);
+        void logResponse(String response);
+
     }
 
 }

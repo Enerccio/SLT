@@ -14,7 +14,7 @@ public class SlimeTest {
             AtomicLong sent = new AtomicLong();
             AtomicLong expected = new AtomicLong();
             SwankServer.startSbcl("sbcl", 4005);
-            SlimeListener listener = new SlimeListener(null, false);
+            SlimeListener listener = new SlimeListener(null, false, null);
             try (SwankClient client = new SwankClient("127.0.0.1", 4005, packet -> {
                 listener.onSwankMessage(packet);
                 expected.addAndGet(1);
