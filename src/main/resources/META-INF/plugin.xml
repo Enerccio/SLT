@@ -55,10 +55,22 @@
             <add-to-group group-id="EditorPopupMenu" anchor="last"/>
         </action>
 
+        <action id="com.en_circle.slt.plugin.actions.EvalCurrentFormAction"
+                icon="/icons/fileicon.svg"
+                class="com.en_circle.slt.plugin.actions.EvalCurrentFormAction" text="Evaluate This S-Expression">
+            <add-to-group group-id="EditorPopupMenu" anchor="after" relative-to-action="com.en_circle.slt.plugin.actions.EvalRegionAction" />
+        </action>
+
         <action id="com.en_circle.slt.plugin.actions.EvalPreviousFormAction"
                 icon="/icons/fileicon.svg"
-                class="com.en_circle.slt.plugin.actions.EvalRegionAction" text="Evaluate Previous Form">
-            <add-to-group group-id="EditorPopupMenu" anchor="after" relative-to-action="com.en_circle.slt.plugin.actions.EvalRegionAction" />
+                class="com.en_circle.slt.plugin.actions.EvalPreviousFormAction" text="Evaluate Previous S-Expression">
+            <add-to-group group-id="EditorPopupMenu" anchor="after" relative-to-action="com.en_circle.slt.plugin.actions.EvalCurrentFormAction" />
+        </action>
+
+        <action id="com.en_circle.slt.plugin.actions.EvalNextFormAction"
+                icon="/icons/fileicon.svg"
+                class="com.en_circle.slt.plugin.actions.EvalNextFormAction" text="Evaluate Next S-Expression">
+            <add-to-group group-id="EditorPopupMenu" anchor="after" relative-to-action="com.en_circle.slt.plugin.actions.EvalPreviousFormAction" />
         </action>
     </actions>
 
