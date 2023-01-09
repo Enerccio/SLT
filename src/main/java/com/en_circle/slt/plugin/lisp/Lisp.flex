@@ -107,6 +107,9 @@ IDENTIFIER_TOKEN_START=[^\ \r\n\f\r\t\(\)\,\@`\'\"0123456789\.]
     \\r                            { string.append('\r'); }
     \\\"                           { string.append('\"'); }
     \\                             { string.append('\\'); }
+
+   <<EOF>> { yybegin(YYINITIAL);
+                                                return LispTypes.STRING_TOKEN; }
   }
 
 <IDENTIFIER> {

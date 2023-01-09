@@ -12,6 +12,7 @@ public class CommonLispHighlighterColors {
     public static TextAttributesKey COMMENT = TextAttributesKey.createTextAttributesKey("CL.COMMENT", DefaultLanguageHighlighterColors.BLOCK_COMMENT);
     public static TextAttributesKey PARENTS = TextAttributesKey.createTextAttributesKey("CL.PARENTS", DefaultLanguageHighlighterColors.PARENTHESES);
     public static TextAttributesKey NUMBER = TextAttributesKey.createTextAttributesKey("CL.NUMBER", DefaultLanguageHighlighterColors.NUMBER);
+    public static TextAttributesKey STRING = TextAttributesKey.createTextAttributesKey("CL.STRING", DefaultLanguageHighlighterColors.STRING);
 
     public static TextAttributesKey SPECIAL_FORM = TextAttributesKey.createTextAttributesKey("CL.SPECIAL_FORM", DefaultLanguageHighlighterColors.KEYWORD);
     public static TextAttributesKey FUNCTION = TextAttributesKey.createTextAttributesKey("CL.FUNCTION", DefaultLanguageHighlighterColors.FUNCTION_CALL);

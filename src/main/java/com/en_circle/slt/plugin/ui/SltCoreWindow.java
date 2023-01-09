@@ -1,5 +1,6 @@
 package com.en_circle.slt.plugin.ui;
 
+import com.en_circle.slt.plugin.SltCommonLispFileType;
 import com.en_circle.slt.plugin.SltSBCL;
 import com.en_circle.slt.plugin.SltSBCL.SBCLServerListener;
 import com.en_circle.slt.plugin.swank.SwankServer;
@@ -11,10 +12,15 @@ import com.intellij.icons.AllIcons.General;
 import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
+import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.wm.ToolWindow;
+import com.intellij.psi.PsiFile;
+import com.intellij.psi.PsiManager;
 import com.intellij.ui.tabs.impl.JBTabsImpl;
+import com.intellij.util.FileContentUtil;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
@@ -91,6 +97,16 @@ public class SltCoreWindow implements SBCLServerListener {
 
             Messages.showErrorDialog(project, e.getMessage(), "Failed to Start SBCL");
         }
+
+        PsiManager psiManager = PsiManager.getInstance(project);
+        List<VirtualFile> toReparse = new ArrayList<>();
+        for (VirtualFile vf : FileEditorManager.getInstance(project).getOpenFiles()) {
+            PsiFile psiFile = psiManager.findFile(vf);
+            if (psiFile != null && psiFile.getFileType().equals(SltCommonLispFileType.INSTANCE)) {
+                toReparse.add(vf);
+            }
+        }
+        FileContentUtil.reparseFiles(project, toReparse, false);
     }
 
     public void stop() {

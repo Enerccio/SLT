@@ -15,7 +15,7 @@ public class CallFormAnnotator implements Annotator {
     public void annotate(@NotNull PsiElement element, @NotNull AnnotationHolder holder) {
         String text = LispPsiImplUtil.getSExpressionHead(element);
         if (text != null) {
-            SymbolState state = SltSBCL.getInstance().refreshSymbolFromServer(SltSBCL.getInstance().getGlobalPackage(), text);
+            SymbolState state = SltSBCL.getInstance().refreshSymbolFromServer(SltSBCL.getInstance().getGlobalPackage(), text, element);
             setHighlight(element, holder, state);
         }
     }

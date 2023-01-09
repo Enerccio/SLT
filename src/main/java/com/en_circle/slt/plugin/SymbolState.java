@@ -3,6 +3,7 @@ package com.en_circle.slt.plugin;
 public class SymbolState {
 
     public final String name;
+    public Long timestamp = null;
 
     public SymbolBinding binding = SymbolBinding.NONE;
     public String documentation;

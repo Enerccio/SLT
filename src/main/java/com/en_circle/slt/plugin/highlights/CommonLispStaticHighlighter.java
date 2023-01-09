@@ -18,6 +18,7 @@ public class CommonLispStaticHighlighter extends SyntaxHighlighterBase {
         SyntaxHighlighterBase.fillMap(colors, CommonLispHighlighterColors.COMMENT, LispTypes.COMMENT);
         SyntaxHighlighterBase.fillMap(colors, CommonLispHighlighterColors.PARENTS, LispTypes.LPAREN, LispTypes.RPAREN);
         SyntaxHighlighterBase.fillMap(colors, CommonLispHighlighterColors.NUMBER, LispTypes.NUMBER_TOKEN);
+        SyntaxHighlighterBase.fillMap(colors, CommonLispHighlighterColors.STRING, LispTypes.STRING_TOKEN);
     }
 
     @Override

@@ -512,13 +512,18 @@ class LispLexer implements FlexLexer {
         zzAtEOF = true;
         zzDoEOF();
         switch (zzLexicalState) {
+            case STRING: {
+              yybegin(YYINITIAL);
+                                                return LispTypes.STRING_TOKEN;
+            }  // fall though
+            case 37: break;
             case IDENTIFIER: {
               IElementType ret = processIdentifier(false);
           if (ret != null) {
               return ret;
           }
             }  // fall though
-            case 37: break;
+            case 38: break;
             default:
         return null;
         }

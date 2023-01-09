@@ -14,7 +14,7 @@ public class SltDocumentationProvider extends AbstractDocumentationProvider {
     public @Nullable @Nls String getQuickNavigateInfo(PsiElement element, PsiElement originalElement) {
         String text = LispPsiImplUtil.getSExpressionHead(element);
         if (text != null) {
-            SymbolState state = SltSBCL.getInstance().refreshSymbolFromServer(SltSBCL.getInstance().getGlobalPackage(), text);
+            SymbolState state = SltSBCL.getInstance().refreshSymbolFromServer(SltSBCL.getInstance().getGlobalPackage(), text, element);
             switch (state.binding) {
                 case NONE:
                     return "Symbol " + text;
@@ -33,7 +33,7 @@ public class SltDocumentationProvider extends AbstractDocumentationProvider {
     public @Nullable @Nls String generateDoc(PsiElement element, @Nullable PsiElement originalElement) {
         String text = LispPsiImplUtil.getSExpressionHead(element);
         if (text != null) {
-            SymbolState state = SltSBCL.getInstance().refreshSymbolFromServer(SltSBCL.getInstance().getGlobalPackage(), text);
+            SymbolState state = SltSBCL.getInstance().refreshSymbolFromServer(SltSBCL.getInstance().getGlobalPackage(), text, element);
             return asHtml(state.documentation);
         }
         return null;

@@ -1,7 +1,6 @@
-package com.en_circle.slt.plugin;
+package com.en_circle.slt.plugin.highlights;
 
-import com.en_circle.slt.plugin.highlights.CommonLispHighlighterColors;
-import com.en_circle.slt.plugin.highlights.CommonLispStaticHighlighter;
+import com.en_circle.slt.plugin.SltIconProvider;
 import com.intellij.openapi.editor.colors.TextAttributesKey;
 import com.intellij.openapi.fileTypes.SyntaxHighlighter;
 import com.intellij.openapi.options.colors.AttributesDescriptor;
@@ -35,10 +34,11 @@ public class SltColorSettingsPage implements ColorSettingsPage {
     private static final AttributesDescriptor[] DESCRIPTORS = new AttributesDescriptor[] {
             new AttributesDescriptor("Parenthesis", CommonLispHighlighterColors.PARENTS),
             new AttributesDescriptor("Number", CommonLispHighlighterColors.NUMBER),
+            new AttributesDescriptor("String literal", CommonLispHighlighterColors.STRING),
             new AttributesDescriptor("Comment", CommonLispHighlighterColors.COMMENT),
-            new AttributesDescriptor("Special Form", CommonLispHighlighterColors.SPECIAL_FORM),
-            new AttributesDescriptor("Function Call", CommonLispHighlighterColors.FUNCTION),
-            new AttributesDescriptor("Macro Call", CommonLispHighlighterColors.MACRO),
+            new AttributesDescriptor("Special form", CommonLispHighlighterColors.SPECIAL_FORM),
+            new AttributesDescriptor("Function call", CommonLispHighlighterColors.FUNCTION),
+            new AttributesDescriptor("Macro call", CommonLispHighlighterColors.MACRO),
     };
 
     @Override

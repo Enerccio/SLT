@@ -13,6 +13,9 @@ import com.en_circle.slt.plugin.swank.SwankServer;
 import com.en_circle.slt.plugin.swank.SwankServer.SwankServerListener;
 import com.en_circle.slt.plugin.swank.requests.SwankEvalAndGrab;
 import com.intellij.openapi.project.Project;
+import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiFile;
+import com.intellij.util.FileContentUtilCore;
 
 import java.io.IOException;
 import java.util.*;
@@ -108,14 +111,14 @@ public class SltSBCL {
     }
 
     public SymbolState getOrCreateBinding(String packageName, String symbolName) {
-        return symbolInformation.computeIfAbsent(packageName + ":" + symbolName, x -> new SymbolState(x));
+        return symbolInformation.computeIfAbsent(packageName + ":" + symbolName, SymbolState::new);
     }
 
-    public SymbolState refreshSymbolFromServer(String packageName, String symbolName) {
+    public SymbolState refreshSymbolFromServer(String packageName, String symbolName, PsiElement element) {
         SymbolState state = getOrCreateBinding(packageName, symbolName);
         SymbolBinding currentBinding = state.binding;
         try {
-            if (currentBinding == SymbolBinding.NONE || checkCache(state)) {
+            if (currentBinding == SymbolBinding.NONE || cacheInvalid(state)) {
                 sendToSbcl(SwankEvalAndGrab.eval(
                         String.format(
                                 "(let ((test-sym '%s) (*standard-output* (make-string-output-stream))) \n" +
@@ -133,23 +136,38 @@ public class SltSBCL {
                             if (parsed.size() == 1 && parsed.get(0).getType() == LispElementType.LIST) {
                                 LispList list = (LispList) parsed.get(0);
                                 String symValue = ((LispSymbol) list.getItems().get(0)).getValue().toUpperCase();
+                                boolean changed = false;
+                                state.timestamp = System.currentTimeMillis();
                                 switch (symValue) {
                                     case ":SPECIAL-FORM":
+                                        changed |= state.binding != SymbolBinding.SPECIAL_FORM;
                                         state.binding = SymbolBinding.SPECIAL_FORM;
                                         break;
                                     case ":MACRO":
+                                        changed |= state.binding != SymbolBinding.MACRO;
                                         state.binding = SymbolBinding.MACRO;
                                         break;
                                     case ":FUNCTION":
+                                        changed |= state.binding != SymbolBinding.FUNCTION;
                                         state.binding = SymbolBinding.FUNCTION;
                                         break;
                                     default:
+                                        changed |= state.binding != SymbolBinding.NONE;
                                         state.binding = SymbolBinding.NONE;
                                         break;
                                 }
+                                boolean hasDoc = state.documentation != null;
                                 state.documentation = null;
                                 if (list.getItems().get(1) instanceof LispString) {
                                     state.documentation = ((LispString) list.getItems().get(1)).getValue();
+                                    if (!hasDoc) {
+                                        changed = true;
+                                    }
+                                }
+
+                                if (changed) {
+                                    PsiFile file = element.getContainingFile();
+                                    FileContentUtilCore.reparseFiles(file.getVirtualFile());
                                 }
                             }
                         }), false);
@@ -160,9 +178,13 @@ public class SltSBCL {
         return state;
     }
 
-    private boolean checkCache(SymbolState state) {
-        // TODO?
-        return false;
+    private boolean cacheInvalid(SymbolState state) {
+        if (state.timestamp == null)
+            return false;
+        if (System.currentTimeMillis() - state.timestamp > 10000)
+            return false;
+
+        return true;
     }
 
     public interface SBCLServerListener extends SwankServerListener {

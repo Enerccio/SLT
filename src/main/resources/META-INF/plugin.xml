@@ -50,7 +50,7 @@
         <lang.syntaxHighlighter language="Common Lisp"
                                 implementationClass="com.en_circle.slt.plugin.highlights.CommonLispStaticHighlighter"/>
 
-        <colorSettingsPage implementation="com.en_circle.slt.plugin.SltColorSettingsPage"/>
+        <colorSettingsPage implementation="com.en_circle.slt.plugin.highlights.SltColorSettingsPage"/>
 
         <lang.syntaxHighlighterFactory language="Common Lisp"
                 implementationClass="com.en_circle.slt.plugin.highlights.CommonLispStaticHighlighterFactory"/>
