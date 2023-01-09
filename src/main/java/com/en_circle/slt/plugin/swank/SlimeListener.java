@@ -5,6 +5,7 @@ import com.en_circle.slt.plugin.SltCommonLispLanguage;
 import com.en_circle.slt.plugin.SltCommonLispParserDefinition;
 import com.en_circle.slt.plugin.lisp.lisp.*;
 import com.en_circle.slt.plugin.lisp.psi.LispCoreProjectEnvironment;
+import com.en_circle.slt.plugin.swank.requests.SwankEvalAndGrab;
 import com.en_circle.slt.plugin.swank.requests.SwankIteractiveEval;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
@@ -41,7 +42,7 @@ public class SlimeListener implements SwankClient.SwankReply {
     public void call(SlimeRequest request, SwankClient client) {
         BigInteger requestId = nextRpc();
         requests.put(requestId, request);
-        SlimePacket packet = request.createPacket(requestId);
+        SwankPacket packet = request.createPacket(requestId);
         if (logger != null) {
             logger.logRequest(packet.getSentData());
         }
@@ -49,7 +50,7 @@ public class SlimeListener implements SwankClient.SwankReply {
     }
 
     @Override
-    public void onSwankMessage(SlimePacket packet) {
+    public void onSwankMessage(SwankPacket packet) {
         String data = packet.getSentData();
 
         if (fromUi) {
@@ -76,16 +77,32 @@ public class SlimeListener implements SwankClient.SwankReply {
             source = factory.createFileFromText("swank-reply.cl", SltCommonLispFileType.INSTANCE, data);
         }
 
-        List<LispElement> elements = LispUtils.convertAst(source);
+        List<LispElement> elements = parse(data);
         if (elements.size() == 1) {
             LispElement element = elements.get(0);
-            if (element instanceof LispList ) {
+            if (element instanceof LispList) {
                 LispList reply = (LispList) element;
                 if (isReturn(reply)) {
                     processReturn(reply);
                 }
             }
         }
+    }
+
+    private List<LispElement> parse(String data) {
+        PsiFile source;
+        if (project == null) {
+            LispCoreProjectEnvironment projectEnvironment = new LispCoreProjectEnvironment();
+            projectEnvironment.getEnvironment()
+                    .registerParserDefinition(SltCommonLispLanguage.INSTANCE, new SltCommonLispParserDefinition());
+            PsiFileFactory factory = PsiFileFactory.getInstance(projectEnvironment.getProject());
+            source = factory.createFileFromText("swank-reply.cl", SltCommonLispFileType.INSTANCE, data);
+        } else {
+            PsiFileFactory factory = PsiFileFactory.getInstance(project);
+            source = factory.createFileFromText("swank-reply.cl", SltCommonLispFileType.INSTANCE, data);
+        }
+
+        return LispUtils.convertAst(source);
     }
 
     private boolean isReturn(LispList reply) {
@@ -101,6 +118,11 @@ public class SlimeListener implements SwankClient.SwankReply {
             if (request instanceof SwankIteractiveEval) {
                 SwankIteractiveEval eval = (SwankIteractiveEval) request;
                 eval.processReply((LispList) reply.getItems().get(1));
+            }
+
+            if (request instanceof SwankEvalAndGrab) {
+                SwankEvalAndGrab evalAndGrab = (SwankEvalAndGrab) request;
+                evalAndGrab.processReply((LispList) reply.getItems().get(1), this::parse);
             }
         } finally {
             requests.remove(replyId.getValue());

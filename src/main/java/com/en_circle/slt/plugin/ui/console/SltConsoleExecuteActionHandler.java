@@ -1,4 +1,4 @@
-package com.en_circle.slt.plugin.view.console;
+package com.en_circle.slt.plugin.ui.console;
 
 import com.intellij.execution.console.BaseConsoleExecuteActionHandler;
 import com.intellij.execution.console.LanguageConsoleView;

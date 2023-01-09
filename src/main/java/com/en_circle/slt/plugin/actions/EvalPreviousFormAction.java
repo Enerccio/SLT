@@ -15,7 +15,7 @@ public class EvalPreviousFormAction extends EvalFormActionBase {
             if (element != null) {
                 if (!(element instanceof PsiWhiteSpace)) {
                     ASTNode node = element.getNode();
-                    if (node.getElementType() == LispTypes.RPARAM) {
+                    if (node.getElementType() == LispTypes.RPAREN) {
                         return element;
                     }
                 }

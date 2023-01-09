@@ -20,11 +20,11 @@ lispFile ::= sexpr*
 
 sexpr ::= sugar* (pair|list|atom|COMMENT)
 
-list ::= LPARAM sexpr* RPARAM
+list ::= LPAREN sexpr* RPAREN
 
-pair ::= LPARAM sexpr+ DOT sexpr RPARAM
+pair ::= LPAREN sexpr+ DOT sexpr RPAREN
 
-sugar ::= (QUOTE | BACKQUOTE | (COMMA AMPERSAND?))
+sugar ::= (QUOTE | BACKQUOTE | (COMMA AMPERSAND?) | (HASHTAG COMMA?))
 
 atom ::= number | string | symbol
 
@@ -32,4 +32,8 @@ number ::= NUMBER_TOKEN
 
 string ::= STRING_TOKEN
 
-symbol ::= IDENTIFIER_TOKEN
+symbol ::= IDENTIFIER_TOKEN {
+    mixin="com.en_circle.slt.plugin.lisp.psi.impl.LispNamedElementImpl"
+  implements="com.en_circle.slt.plugin.lisp.psi.LispNamedElement"
+  methods=[getName setName getNameIdentifier]
+}

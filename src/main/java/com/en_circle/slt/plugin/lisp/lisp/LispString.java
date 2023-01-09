@@ -3,7 +3,7 @@ package com.en_circle.slt.plugin.lisp.lisp;
 public class LispString extends LispAtom<String> {
 
     public LispString(String value) {
-        super(value);
+        super(value.substring(1, value.length() - 1));
     }
 
     @Override

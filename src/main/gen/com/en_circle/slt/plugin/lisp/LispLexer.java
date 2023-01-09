@@ -2,10 +2,10 @@
 
 package com.en_circle.slt.plugin.lisp;
 
-import com.intellij.lexer.FlexLexer;
-import com.intellij.psi.tree.IElementType;
-import com.intellij.psi.TokenType;
 import com.en_circle.slt.plugin.lisp.psi.LispTypes;
+import com.intellij.lexer.FlexLexer;
+import com.intellij.psi.TokenType;
+import com.intellij.psi.tree.IElementType;
 
 
 /**
@@ -25,6 +25,7 @@ class LispLexer implements FlexLexer {
   public static final int YYINITIAL = 0;
   public static final int STRING = 2;
   public static final int IDENTIFIER = 4;
+  public static final int BLOCKCOMMENT = 6;
 
   /**
    * ZZ_LEXSTATE[l] is the state in the DFA for the lexical state l
@@ -33,7 +34,7 @@ class LispLexer implements FlexLexer {
    * l is of the form l = 2*k, k a non negative integer
    */
   private static final int ZZ_LEXSTATE[] = { 
-     0,  0,  1,  1,  2, 2
+     0,  0,  1,  1,  2,  2,  3, 3
   };
 
   /** 
@@ -55,9 +56,9 @@ class LispLexer implements FlexLexer {
 
   /* The ZZ_CMAP_A table has 256 entries */
   static final char ZZ_CMAP_A[] = zzUnpackCMap(
-    "\11\0\1\1\1\3\1\0\1\1\1\3\22\0\1\1\1\0\1\23\4\0\1\11\1\4\1\5\2\0\1\6\1\0\1"+
-    "\12\1\0\1\13\1\16\6\20\2\14\1\0\1\2\4\0\1\7\6\22\25\0\1\24\3\0\1\10\1\22\1"+
-    "\15\4\22\7\0\1\26\1\17\2\0\1\27\1\0\1\25\3\0\1\21\3\0\1\22\203\0");
+    "\11\0\1\1\1\3\1\0\1\1\1\3\22\0\1\1\1\0\1\24\1\13\3\0\1\11\1\4\1\5\1\25\1\0"+
+    "\1\6\1\0\1\12\1\0\1\14\1\17\6\21\2\15\1\0\1\2\4\0\1\7\6\23\25\0\1\26\3\0\1"+
+    "\10\1\23\1\16\4\23\7\0\1\30\1\20\2\0\1\31\1\0\1\27\3\0\1\22\3\0\1\23\203\0");
 
   /** 
    * Translates DFA states to action switch labels.
@@ -65,13 +66,13 @@ class LispLexer implements FlexLexer {
   private static final int [] ZZ_ACTION = zzUnpackAction();
 
   private static final String ZZ_ACTION_PACKED_0 =
-    "\3\0\1\1\1\2\1\3\1\4\1\5\1\6\1\7"+
-    "\1\10\1\11\1\12\2\13\1\14\1\15\1\16\1\17"+
-    "\1\20\1\21\1\22\1\0\3\13\1\23\1\24\1\25"+
-    "\1\26\2\13";
+    "\4\0\1\1\1\2\1\3\1\4\1\5\1\6\1\7"+
+    "\1\10\1\11\1\12\1\13\2\14\1\15\1\16\1\17"+
+    "\1\20\1\21\2\22\1\23\1\24\1\0\3\14\1\25"+
+    "\1\26\1\27\1\30\2\14";
 
   private static int [] zzUnpackAction() {
-    int [] result = new int[32];
+    int [] result = new int[36];
     int offset = 0;
     offset = zzUnpackAction(ZZ_ACTION_PACKED_0, offset, result);
     return result;
@@ -96,13 +97,14 @@ class LispLexer implements FlexLexer {
   private static final int [] ZZ_ROWMAP = zzUnpackRowMap();
 
   private static final String ZZ_ROWMAP_PACKED_0 =
-    "\0\0\0\30\0\60\0\110\0\140\0\170\0\110\0\110"+
-    "\0\110\0\110\0\110\0\110\0\110\0\220\0\250\0\110"+
-    "\0\300\0\110\0\110\0\330\0\360\0\110\0\u0108\0\u0120"+
-    "\0\u0138\0\u0150\0\110\0\110\0\110\0\110\0\110\0\u0168";
+    "\0\0\0\32\0\64\0\116\0\150\0\202\0\234\0\150"+
+    "\0\150\0\150\0\150\0\150\0\150\0\150\0\150\0\266"+
+    "\0\320\0\150\0\352\0\150\0\u0104\0\u011e\0\150\0\u011e"+
+    "\0\u0138\0\150\0\u0152\0\u016c\0\u0186\0\u01a0\0\150\0\150"+
+    "\0\150\0\150\0\150\0\u01ba";
 
   private static int [] zzUnpackRowMap() {
-    int [] result = new int[32];
+    int [] result = new int[36];
     int offset = 0;
     offset = zzUnpackRowMap(ZZ_ROWMAP_PACKED_0, offset, result);
     return result;
@@ -125,22 +127,23 @@ class LispLexer implements FlexLexer {
   private static final int [] ZZ_TRANS = zzUnpackTrans();
 
   private static final String ZZ_TRANS_PACKED_0 =
-    "\1\4\1\5\1\6\1\5\1\7\1\10\1\11\1\12"+
-    "\1\13\1\14\1\15\1\16\1\17\1\4\1\17\1\4"+
-    "\1\17\2\4\1\20\4\4\3\21\1\22\17\21\1\23"+
-    "\1\24\3\21\1\25\11\26\11\25\1\26\4\25\31\0"+
-    "\1\5\1\0\1\5\24\0\3\6\1\0\24\6\12\0"+
-    "\1\27\2\0\1\30\1\0\1\31\1\0\1\32\20\0"+
-    "\1\27\2\17\1\0\1\17\1\0\1\17\7\0\3\21"+
-    "\1\0\17\21\2\0\3\21\23\0\1\33\1\0\1\34"+
-    "\1\35\1\36\1\25\11\0\11\25\1\0\4\25\13\0"+
-    "\1\37\1\40\1\0\1\40\1\0\1\40\22\0\1\30"+
-    "\2\0\1\30\24\0\1\31\2\0\1\31\1\0\1\31"+
-    "\13\0\2\32\6\0\3\32\1\0\1\32\1\0\1\32"+
-    "\20\0\2\40\1\0\1\40\1\0\1\40\7\0";
+    "\1\5\1\6\1\7\1\6\1\10\1\11\1\12\1\13"+
+    "\1\14\1\15\1\16\1\17\1\20\1\21\1\5\1\21"+
+    "\1\5\1\21\2\5\1\22\5\5\24\23\1\24\1\23"+
+    "\1\25\3\23\1\26\11\27\1\26\1\30\10\26\1\27"+
+    "\5\26\25\31\1\32\4\31\33\0\1\6\1\0\1\6"+
+    "\26\0\3\7\1\0\26\7\12\0\1\33\3\0\1\34"+
+    "\1\0\1\35\1\0\1\36\21\0\1\33\1\0\2\21"+
+    "\1\0\1\21\1\0\1\21\10\0\24\23\1\0\1\23"+
+    "\1\0\3\23\24\0\1\37\2\0\1\40\1\41\1\42"+
+    "\1\26\11\0\12\26\1\0\5\26\25\31\1\0\4\31"+
+    "\14\0\1\43\1\44\1\0\1\44\1\0\1\44\24\0"+
+    "\1\34\2\0\1\34\26\0\1\35\2\0\1\35\1\0"+
+    "\1\35\14\0\2\36\7\0\3\36\1\0\1\36\1\0"+
+    "\1\36\22\0\2\44\1\0\1\44\1\0\1\44\10\0";
 
   private static int [] zzUnpackTrans() {
-    int [] result = new int[384];
+    int [] result = new int[468];
     int offset = 0;
     offset = zzUnpackTrans(ZZ_TRANS_PACKED_0, offset, result);
     return result;
@@ -178,11 +181,11 @@ class LispLexer implements FlexLexer {
   private static final int [] ZZ_ATTRIBUTE = zzUnpackAttribute();
 
   private static final String ZZ_ATTRIBUTE_PACKED_0 =
-    "\3\0\1\11\2\1\7\11\2\1\1\11\1\1\2\11"+
-    "\2\1\1\11\1\0\3\1\5\11\1\1";
+    "\4\0\1\11\2\1\10\11\2\1\1\11\1\1\1\11"+
+    "\2\1\1\11\2\1\1\11\1\0\3\1\5\11\1\1";
 
   private static int [] zzUnpackAttribute() {
-    int [] result = new int[32];
+    int [] result = new int[36];
     int offset = 0;
     offset = zzUnpackAttribute(ZZ_ATTRIBUTE_PACKED_0, offset, result);
     return result;
@@ -238,14 +241,19 @@ class LispLexer implements FlexLexer {
   private boolean zzEOFDone;
 
   /* user code: */
+  StringBuffer comment = new StringBuffer();
   StringBuffer string = new StringBuffer();
   StringBuffer identifier = new StringBuffer();
 
   IElementType processIdentifier(boolean unread) {
+        String value = identifier.toString();
+        if ("*|".equals(value)) {
+            yybegin(BLOCKCOMMENT);
+            return null;
+        }
         yybegin(YYINITIAL);
         if (unread)
           yypushback(1);
-        String value = identifier.toString();
         return LispTypes.IDENTIFIER_TOKEN;
     }
 
@@ -505,9 +513,12 @@ class LispLexer implements FlexLexer {
         zzDoEOF();
         switch (zzLexicalState) {
             case IDENTIFIER: {
-              return processIdentifier(false);
+              IElementType ret = processIdentifier(false);
+          if (ret != null) {
+              return ret;
+          }
             }  // fall though
-            case 33: break;
+            case 37: break;
             default:
         return null;
         }
@@ -518,114 +529,130 @@ class LispLexer implements FlexLexer {
             { identifier.setLength(0); identifier.append(yytext()); yybegin(IDENTIFIER);
             } 
             // fall through
-          case 23: break;
+          case 25: break;
           case 2: 
             { yybegin(YYINITIAL); return TokenType.WHITE_SPACE;
             } 
             // fall through
-          case 24: break;
+          case 26: break;
           case 3: 
             { yybegin(YYINITIAL); return LispTypes.COMMENT;
             } 
             // fall through
-          case 25: break;
-          case 4: 
-            { yybegin(YYINITIAL); return LispTypes.LPARAM;
-            } 
-            // fall through
-          case 26: break;
-          case 5: 
-            { yybegin(YYINITIAL); return LispTypes.RPARAM;
-            } 
-            // fall through
           case 27: break;
+          case 4: 
+            { yybegin(YYINITIAL); return LispTypes.LPAREN;
+            } 
+            // fall through
+          case 28: break;
+          case 5: 
+            { yybegin(YYINITIAL); return LispTypes.RPAREN;
+            } 
+            // fall through
+          case 29: break;
           case 6: 
             { yybegin(YYINITIAL); return LispTypes.COMMA;
             } 
             // fall through
-          case 28: break;
+          case 30: break;
           case 7: 
             { yybegin(YYINITIAL); return LispTypes.AMPERSAND;
             } 
             // fall through
-          case 29: break;
+          case 31: break;
           case 8: 
             { yybegin(YYINITIAL); return LispTypes.BACKQUOTE;
             } 
             // fall through
-          case 30: break;
+          case 32: break;
           case 9: 
             { yybegin(YYINITIAL); return LispTypes.QUOTE;
             } 
             // fall through
-          case 31: break;
+          case 33: break;
           case 10: 
             { yybegin(YYINITIAL); return LispTypes.DOT;
             } 
             // fall through
-          case 32: break;
-          case 11: 
-            { yybegin(YYINITIAL); return LispTypes.NUMBER_TOKEN;
-            } 
-            // fall through
-          case 33: break;
-          case 12: 
-            { string.setLength(0); yybegin(STRING);
-            } 
-            // fall through
           case 34: break;
-          case 13: 
-            { string.append( yytext() );
+          case 11: 
+            { yybegin(YYINITIAL); return LispTypes.HASHTAG;
             } 
             // fall through
           case 35: break;
-          case 14: 
-            { throw new Error("Illegal character <"+
-                                                    yytext()+">");
+          case 12: 
+            { yybegin(YYINITIAL); return LispTypes.NUMBER_TOKEN;
             } 
             // fall through
           case 36: break;
+          case 13: 
+            { string.setLength(0); yybegin(STRING);
+            } 
+            // fall through
+          case 37: break;
+          case 14: 
+            { string.append( yytext() );
+            } 
+            // fall through
+          case 38: break;
           case 15: 
             { yybegin(YYINITIAL);
                                      return LispTypes.STRING_TOKEN;
             } 
             // fall through
-          case 37: break;
+          case 39: break;
           case 16: 
             { string.append('\\');
             } 
             // fall through
-          case 38: break;
+          case 40: break;
           case 17: 
             { identifier.append( yytext() );
             } 
             // fall through
-          case 39: break;
-          case 18: 
-            { return processIdentifier(true);
-            } 
-            // fall through
-          case 40: break;
-          case 19: 
-            { string.append('\"');
-            } 
-            // fall through
           case 41: break;
-          case 20: 
-            { string.append('\t');
+          case 18: 
+            { IElementType ret = processIdentifier(true);
+            if (ret != null) {
+                return ret;
+            }
             } 
             // fall through
           case 42: break;
-          case 21: 
-            { string.append('\n');
+          case 19: 
+            { comment.append(yytext());
             } 
             // fall through
           case 43: break;
-          case 22: 
-            { string.append('\r');
+          case 20: 
+            { if (comment.toString().endsWith("|")) {
+            yybegin(YYINITIAL); return LispTypes.COMMENT;
+        } else {
+            comment.append(yytext());
+        }
             } 
             // fall through
           case 44: break;
+          case 21: 
+            { string.append('\"');
+            } 
+            // fall through
+          case 45: break;
+          case 22: 
+            { string.append('\t');
+            } 
+            // fall through
+          case 46: break;
+          case 23: 
+            { string.append('\n');
+            } 
+            // fall through
+          case 47: break;
+          case 24: 
+            { string.append('\r');
+            } 
+            // fall through
+          case 48: break;
           default:
             zzScanError(ZZ_NO_MATCH);
           }

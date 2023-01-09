@@ -45,13 +45,15 @@ public class SwankClient implements AutoCloseable, Runnable {
         connection.setKeepAlive(true);
     }
 
-    public void swankSend(SlimePacket value) {
+    public void swankSend(SwankPacket value) {
         swankExecutor.submit(() -> {
-            try {
-                checkConnection();
-                value.writeTo(connection.getOutputStream());
-            } catch (Exception ignored) {
-                // TODO: maybe log
+            synchronized (this) {
+                try {
+                    checkConnection();
+                    value.writeTo(connection.getOutputStream());
+                } catch (Exception ignored) {
+                    // TODO: maybe log
+                }
             }
         });
     }
@@ -76,9 +78,10 @@ public class SwankClient implements AutoCloseable, Runnable {
             try {
                 checkConnection();
                 InputStream is = connection.getInputStream();
-                SlimePacket packet = SlimePacket.fromInput(is);
+                SwankPacket packet = SwankPacket.fromInput(is);
                 callback.onSwankMessage(packet);
             } catch (ConnectException | InterruptedException e) {
+                e.printStackTrace();
                 return;
             } catch (IOException e) {
                 if (e instanceof EOFException) {
@@ -91,7 +94,7 @@ public class SwankClient implements AutoCloseable, Runnable {
     }
 
     public interface SwankReply {
-        void onSwankMessage(SlimePacket packet);
+        void onSwankMessage(SwankPacket packet);
     }
 
 }

@@ -1,10 +1,10 @@
-package com.en_circle.slt.plugin.view;
+package com.en_circle.slt.plugin.ui;
 
 import com.en_circle.slt.plugin.SltSBCL;
 import com.en_circle.slt.plugin.SltSBCL.SBCLServerListener;
 import com.en_circle.slt.plugin.swank.SwankServer;
 import com.en_circle.slt.plugin.swank.SwankServer.SwankServerOutput;
-import com.en_circle.slt.plugin.view.console.SltConsole;
+import com.en_circle.slt.plugin.ui.console.SltConsole;
 import com.intellij.icons.AllIcons;
 import com.intellij.icons.AllIcons.Actions;
 import com.intellij.icons.AllIcons.General;

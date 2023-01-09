@@ -1,31 +1,27 @@
-package com.en_circle.slt.plugin.view;
+package com.en_circle.slt.plugin.ui;
 
+import com.en_circle.slt.plugin.swank.SlimeListener.RequestResponseLogger;
 import com.en_circle.slt.plugin.swank.SwankServer.SwankServerOutput;
+import com.en_circle.slt.tools.BufferedString;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.*;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.tabs.TabInfo;
-import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 import javax.swing.text.DefaultCaret;
 import java.awt.*;
 
-public class SltOutputHandlerComponent implements SltComponent {
+public class SltGeneralLog implements SltComponent, RequestResponseLogger {
 
-    private final SwankServerOutput output;
     private final JPanel dataContainer;
     private JTextArea area;
     private TabInfo tabInfo;
+    private BufferedString bufferedString;
 
-    public SltOutputHandlerComponent(SltCoreWindow coreWindow, SwankServerOutput output) {
-        this.output = output;
+    public SltGeneralLog() {
         this.dataContainer = new JPanel(new BorderLayout());
-    }
-
-    public SwankServerOutput getOutput() {
-        return output;
     }
 
     @Override
@@ -43,11 +39,21 @@ public class SltOutputHandlerComponent implements SltComponent {
         toolbar.setTargetComponent(dataContainer);
         dataContainer.add(toolbar.getComponent(), BorderLayout.EAST);
 
+        bufferedString = new BufferedString(data -> SwingUtilities.invokeLater(() -> {
+            area.setText(area.getText() + data);
+            if (caret.getUpdatePolicy() == DefaultCaret.ALWAYS_UPDATE)
+                area.setCaretPosition(area.getDocument().getLength());
+        }), fullData -> SwingUtilities.invokeLater(() -> {
+            area.setText(fullData);
+            if (caret.getUpdatePolicy() == DefaultCaret.ALWAYS_UPDATE)
+                area.setCaretPosition(area.getDocument().getLength());
+        }));
+
         controlGroup.add(new AnAction("Clear Text", "", AllIcons.Actions.GC) {
 
             @Override
             public void actionPerformed(@NotNull AnActionEvent e) {
-                area.setText("");
+                bufferedString.clear();
             }
         });
         controlGroup.add(new ToggleAction("Soft Wrap", "", AllIcons.Actions.ToggleSoftWrap) {
@@ -94,9 +100,7 @@ public class SltOutputHandlerComponent implements SltComponent {
 
     @Override
     public void onPreStart() {
-        if (StringUtils.isNotBlank(area.getText())) {
-            area.setText(area.getText() + "\n\n***\n\n");
-        }
+
     }
 
     @Override
@@ -106,12 +110,7 @@ public class SltOutputHandlerComponent implements SltComponent {
 
     @Override
     public void handleOutput(SwankServerOutput output, String data) {
-        if (output == this.output) {
-            area.setText(area.getText() + data);
-            DefaultCaret caret = (DefaultCaret) area.getCaret();
-            if (caret.getUpdatePolicy() == DefaultCaret.ALWAYS_UPDATE)
-                area.setCaretPosition(area.getDocument().getLength());
-        }
+
     }
 
     @Override
@@ -126,7 +125,16 @@ public class SltOutputHandlerComponent implements SltComponent {
 
     @Override
     public String getTitle() {
-        return getOutput() == SwankServerOutput.STDERR ? "Error Output" : "Standard Output";
+        return "Slime Log";
     }
 
+    @Override
+    public void logRequest(String request) {
+        bufferedString.append("\n\n" + request);
+    }
+
+    @Override
+    public void logResponse(String response) {
+        bufferedString.append("\n\n" + response);
+    }
 }

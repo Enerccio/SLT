@@ -3,8 +3,8 @@ package com.en_circle.slt.plugin.swank.requests;
 import com.en_circle.slt.plugin.lisp.lisp.LispList;
 import com.en_circle.slt.plugin.lisp.lisp.LispString;
 import com.en_circle.slt.plugin.lisp.lisp.LispSymbol;
-import com.en_circle.slt.plugin.swank.SlimePacket;
 import com.en_circle.slt.plugin.swank.SlimeRequest;
+import com.en_circle.slt.plugin.swank.SwankPacket;
 
 import java.math.BigInteger;
 
@@ -31,7 +31,7 @@ public class SwankIteractiveEval extends SlimeRequest {
     public void processReply(LispList data) {
         if (isOk(data)) {
             String returnedText = ((LispString) data.getItems().get(1)).getValue();
-            callback.onResult(returnedText.substring(4, returnedText.length()-1));
+            callback.onResult(returnedText.substring(3));
         }
     }
 
@@ -42,8 +42,8 @@ public class SwankIteractiveEval extends SlimeRequest {
     }
 
     @Override
-    public SlimePacket createPacket(BigInteger requestId) {
-        return SlimePacket.swankInteractiveEval(code, module, requestId);
+    public SwankPacket createPacket(BigInteger requestId) {
+        return SwankPacket.swankInteractiveEval(code, module, requestId);
     }
 
     public interface Callback {

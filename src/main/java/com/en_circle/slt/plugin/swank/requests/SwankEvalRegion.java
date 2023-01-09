@@ -1,7 +1,7 @@
 package com.en_circle.slt.plugin.swank.requests;
 
-import com.en_circle.slt.plugin.swank.SlimePacket;
 import com.en_circle.slt.plugin.swank.SlimeRequest;
+import com.en_circle.slt.plugin.swank.SwankPacket;
 
 import java.math.BigInteger;
 
@@ -20,7 +20,7 @@ public class SwankEvalRegion extends SwankIteractiveEval {
     }
 
     @Override
-    public SlimePacket createPacket(BigInteger requestId) {
-        return SlimePacket.evalRegion(code, module, requestId);
+    public SwankPacket createPacket(BigInteger requestId) {
+        return SwankPacket.evalRegion(code, module, requestId);
     }
 }

@@ -16,30 +16,37 @@ import com.en_circle.slt.plugin.lisp.psi.LispTypes;
 %eof}
 
 %{
+  StringBuffer comment = new StringBuffer();
   StringBuffer string = new StringBuffer();
   StringBuffer identifier = new StringBuffer();
 
   IElementType processIdentifier(boolean unread) {
+        String value = identifier.toString();
+        if ("*|".equals(value)) {
+            yybegin(BLOCKCOMMENT);
+            return null;
+        }
         yybegin(YYINITIAL);
         if (unread)
           yypushback(1);
-        String value = identifier.toString();
         return LispTypes.IDENTIFIER_TOKEN;
     }
 %}
 
 %state STRING
 %state IDENTIFIER
+%state BLOCKCOMMENT
 
 WHITE_SPACE=[\ \n\t\f\r]
 END_OF_LINE_COMMENT=(";")[^\r\n]*
-LPARAM=["("]
-RPARAM=[")"]
+LPAREN=["("]
+RPAREN=[")"]
 COMMA=[","]
 AMPERSAND=["@"]
 BACKQUOTE=["`"]
 QUOTE=["'"]
 DOT=["."]
+HASHTAG=["#"]
 INTEGER_LITERAL = 0 | [1-9][0-9]*
 BIN_LITERAL = (0b)[0-1]*
 OCT_LITERAL = (0o)[0-7]*
@@ -54,10 +61,10 @@ IDENTIFIER_TOKEN_START=[^\ \r\n\f\r\t\(\)\,\@`\'\"0123456789\.]
 <YYINITIAL> {WHITE_SPACE}+
     { yybegin(YYINITIAL); return TokenType.WHITE_SPACE; }
 
-<YYINITIAL> {LPARAM}
-    { yybegin(YYINITIAL); return LispTypes.LPARAM; }
-<YYINITIAL> {RPARAM}
-    { yybegin(YYINITIAL); return LispTypes.RPARAM; }
+<YYINITIAL> {LPAREN}
+    { yybegin(YYINITIAL); return LispTypes.LPAREN; }
+<YYINITIAL> {RPAREN}
+    { yybegin(YYINITIAL); return LispTypes.RPAREN; }
 <YYINITIAL> {AMPERSAND}
     { yybegin(YYINITIAL); return LispTypes.AMPERSAND; }
 <YYINITIAL> {COMMA}
@@ -66,6 +73,8 @@ IDENTIFIER_TOKEN_START=[^\ \r\n\f\r\t\(\)\,\@`\'\"0123456789\.]
     { yybegin(YYINITIAL); return LispTypes.BACKQUOTE; }
 <YYINITIAL> {DOT}
     { yybegin(YYINITIAL); return LispTypes.DOT; }
+<YYINITIAL> {HASHTAG}
+  { yybegin(YYINITIAL); return LispTypes.HASHTAG; }
 <YYINITIAL> {QUOTE}
     { yybegin(YYINITIAL); return LispTypes.QUOTE; }
 <YYINITIAL> {INTEGER_LITERAL}|{BIN_LITERAL}|{OCT_LITERAL}|{HEX_LITERAL}|{FLOAT_LITERAL}
@@ -76,10 +85,22 @@ IDENTIFIER_TOKEN_START=[^\ \r\n\f\r\t\(\)\,\@`\'\"0123456789\.]
 <YYINITIAL> {IDENTIFIER_TOKEN_START}
     { identifier.setLength(0); identifier.append(yytext()); yybegin(IDENTIFIER); }
 
+<BLOCKCOMMENT> {
+    [^\*]+ { comment.append(yytext()); }
+
+    \* {
+        if (comment.toString().endsWith("|")) {
+            yybegin(YYINITIAL); return LispTypes.COMMENT;
+        } else {
+            comment.append(yytext());
+        }
+    }
+}
+
 <STRING> {
     \"                             { yybegin(YYINITIAL);
                                      return LispTypes.STRING_TOKEN; }
-    [^\n\r\"\\]+                   { string.append( yytext() ); }
+    [^\"\\]+                   { string.append( yytext() ); }
     \\t                            { string.append('\t'); }
     \\n                            { string.append('\n'); }
 
@@ -89,13 +110,19 @@ IDENTIFIER_TOKEN_START=[^\ \r\n\f\r\t\(\)\,\@`\'\"0123456789\.]
   }
 
 <IDENTIFIER> {
-    [\ \r\n\f\r\t\(\)\,\@`\'\"\;]
+    [\ \r\n\f\r\t\(\)\,\@`\'\"\;\#]
       {
-            return processIdentifier(true);
+            IElementType ret = processIdentifier(true);
+            if (ret != null) {
+                return ret;
+            }
       }
 
     <<EOF>> {
-          return processIdentifier(false);
+          IElementType ret = processIdentifier(false);
+          if (ret != null) {
+              return ret;
+          }
       }
 
     [^\ \r\n\f\t\r\(\)\,\@`\'\"\;]+

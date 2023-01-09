@@ -1,10 +1,10 @@
 // This is a generated file. Not intended for manual editing.
 package com.en_circle.slt.plugin.lisp.psi;
 
-import com.intellij.psi.tree.IElementType;
-import com.intellij.psi.PsiElement;
-import com.intellij.lang.ASTNode;
 import com.en_circle.slt.plugin.lisp.impl.*;
+import com.intellij.lang.ASTNode;
+import com.intellij.psi.PsiElement;
+import com.intellij.psi.tree.IElementType;
 
 public interface LispTypes {
 
@@ -22,11 +22,12 @@ public interface LispTypes {
   IElementType COMMA = new LispTokenType("COMMA");
   IElementType COMMENT = new LispTokenType("COMMENT");
   IElementType DOT = new LispTokenType("DOT");
+  IElementType HASHTAG = new LispTokenType("HASHTAG");
   IElementType IDENTIFIER_TOKEN = new LispTokenType("IDENTIFIER_TOKEN");
-  IElementType LPARAM = new LispTokenType("LPARAM");
+  IElementType LPAREN = new LispTokenType("LPAREN");
   IElementType NUMBER_TOKEN = new LispTokenType("NUMBER_TOKEN");
   IElementType QUOTE = new LispTokenType("QUOTE");
-  IElementType RPARAM = new LispTokenType("RPARAM");
+  IElementType RPAREN = new LispTokenType("RPAREN");
   IElementType STRING_TOKEN = new LispTokenType("STRING_TOKEN");
 
   class Factory {

@@ -4,6 +4,6 @@ import java.math.BigInteger;
 
 public abstract  class SlimeRequest {
 
-    public abstract SlimePacket createPacket(BigInteger requestId);
+    public abstract SwankPacket createPacket(BigInteger requestId);
 
 }

@@ -39,8 +39,27 @@
 
         <applicationConfigurable instance="com.en_circle.slt.plugin.settings.SltSettingsConfigurable"/>
 
+        <lang.documentationProvider language="Common Lisp" implementationClass="com.en_circle.slt.plugin.SltDocumentationProvider"/>
+
         <toolWindow factoryClass="com.en_circle.slt.plugin.SltWindowFactory" id="Common Lisp"
                     anchor="bottom" icon="/icons/fileicon.svg"/>
+
+        <lang.braceMatcher language="Common Lisp"
+                           implementationClass="com.en_circle.slt.plugin.highlights.CommonLispBraceMatcher"/>
+
+        <lang.syntaxHighlighter language="Common Lisp"
+                                implementationClass="com.en_circle.slt.plugin.highlights.CommonLispStaticHighlighter"/>
+
+        <colorSettingsPage implementation="com.en_circle.slt.plugin.SltColorSettingsPage"/>
+
+        <lang.syntaxHighlighterFactory language="Common Lisp"
+                implementationClass="com.en_circle.slt.plugin.highlights.CommonLispStaticHighlighterFactory"/>
+
+        <!-- Highlight annotators -->
+        <annotator language="Common Lisp" implementationClass="com.en_circle.slt.plugin.highlights.annotators.CallFormAnnotator"/>
+
+        <!-- Functional annotators -->
+        <annotator language="Common Lisp" implementationClass="com.en_circle.slt.plugin.actions.annotators.MacroExpandAnnotator"/>
     </extensions>
 
     <actions>

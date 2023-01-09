@@ -81,7 +81,7 @@ public class SwankStreamController extends Thread {
             AtomicBoolean started = new AtomicBoolean(false);
             Awaitility.await()
                     .pollInterval(new FixedPollInterval(250, TimeUnit.MILLISECONDS))
-                    .atMost(1L, TimeUnit.MINUTES)
+                    .atMost(10L, TimeUnit.SECONDS)
                     .until(() -> {
                         if (!process.isAlive()) {
                             return true;

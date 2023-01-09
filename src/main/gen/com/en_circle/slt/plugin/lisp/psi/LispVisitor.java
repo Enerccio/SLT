@@ -1,9 +1,9 @@
 // This is a generated file. Not intended for manual editing.
 package com.en_circle.slt.plugin.lisp.psi;
 
-import org.jetbrains.annotations.*;
-import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiElementVisitor;
+import org.jetbrains.annotations.NotNull;
 
 public class LispVisitor extends PsiElementVisitor {
 
@@ -36,6 +36,10 @@ public class LispVisitor extends PsiElementVisitor {
   }
 
   public void visitSymbol(@NotNull LispSymbol o) {
+    visitNamedElement(o);
+  }
+
+  public void visitNamedElement(@NotNull LispNamedElement o) {
     visitPsiElement(o);
   }
 

@@ -1,15 +1,15 @@
 // This is a generated file. Not intended for manual editing.
 package com.en_circle.slt.plugin.lisp;
 
+import com.intellij.lang.ASTNode;
+import com.intellij.lang.LightPsiParser;
 import com.intellij.lang.PsiBuilder;
 import com.intellij.lang.PsiBuilder.Marker;
-import static com.en_circle.slt.plugin.lisp.psi.LispTypes.*;
-import static com.en_circle.slt.plugin.lisp.LispParserUtil.*;
-import com.intellij.psi.tree.IElementType;
-import com.intellij.lang.ASTNode;
-import com.intellij.psi.tree.TokenSet;
 import com.intellij.lang.PsiParser;
-import com.intellij.lang.LightPsiParser;
+import com.intellij.psi.tree.IElementType;
+
+import static com.en_circle.slt.plugin.lisp.LispParserUtil.*;
+import static com.en_circle.slt.plugin.lisp.psi.LispTypes.*;
 
 @SuppressWarnings({"SimplifiableIfStatement", "UnusedAssignment"})
 public class LispParser implements PsiParser, LightPsiParser {
@@ -61,15 +61,15 @@ public class LispParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // LPARAM sexpr* RPARAM
+  // LPAREN sexpr* RPAREN
   public static boolean list(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "list")) return false;
-    if (!nextTokenIs(b, LPARAM)) return false;
+    if (!nextTokenIs(b, LPAREN)) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = consumeToken(b, LPARAM);
+    r = consumeToken(b, LPAREN);
     r = r && list_1(b, l + 1);
-    r = r && consumeToken(b, RPARAM);
+    r = r && consumeToken(b, RPAREN);
     exit_section_(b, m, LIST, r);
     return r;
   }
@@ -98,17 +98,17 @@ public class LispParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // LPARAM sexpr+ DOT sexpr RPARAM
+  // LPAREN sexpr+ DOT sexpr RPAREN
   public static boolean pair(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "pair")) return false;
-    if (!nextTokenIs(b, LPARAM)) return false;
+    if (!nextTokenIs(b, LPAREN)) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = consumeToken(b, LPARAM);
+    r = consumeToken(b, LPAREN);
     r = r && pair_1(b, l + 1);
     r = r && consumeToken(b, DOT);
     r = r && sexpr(b, l + 1);
-    r = r && consumeToken(b, RPARAM);
+    r = r && consumeToken(b, RPAREN);
     exit_section_(b, m, PAIR, r);
     return r;
   }
@@ -175,7 +175,7 @@ public class LispParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // QUOTE | BACKQUOTE | (COMMA AMPERSAND?)
+  // QUOTE | BACKQUOTE | (COMMA AMPERSAND?) | (HASHTAG COMMA?)
   public static boolean sugar(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "sugar")) return false;
     boolean r;
@@ -183,6 +183,7 @@ public class LispParser implements PsiParser, LightPsiParser {
     r = consumeToken(b, QUOTE);
     if (!r) r = consumeToken(b, BACKQUOTE);
     if (!r) r = sugar_2(b, l + 1);
+    if (!r) r = sugar_3(b, l + 1);
     exit_section_(b, l, m, r, false, null);
     return r;
   }
@@ -202,6 +203,24 @@ public class LispParser implements PsiParser, LightPsiParser {
   private static boolean sugar_2_1(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "sugar_2_1")) return false;
     consumeToken(b, AMPERSAND);
+    return true;
+  }
+
+  // HASHTAG COMMA?
+  private static boolean sugar_3(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "sugar_3")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, HASHTAG);
+    r = r && sugar_3_1(b, l + 1);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  // COMMA?
+  private static boolean sugar_3_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "sugar_3_1")) return false;
+    consumeToken(b, COMMA);
     return true;
   }
 

@@ -1,4 +1,4 @@
-package com.en_circle.slt.plugin.view.console;
+package com.en_circle.slt.plugin.ui.console;
 
 import com.intellij.ide.DataManager;
 import com.intellij.openapi.actionSystem.IdeActions;

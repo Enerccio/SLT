@@ -72,10 +72,15 @@ public class SwankServer {
             WaitForOccurrence wait = new WaitForOccurrence("Swank started at port");
             errorController.addUpdateListener(wait);
             if (listener != null) {
-                errorController.addUpdateListener(data ->
-                        ApplicationManager.getApplication().invokeLater(() -> listener.onOutputChanged(SwankServerOutput.STDERR, data)));
-                outputController.addUpdateListener(data ->
-                        ApplicationManager.getApplication().invokeLater(() -> listener.onOutputChanged(SwankServerOutput.STDOUT, data)));
+                if (ApplicationManager.getApplication() != null) {
+                    errorController.addUpdateListener(data ->
+                            ApplicationManager.getApplication().invokeLater(() -> listener.onOutputChanged(SwankServerOutput.STDERR, data)));
+                    outputController.addUpdateListener(data ->
+                            ApplicationManager.getApplication().invokeLater(() -> listener.onOutputChanged(SwankServerOutput.STDOUT, data)));
+                } else {
+                    errorController.addUpdateListener(data -> listener.onOutputChanged(SwankServerOutput.STDERR, data));
+                    outputController.addUpdateListener(data -> listener.onOutputChanged(SwankServerOutput.STDOUT, data));
+                }
             }
 
             errorController.start();
