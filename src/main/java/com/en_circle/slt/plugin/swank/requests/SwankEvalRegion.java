@@ -5,7 +5,7 @@ import com.en_circle.slt.plugin.swank.SwankPacket;
 
 import java.math.BigInteger;
 
-public class SwankEvalRegion extends SwankIteractiveEval {
+public class SwankEvalRegion extends SltEval {
 
     public static SlimeRequest eval(String code, String module, Callback callback) {
         return new SwankEvalRegion(code, module, callback);

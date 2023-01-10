@@ -8,21 +8,21 @@ import com.en_circle.slt.plugin.swank.SwankPacket;
 
 import java.math.BigInteger;
 
-public class SwankIteractiveEval extends SlimeRequest {
+public class SltEval extends SlimeRequest {
 
     public static SlimeRequest eval(String code, String module, Callback callback) {
-        return new SwankIteractiveEval(code, module, callback);
+        return new SltEval(code, module, callback);
     }
 
     public static SlimeRequest eval(String code, Callback callback) {
-        return new SwankIteractiveEval(code, "cl-user", callback);
+        return new SltEval(code, "cl-user", callback);
     }
 
     protected final Callback callback;
     protected final String module;
     protected final String code;
 
-    protected SwankIteractiveEval(String code, String module, Callback callback) {
+    protected SltEval(String code, String module, Callback callback) {
         this.callback = callback;
         this.module = module;
         this.code = code;
@@ -31,7 +31,7 @@ public class SwankIteractiveEval extends SlimeRequest {
     public void processReply(LispList data) {
         if (isOk(data)) {
             String returnedText = ((LispString) data.getItems().get(1)).getValue();
-            callback.onResult(returnedText.substring(3));
+            callback.onResult(returnedText);
         }
     }
 
@@ -43,7 +43,7 @@ public class SwankIteractiveEval extends SlimeRequest {
 
     @Override
     public SwankPacket createPacket(BigInteger requestId) {
-        return SwankPacket.swankInteractiveEval(code, module, requestId);
+        return SwankPacket.sltEval(code, module, requestId);
     }
 
     public interface Callback {

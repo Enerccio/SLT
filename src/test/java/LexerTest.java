@@ -5,17 +5,22 @@ public class LexerTest {
 
     public static void main(String[] args) {
         LispLexerAdapter adapter = new LispLexerAdapter();
-        adapter.start("*| block\n" +
-                "comment |*\n" +
+        adapter.start("*|\n" +
+                "wot:\n" +
+                "- Author: pvan\n" +
+                "- Date: 2023-01-06\n" +
+                "|*\n" +
                 "\n" +
-                "(defun foo (bar &args baz)\n" +
-                "    (setf qux (* 2 baz))\n" +
-                "    (progn ;hello\n" +
-                "        (let ((a 5)\n" +
-                "              (b qux))\n" +
-                "          (if bar\n" +
-                "            (format T \"Hello %s\" b)\n" +
-                "            (format T \"World %s\" a)))))");
+                ":ar\n" +
+                "*|\n" +
+                "(defmacro loop-three-times (form)\n" +
+                "    `(progn ,form ,form ,form))\n" +
+                "\n" +
+                "(loop-three-times (print \"Anca\"))\n" +
+                "(print \"Mara\")\n" +
+                "(defun bobz (foo bar &rest args)\n" +
+                "    (bobz (+ foo 1) bar args :vegana))\n" +
+                "|*");
         while (true) {
             IElementType token = adapter.getTokenType();
             if (token == null)

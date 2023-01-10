@@ -56,18 +56,13 @@
                 implementationClass="com.en_circle.slt.plugin.highlights.CommonLispStaticHighlighterFactory"/>
 
         <!-- Highlight annotators -->
-        <annotator language="Common Lisp" implementationClass="com.en_circle.slt.plugin.highlights.annotators.CallFormAnnotator"/>
+        <annotator language="Common Lisp" implementationClass="com.en_circle.slt.plugin.highlights.annotators.SymbolAnnotator"/>
 
         <!-- Functional annotators -->
         <annotator language="Common Lisp" implementationClass="com.en_circle.slt.plugin.actions.annotators.MacroExpandAnnotator"/>
     </extensions>
 
     <actions>
-        <action id="CommonLispCreateNewFile" icon="/icons/fileicon.svg" class="com.en_circle.slt.plugin.actions.CreateNewFile"
-                description="CommonLispCreateNewFile">
-            <add-to-group group-id="NewGroup" anchor="before" relative-to-action="NewHtmlFile" />
-        </action>
-
         <action id="com.en_circle.slt.plugin.actions.EvalRegionAction"
                 icon="/icons/fileicon.svg"
                 class="com.en_circle.slt.plugin.actions.EvalRegionAction" text="Evaluate Selected Region">

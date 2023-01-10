@@ -24,6 +24,17 @@ public class LispPsiImplUtil {
         return null;
     }
 
+    public static LispSymbol getNotSExpressionHead(PsiElement element) {
+        ASTNode node = element.getNode();
+        if (node != null && node.getElementType() == LispTypes.SYMBOL) {
+            String head = getSExpressionHead(element);
+            if (head == null) {
+                return (LispSymbol) element;
+            }
+        }
+        return null;
+    }
+
     public static String getName(LispSymbol element) {
         ASTNode identifier = element.getNode().findChildByType(LispTypes.IDENTIFIER_TOKEN);
         assert identifier != null;

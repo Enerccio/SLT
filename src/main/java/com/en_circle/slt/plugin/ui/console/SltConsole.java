@@ -4,7 +4,7 @@ import com.en_circle.slt.plugin.SltCommonLispLanguage;
 import com.en_circle.slt.plugin.SltSBCL;
 import com.en_circle.slt.plugin.swank.SwankServer;
 import com.en_circle.slt.plugin.swank.SwankServer.SwankServerOutput;
-import com.en_circle.slt.plugin.swank.requests.SwankIteractiveEval;
+import com.en_circle.slt.plugin.swank.requests.SltEval;
 import com.en_circle.slt.plugin.ui.SltComponent;
 import com.intellij.execution.console.ConsoleExecuteAction;
 import com.intellij.execution.console.ConsoleHistoryController;
@@ -64,7 +64,7 @@ public class SltConsole implements SltComponent {
     private void eval(String data) {
         try {
             if (StringUtils.isNotBlank(data)) {
-                SltSBCL.getInstance().sendToSbcl(SwankIteractiveEval.eval(data, currentModule,
+                SltSBCL.getInstance().sendToSbcl(SltEval.eval(data, currentModule,
                         result -> languageConsole.print(result + "\n", ConsoleViewContentType.NORMAL_OUTPUT)));
             }
         } catch (Exception e) {

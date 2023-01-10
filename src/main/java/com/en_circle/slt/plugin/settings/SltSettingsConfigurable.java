@@ -1,7 +1,7 @@
 package com.en_circle.slt.plugin.settings;
 
+import com.en_circle.slt.plugin.SltSBCL;
 import com.en_circle.slt.plugin.SltState;
-import com.en_circle.slt.plugin.swank.SwankServer;
 import com.intellij.openapi.options.Configurable;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.ui.Messages;
@@ -35,6 +35,7 @@ public class SltSettingsConfigurable implements Configurable {
         SltState settings = SltState.getInstance();
         boolean modified = !component.getSbclExecutable().equals(settings.sbclExecutable);
         modified |= component.getPort() != settings.port;
+        modified |= !component.getQuicklispStartScript().equals(settings.quicklispStartScript);
         return modified;
     }
 
@@ -48,11 +49,19 @@ public class SltSettingsConfigurable implements Configurable {
         if (component.getPort() != settings.port) {
             restartServer = true;
         }
+        if (!component.getQuicklispStartScript().equals(settings.quicklispStartScript)) {
+            restartServer = true;
+        }
 
         settings.sbclExecutable = component.getSbclExecutable();
         if (restartServer) {
             if (Messages.YES == Messages.showYesNoDialog("Settings changed, restart server?", "Settings Changed", "Yes", "No", Messages.getQuestionIcon())) {
-                SwankServer.restart(SltState.getInstance().sbclExecutable, SltState.getInstance().port);
+                try {
+                    SltSBCL.getInstance().stop();
+                    SltSBCL.getInstance().start();
+                } catch (Exception e) {
+                    // TODO: show exception
+                }
             }
         }
     }
@@ -61,6 +70,7 @@ public class SltSettingsConfigurable implements Configurable {
     public void reset() {
         SltState settings = SltState.getInstance();
         component.setSbclExecutable(settings.sbclExecutable);
+        component.setQuicklispStartScript(settings.quicklispStartScript);
         component.setPort(settings.port);
     }
 

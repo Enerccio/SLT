@@ -12,6 +12,7 @@ repositories {
 
 dependencies {
     implementation("org.awaitility:awaitility:4.2.0")
+    implementation("org.watertemplate:watertemplate-engine:1.2.2")
 }
 
 sourceSets {

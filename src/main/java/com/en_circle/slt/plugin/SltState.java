@@ -15,6 +15,7 @@ import org.jetbrains.annotations.Nullable;
 public class SltState implements PersistentStateComponent<SltState> {
 
     public String sbclExecutable = "sbcl";
+    public String quicklispStartScript = "~/quicklisp/setup.lisp";
     public int port = 4005;
 
     public static SltState getInstance() {

@@ -1,9 +1,7 @@
-import com.en_circle.slt.plugin.swank.SlimeListener;
-import com.en_circle.slt.plugin.swank.SwankClient;
-import com.en_circle.slt.plugin.swank.SwankPacket;
-import com.en_circle.slt.plugin.swank.SwankServer;
+import com.en_circle.slt.plugin.swank.*;
 import org.awaitility.Awaitility;
 
+import java.math.BigInteger;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -13,14 +11,14 @@ public class SlimeTest {
         try {
             AtomicLong sent = new AtomicLong();
             AtomicLong expected = new AtomicLong();
-            SwankServer.startSbcl("sbcl", 4005);
+            SwankServer.startSbcl(new SwankServerConfiguration.Builder().build());
             SlimeListener listener = new SlimeListener(null, false, null);
             try (SwankClient client = new SwankClient("127.0.0.1", 4005, packet -> {
                 listener.onSwankMessage(packet);
                 expected.addAndGet(1);
             })) {
                 sent.addAndGet(1);
-                client.swankSend(SwankPacket.swankInteractiveEval("(+ + 5)", 3));
+                client.swankSend(SwankPacket.sltEval("(+ + 5)", new BigInteger("3")));
 
                 Awaitility.await()
                         .atMost(10, TimeUnit.SECONDS)

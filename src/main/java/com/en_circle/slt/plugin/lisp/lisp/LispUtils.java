@@ -51,8 +51,13 @@ public class LispUtils {
         @Override
         public void visitNumber(@NotNull LispNumber o) {
             super.visitNumber(o);
-            LispInteger lispInteger = new LispInteger(o.getText());
-            stack.peek().add(lispInteger);
+            try {
+                LispInteger lispInteger = new LispInteger(o.getText());
+                stack.peek().add(lispInteger);
+            } catch (NumberFormatException ex) {
+                LispDouble lispDouble = new LispDouble(o.getText());
+                stack.peek().add(lispDouble);
+            }
         }
 
         @Override

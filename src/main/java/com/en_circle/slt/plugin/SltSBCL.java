@@ -5,11 +5,8 @@ import com.en_circle.slt.plugin.lisp.lisp.LispElementType;
 import com.en_circle.slt.plugin.lisp.lisp.LispList;
 import com.en_circle.slt.plugin.lisp.lisp.LispString;
 import com.en_circle.slt.plugin.lisp.lisp.LispSymbol;
-import com.en_circle.slt.plugin.swank.SlimeListener;
+import com.en_circle.slt.plugin.swank.*;
 import com.en_circle.slt.plugin.swank.SlimeListener.RequestResponseLogger;
-import com.en_circle.slt.plugin.swank.SlimeRequest;
-import com.en_circle.slt.plugin.swank.SwankClient;
-import com.en_circle.slt.plugin.swank.SwankServer;
 import com.en_circle.slt.plugin.swank.SwankServer.SwankServerListener;
 import com.en_circle.slt.plugin.swank.requests.SwankEvalAndGrab;
 import com.intellij.openapi.project.Project;
@@ -40,12 +37,18 @@ public class SltSBCL {
             listener.onPreStart();
         }
 
-        SwankServer.startSbcl(SltState.getInstance().sbclExecutable, SltState.getInstance().port,
-                (output, newData) -> {
+        SwankServerConfiguration c = new SwankServerConfiguration.Builder()
+                .setExecutable(SltState.getInstance().sbclExecutable)
+                .setPort(SltState.getInstance().port)
+                .setQuicklispStartScriptPath(SltState.getInstance().quicklispStartScript)
+                .setProjectDirectory(project.getBasePath())
+                .setListener((output, newData) -> {
                     for (SBCLServerListener listener : serverListeners) {
                         listener.onOutputChanged(output, newData);
                     }
-                });
+                })
+                .build();
+        SwankServer.startSbcl(c);
 
         slimeListener = new SlimeListener(project, true, logger);
         client = new SwankClient("127.0.0.1", SltState.getInstance().port, slimeListener);
@@ -121,16 +124,7 @@ public class SltSBCL {
             if (currentBinding == SymbolBinding.NONE || cacheInvalid(state)) {
                 sendToSbcl(SwankEvalAndGrab.eval(
                         String.format(
-                                "(let ((test-sym '%s) (*standard-output* (make-string-output-stream))) \n" +
-                                        "   (cond \n" +
-                                        "       ((special-operator-p test-sym) (list :special-form NIL))\n" +
-                                        "       ((macro-function test-sym) (progn \n" +
-                                        "                                       (describe test-sym) \n" +
-                                        "                                       (list :macro (get-output-stream-string *standard-output*))))\n" +
-                                        "       ((fboundp test-sym) (progn \n " +
-                                        "                               (describe test-sym) \n" +
-                                        "                               (list :function (get-output-stream-string *standard-output*))))\n" +
-                                        "       (T (list NIL NIL))))",
+                                "(slt-core:analyze-symbol '%s)",
                                 symbolName),
                         SltSBCL.getInstance().getGlobalPackage(), true, (result, stdout, parsed) -> {
                             if (parsed.size() == 1 && parsed.get(0).getType() == LispElementType.LIST) {
@@ -151,11 +145,24 @@ public class SltSBCL {
                                         changed |= state.binding != SymbolBinding.FUNCTION;
                                         state.binding = SymbolBinding.FUNCTION;
                                         break;
+                                    case ":CONSTANT":
+                                        changed |= state.binding != SymbolBinding.CONSTANT;
+                                        state.binding = SymbolBinding.CONSTANT;
+                                        break;
+                                    case ":KEYWORD":
+                                        changed |= state.binding != SymbolBinding.KEYWORD;
+                                        state.binding = SymbolBinding.KEYWORD;
+                                        break;
+                                    case ":SPECIAL":
+                                        changed |= state.binding != SymbolBinding.SPECIAL_VARIABLE;
+                                        state.binding = SymbolBinding.SPECIAL_VARIABLE;
+                                        break;
                                     default:
                                         changed |= state.binding != SymbolBinding.NONE;
                                         state.binding = SymbolBinding.NONE;
                                         break;
                                 }
+                                state.symbol = packageName + ":" + symbolName;
                                 boolean hasDoc = state.documentation != null;
                                 state.documentation = null;
                                 if (list.getItems().get(1) instanceof LispString) {

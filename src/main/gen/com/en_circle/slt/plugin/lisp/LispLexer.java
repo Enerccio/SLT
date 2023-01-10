@@ -524,6 +524,10 @@ class LispLexer implements FlexLexer {
           }
             }  // fall though
             case 38: break;
+            case BLOCKCOMMENT: {
+              yybegin(YYINITIAL); return LispTypes.COMMENT;
+            }  // fall though
+            case 39: break;
             default:
         return null;
         }

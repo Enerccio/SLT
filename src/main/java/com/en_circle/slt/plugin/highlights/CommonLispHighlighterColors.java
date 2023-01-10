@@ -13,7 +13,11 @@ public class CommonLispHighlighterColors {
     public static TextAttributesKey PARENTS = TextAttributesKey.createTextAttributesKey("CL.PARENTS", DefaultLanguageHighlighterColors.PARENTHESES);
     public static TextAttributesKey NUMBER = TextAttributesKey.createTextAttributesKey("CL.NUMBER", DefaultLanguageHighlighterColors.NUMBER);
     public static TextAttributesKey STRING = TextAttributesKey.createTextAttributesKey("CL.STRING", DefaultLanguageHighlighterColors.STRING);
-
+    public static TextAttributesKey KEYWORD = TextAttributesKey.createTextAttributesKey("CL.KEYWORD", DefaultLanguageHighlighterColors.METADATA);
+    public static TextAttributesKey DEFUN_FORM = TextAttributesKey.createTextAttributesKey("CL.DEFUN_FORM", DefaultLanguageHighlighterColors.METADATA);
+    public static TextAttributesKey SPECIAL_VARIABLE = TextAttributesKey.createTextAttributesKey("CL.DYNAMIC", DefaultLanguageHighlighterColors.GLOBAL_VARIABLE);
+    public static TextAttributesKey SUGAR = TextAttributesKey.createTextAttributesKey("CL.SUGAR", DefaultLanguageHighlighterColors.PREDEFINED_SYMBOL);
+    public static TextAttributesKey CONSTANT = TextAttributesKey.createTextAttributesKey("CL.CONSTANT", DefaultLanguageHighlighterColors.CONSTANT);
     public static TextAttributesKey SPECIAL_FORM = TextAttributesKey.createTextAttributesKey("CL.SPECIAL_FORM", DefaultLanguageHighlighterColors.KEYWORD);
     public static TextAttributesKey FUNCTION = TextAttributesKey.createTextAttributesKey("CL.FUNCTION", DefaultLanguageHighlighterColors.FUNCTION_CALL);
     public static TextAttributesKey MACRO = TextAttributesKey.createTextAttributesKey("CL.MACRO", DefaultLanguageHighlighterColors.KEYWORD);

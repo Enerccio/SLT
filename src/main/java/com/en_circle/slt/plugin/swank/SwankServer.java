@@ -1,6 +1,8 @@
 package com.en_circle.slt.plugin.swank;
 
 import com.en_circle.slt.plugin.swank.SwankStreamController.WaitForOccurrence;
+import com.en_circle.slt.templates.InitScriptTemplate;
+import com.en_circle.slt.templates.SltScriptTemplate;
 import com.intellij.openapi.application.ApplicationManager;
 import org.apache.commons.io.FileUtils;
 
@@ -13,21 +15,14 @@ public class SwankServer {
     public static SwankServer INSTANCE = new SwankServer();
 
     private Process sbclProcess;
-    private SwankStreamController errorController;
-    private SwankStreamController outputController;
 
-
-    public static void startSbcl(String executable, int port) {
-        startSbcl(executable, port, null);
+    public static void startSbcl(SwankServerConfiguration configuration) {
+        INSTANCE.start(configuration);
     }
 
-    public static void startSbcl(String executable, int port, SwankServerListener listener) {
-        INSTANCE.start(executable, port, listener);
-    }
-
-    public static void restart(String executable, int port) {
+    public static void restart(SwankServerConfiguration configuration) {
         INSTANCE.stopInstance();
-        INSTANCE.start(executable, port, null);
+        INSTANCE.start(configuration);
     }
 
     public static void stop() {
@@ -45,20 +40,23 @@ public class SwankServer {
         }
     }
 
-    private synchronized void start(String command, int port, SwankServerListener listener) {
+    private synchronized void start(SwankServerConfiguration configuration) {
         if (sbclProcess != null)
             return;
 
         try {
+            File sltCore = File.createTempFile("slt", ".cl");
+            sltCore.deleteOnExit();
+            String sltScriptTemplate = new SltScriptTemplate().render();
+            FileUtils.write(sltCore, sltScriptTemplate, StandardCharsets.UTF_8);
+
             File serverStartSetup = File.createTempFile("startServer", ".cl");
             serverStartSetup.deleteOnExit();
-            String serverStarter = String.format("(load \"~/quicklisp/setup.lisp\")\n" +
-                    "(ql:quickload :swank)\n" +
-                    "(swank:create-server :port %s :dont-close nil)\n", port);
+            String startScriptTemplate = new InitScriptTemplate(configuration, sltCore.getAbsolutePath()).render();
+            FileUtils.write(serverStartSetup, startScriptTemplate, StandardCharsets.UTF_8);
 
-            FileUtils.write(serverStartSetup, serverStarter, StandardCharsets.UTF_8);
             String[] commands = new String[]{
-                    command,
+                    configuration.getExecutablePath(),
                     "--load",
                     serverStartSetup.getName()
             };
@@ -66,11 +64,13 @@ public class SwankServer {
             pb.directory(serverStartSetup.getParentFile());
             sbclProcess = pb.start();
 
-            errorController = new SwankStreamController(sbclProcess.getErrorStream());
-            outputController = new SwankStreamController(sbclProcess.getInputStream());
+            SwankStreamController errorController = new SwankStreamController(sbclProcess.getErrorStream());
+            SwankStreamController outputController = new SwankStreamController(sbclProcess.getInputStream());
 
             WaitForOccurrence wait = new WaitForOccurrence("Swank started at port");
             errorController.addUpdateListener(wait);
+
+            SwankServerListener listener = configuration.getListener();
             if (listener != null) {
                 if (ApplicationManager.getApplication() != null) {
                     errorController.addUpdateListener(data ->

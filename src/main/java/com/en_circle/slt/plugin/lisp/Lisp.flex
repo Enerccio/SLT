@@ -88,6 +88,8 @@ IDENTIFIER_TOKEN_START=[^\ \r\n\f\r\t\(\)\,\@`\'\"0123456789\.]
 <BLOCKCOMMENT> {
     [^\*]+ { comment.append(yytext()); }
 
+    <<EOF>> { yybegin(YYINITIAL); return LispTypes.COMMENT; }
+
     \* {
         if (comment.toString().endsWith("|")) {
             yybegin(YYINITIAL); return LispTypes.COMMENT;

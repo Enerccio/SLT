@@ -8,6 +8,7 @@ import com.en_circle.slt.plugin.swank.SwankClient;
 import com.en_circle.slt.plugin.swank.SwankPacket;
 import com.en_circle.slt.plugin.swank.SwankServer;
 import com.en_circle.slt.plugin.swank.SwankServer.SwankServerOutput;
+import com.en_circle.slt.plugin.swank.SwankServerConfiguration;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiFileFactory;
 
@@ -17,11 +18,14 @@ public class SwankTest {
 
     public static void main(String[] args) throws Exception {
         try {
-            SwankServer.startSbcl("sbcl", 4005, (output, newData) -> {
-                if (output == SwankServerOutput.STDERR) {
-                    System.err.print(newData);
-                }
-            });
+            SwankServerConfiguration c = new SwankServerConfiguration.Builder()
+                    .setListener((output, newData) -> {
+                        if (output == SwankServerOutput.STDERR) {
+                            System.err.print(newData);
+                        }
+                    })
+                    .build();
+            SwankServer.startSbcl(c);
             try (SwankClient client = new SwankClient("127.0.0.1", 4005, packet -> {
                 LispCoreProjectEnvironment projectEnvironment = new LispCoreProjectEnvironment();
                 projectEnvironment.getEnvironment()

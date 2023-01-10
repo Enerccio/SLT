@@ -5,8 +5,8 @@ import com.en_circle.slt.plugin.SltCommonLispLanguage;
 import com.en_circle.slt.plugin.SltCommonLispParserDefinition;
 import com.en_circle.slt.plugin.lisp.lisp.*;
 import com.en_circle.slt.plugin.lisp.psi.LispCoreProjectEnvironment;
+import com.en_circle.slt.plugin.swank.requests.SltEval;
 import com.en_circle.slt.plugin.swank.requests.SwankEvalAndGrab;
-import com.en_circle.slt.plugin.swank.requests.SwankIteractiveEval;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiFile;
@@ -115,8 +115,8 @@ public class SlimeListener implements SwankClient.SwankReply {
         LispInteger replyId = (LispInteger) reply.getItems().get(2);
         try {
             SlimeRequest request = requests.get(replyId.getValue());
-            if (request instanceof SwankIteractiveEval) {
-                SwankIteractiveEval eval = (SwankIteractiveEval) request;
+            if (request instanceof SltEval) {
+                SltEval eval = (SltEval) request;
                 eval.processReply((LispList) reply.getItems().get(1));
             }
 
