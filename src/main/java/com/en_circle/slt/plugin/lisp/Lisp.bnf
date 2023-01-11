@@ -47,7 +47,7 @@ pair ::= LPAREN sexpr+ DOT sexpr RPAREN
 
 string ::= STRING_TOKEN
 
-number ::= binary_number | octal_number | hex_number | radix_number | integer | ratio
+number ::= binary_number | octal_number | hex_number | radix_number | integer | ratio | real
 
 binary_number ::= BINARY_NUMBER_TOKEN
 
@@ -67,6 +67,6 @@ ratio ::= RATIO_NUMBER
 
 symbol ::= UNINTERN? SYMBOL_TOKEN {
     mixin="com.en_circle.slt.plugin.lisp.psi.impl.LispNamedElementImpl"
-  implements="com.en_circle.slt.plugin.lisp.psi.LispNamedElement"
-  methods=[getName setName getNameIdentifier]
+    implements="com.en_circle.slt.plugin.lisp.psi.LispNamedElement"
+    methods=[getName setName getNameIdentifier]
 }

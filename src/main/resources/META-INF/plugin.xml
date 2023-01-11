@@ -57,6 +57,7 @@
 
         <!-- Highlight annotators -->
         <annotator language="Common Lisp" implementationClass="com.en_circle.slt.plugin.highlights.annotators.SymbolAnnotator"/>
+        <annotator language="Common Lisp" implementationClass="com.en_circle.slt.plugin.highlights.annotators.StaticHighlightAnnotator"/>
 
         <!-- Functional annotators -->
         <annotator language="Common Lisp" implementationClass="com.en_circle.slt.plugin.actions.annotators.MacroExpandAnnotator"/>
@@ -67,24 +68,28 @@
                 icon="/icons/fileicon.svg"
                 class="com.en_circle.slt.plugin.actions.EvalRegionAction" text="Evaluate Selected Region">
             <add-to-group group-id="EditorPopupMenu" anchor="last"/>
+            <keyboard-shortcut keymap="$default" first-keystroke="ctrl alt R"/>
         </action>
 
         <action id="com.en_circle.slt.plugin.actions.EvalCurrentFormAction"
                 icon="/icons/fileicon.svg"
                 class="com.en_circle.slt.plugin.actions.EvalCurrentFormAction" text="Evaluate This S-Expression">
             <add-to-group group-id="EditorPopupMenu" anchor="after" relative-to-action="com.en_circle.slt.plugin.actions.EvalRegionAction" />
+            <keyboard-shortcut keymap="$default" first-keystroke="ctrl alt F"/>
         </action>
 
         <action id="com.en_circle.slt.plugin.actions.EvalPreviousFormAction"
                 icon="/icons/fileicon.svg"
                 class="com.en_circle.slt.plugin.actions.EvalPreviousFormAction" text="Evaluate Previous S-Expression">
             <add-to-group group-id="EditorPopupMenu" anchor="after" relative-to-action="com.en_circle.slt.plugin.actions.EvalCurrentFormAction" />
+            <keyboard-shortcut keymap="$default" first-keystroke="ctrl alt E"/>
         </action>
 
         <action id="com.en_circle.slt.plugin.actions.EvalNextFormAction"
                 icon="/icons/fileicon.svg"
                 class="com.en_circle.slt.plugin.actions.EvalNextFormAction" text="Evaluate Next S-Expression">
             <add-to-group group-id="EditorPopupMenu" anchor="after" relative-to-action="com.en_circle.slt.plugin.actions.EvalPreviousFormAction" />
+            <keyboard-shortcut keymap="$default" first-keystroke="ctrl alt Q"/>
         </action>
     </actions>
 

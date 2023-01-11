@@ -7,7 +7,7 @@ public class SwankServerConfiguration {
     private String executablePath = "sbcl";
     private String quicklispStartScript = "~/quicklisp/setup.lisp";
     private int port = 4005;
-    private String projectDirectory = "~";
+    private String projectDirectory = "/tmp";
     private SwankServerListener listener = null;
 
     private SwankServerConfiguration() {

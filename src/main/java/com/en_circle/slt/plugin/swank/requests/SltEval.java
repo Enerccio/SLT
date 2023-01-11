@@ -1,6 +1,6 @@
 package com.en_circle.slt.plugin.swank.requests;
 
-import com.en_circle.slt.plugin.lisp.lisp.LispList;
+import com.en_circle.slt.plugin.lisp.lisp.LispContainer;
 import com.en_circle.slt.plugin.lisp.lisp.LispString;
 import com.en_circle.slt.plugin.lisp.lisp.LispSymbol;
 import com.en_circle.slt.plugin.swank.SlimeRequest;
@@ -28,14 +28,14 @@ public class SltEval extends SlimeRequest {
         this.code = code;
     }
 
-    public void processReply(LispList data) {
+    public void processReply(LispContainer data) {
         if (isOk(data)) {
             String returnedText = ((LispString) data.getItems().get(1)).getValue();
             callback.onResult(returnedText);
         }
     }
 
-    private boolean isOk(LispList data) {
+    private boolean isOk(LispContainer data) {
         return data.getItems().size() > 0 &&
                 data.getItems().get(0) instanceof LispSymbol &&
                 ":ok".equals(((LispSymbol) data.getItems().get(0)).getValue());

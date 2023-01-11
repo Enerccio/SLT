@@ -24,4 +24,7 @@ public interface LispNumber extends PsiElement {
   @Nullable
   LispRatio getRatio();
 
+  @Nullable
+  LispReal getReal();
+
 }

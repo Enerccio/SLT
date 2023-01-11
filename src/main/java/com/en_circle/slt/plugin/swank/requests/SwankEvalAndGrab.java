@@ -1,7 +1,7 @@
 package com.en_circle.slt.plugin.swank.requests;
 
+import com.en_circle.slt.plugin.lisp.lisp.LispContainer;
 import com.en_circle.slt.plugin.lisp.lisp.LispElement;
-import com.en_circle.slt.plugin.lisp.lisp.LispList;
 import com.en_circle.slt.plugin.lisp.lisp.LispString;
 import com.en_circle.slt.plugin.lisp.lisp.LispSymbol;
 import com.en_circle.slt.plugin.swank.SlimeRequest;
@@ -34,9 +34,9 @@ public class SwankEvalAndGrab extends SlimeRequest {
         this.parse = parse;
     }
 
-    public void processReply(LispList data, Function<String, List<LispElement>> parser) {
+    public void processReply(LispContainer data, Function<String, List<LispElement>> parser) {
         if (isOk(data)) {
-            LispList list = (LispList) data.getItems().get(1);
+            LispContainer list = (LispContainer) data.getItems().get(1);
             String returnedStdout = ((LispString) list.getItems().get(0)).getValue();
             String returnedForm = ((LispString) list.getItems().get(1)).getValue();
             List<LispElement> parsed = null;
@@ -49,7 +49,7 @@ public class SwankEvalAndGrab extends SlimeRequest {
         }
     }
 
-    private boolean isOk(LispList data) {
+    private boolean isOk(LispContainer data) {
         return data.getItems().size() > 0 &&
                 data.getItems().get(0) instanceof LispSymbol &&
                 ":ok".equals(((LispSymbol) data.getItems().get(0)).getValue());

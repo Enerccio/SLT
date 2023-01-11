@@ -28,7 +28,6 @@ public class SltColorSettingsPage implements ColorSettingsPage {
             new AttributesDescriptor("Helper symbol", CommonLispHighlighterColors.DEFUN_FORM),
             new AttributesDescriptor("Special variable", CommonLispHighlighterColors.SPECIAL_VARIABLE),
             new AttributesDescriptor("Constant variable", CommonLispHighlighterColors.CONSTANT),
-            new AttributesDescriptor("Comment", CommonLispHighlighterColors.COMMENT),
             new AttributesDescriptor("Special form", CommonLispHighlighterColors.SPECIAL_FORM),
             new AttributesDescriptor("Function call", CommonLispHighlighterColors.FUNCTION),
             new AttributesDescriptor("Macro call", CommonLispHighlighterColors.MACRO),

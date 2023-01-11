@@ -60,4 +60,10 @@ public class LispNumberImpl extends ASTWrapperPsiElement implements LispNumber {
     return findChildByClass(LispRatio.class);
   }
 
+  @Override
+  @Nullable
+  public LispReal getReal() {
+    return findChildByClass(LispReal.class);
+  }
+
 }

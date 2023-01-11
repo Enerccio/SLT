@@ -1,8 +1,8 @@
 package com.en_circle.slt.plugin;
 
 import com.en_circle.slt.plugin.SymbolState.SymbolBinding;
+import com.en_circle.slt.plugin.lisp.lisp.LispContainer;
 import com.en_circle.slt.plugin.lisp.lisp.LispElementType;
-import com.en_circle.slt.plugin.lisp.lisp.LispList;
 import com.en_circle.slt.plugin.lisp.lisp.LispString;
 import com.en_circle.slt.plugin.lisp.lisp.LispSymbol;
 import com.en_circle.slt.plugin.swank.*;
@@ -127,8 +127,8 @@ public class SltSBCL {
                                 "(slt-core:analyze-symbol '%s)",
                                 symbolName),
                         SltSBCL.getInstance().getGlobalPackage(), true, (result, stdout, parsed) -> {
-                            if (parsed.size() == 1 && parsed.get(0).getType() == LispElementType.LIST) {
-                                LispList list = (LispList) parsed.get(0);
+                            if (parsed.size() == 1 && parsed.get(0).getType() == LispElementType.CONTAINER) {
+                                LispContainer list = (LispContainer) parsed.get(0);
                                 String symValue = ((LispSymbol) list.getItems().get(0)).getValue().toUpperCase();
                                 boolean changed = false;
                                 state.timestamp = System.currentTimeMillis();

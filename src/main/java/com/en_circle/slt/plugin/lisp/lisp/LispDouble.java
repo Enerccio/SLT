@@ -4,11 +4,11 @@ import java.math.BigDecimal;
 
 public class LispDouble extends LispAtom<BigDecimal> {
 
-    private BigDecimal value;
+    private final BigDecimal value;
 
-    public LispDouble(String value) {
+    public LispDouble(String value, BigDecimal bigDecimal) {
         super(value);
-        this.value = new BigDecimal(value);
+        this.value = bigDecimal;
     }
 
     @Override

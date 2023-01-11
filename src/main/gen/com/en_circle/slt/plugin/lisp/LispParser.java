@@ -193,7 +193,7 @@ public class LispParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // binary_number | octal_number | hex_number | radix_number | integer | ratio
+  // binary_number | octal_number | hex_number | radix_number | integer | ratio | real
   public static boolean number(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "number")) return false;
     boolean r;
@@ -204,6 +204,7 @@ public class LispParser implements PsiParser, LightPsiParser {
     if (!r) r = radix_number(b, l + 1);
     if (!r) r = integer(b, l + 1);
     if (!r) r = ratio(b, l + 1);
+    if (!r) r = real(b, l + 1);
     exit_section_(b, l, m, r, false, null);
     return r;
   }

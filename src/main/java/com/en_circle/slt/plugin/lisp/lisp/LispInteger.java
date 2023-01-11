@@ -4,11 +4,11 @@ import java.math.BigInteger;
 
 public class LispInteger extends LispAtom<BigInteger> {
 
-    private BigInteger value;
+    private final BigInteger value;
 
-    public LispInteger(String value) {
+    public LispInteger(String value, BigInteger integer) {
         super(value);
-        this.value = new BigInteger(value);
+        this.value = integer;
     }
 
     @Override

@@ -80,8 +80,8 @@ public class SlimeListener implements SwankClient.SwankReply {
         List<LispElement> elements = parse(data);
         if (elements.size() == 1) {
             LispElement element = elements.get(0);
-            if (element instanceof LispList) {
-                LispList reply = (LispList) element;
+            if (element instanceof LispContainer) {
+                LispContainer reply = (LispContainer) element;
                 if (isReturn(reply)) {
                     processReturn(reply);
                 }
@@ -105,24 +105,24 @@ public class SlimeListener implements SwankClient.SwankReply {
         return LispUtils.convertAst(source);
     }
 
-    private boolean isReturn(LispList reply) {
+    private boolean isReturn(LispContainer reply) {
         return reply.getItems().size() > 0 &&
                 reply.getItems().get(0) instanceof LispSymbol &&
                 ":return".equals(((LispSymbol) reply.getItems().get(0)).getValue());
     }
 
-    private void processReturn(LispList reply) {
+    private void processReturn(LispContainer reply) {
         LispInteger replyId = (LispInteger) reply.getItems().get(2);
         try {
             SlimeRequest request = requests.get(replyId.getValue());
             if (request instanceof SltEval) {
                 SltEval eval = (SltEval) request;
-                eval.processReply((LispList) reply.getItems().get(1));
+                eval.processReply((LispContainer) reply.getItems().get(1));
             }
 
             if (request instanceof SwankEvalAndGrab) {
                 SwankEvalAndGrab evalAndGrab = (SwankEvalAndGrab) request;
-                evalAndGrab.processReply((LispList) reply.getItems().get(1), this::parse);
+                evalAndGrab.processReply((LispContainer) reply.getItems().get(1), this::parse);
             }
         } finally {
             requests.remove(replyId.getValue());
