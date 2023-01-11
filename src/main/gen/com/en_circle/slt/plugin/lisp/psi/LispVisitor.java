@@ -7,7 +7,35 @@ import org.jetbrains.annotations.NotNull;
 
 public class LispVisitor extends PsiElementVisitor {
 
-  public void visitAtom(@NotNull LispAtom o) {
+  public void visitArray(@NotNull LispArray o) {
+    visitPsiElement(o);
+  }
+
+  public void visitBinaryNumber(@NotNull LispBinaryNumber o) {
+    visitPsiElement(o);
+  }
+
+  public void visitComment(@NotNull LispComment o) {
+    visitPsiElement(o);
+  }
+
+  public void visitDatum(@NotNull LispDatum o) {
+    visitPsiElement(o);
+  }
+
+  public void visitEnhancement(@NotNull LispEnhancement o) {
+    visitPsiElement(o);
+  }
+
+  public void visitEvaled(@NotNull LispEvaled o) {
+    visitPsiElement(o);
+  }
+
+  public void visitHexNumber(@NotNull LispHexNumber o) {
+    visitPsiElement(o);
+  }
+
+  public void visitInteger(@NotNull LispInteger o) {
     visitPsiElement(o);
   }
 
@@ -19,7 +47,31 @@ public class LispVisitor extends PsiElementVisitor {
     visitPsiElement(o);
   }
 
+  public void visitOctalNumber(@NotNull LispOctalNumber o) {
+    visitPsiElement(o);
+  }
+
   public void visitPair(@NotNull LispPair o) {
+    visitPsiElement(o);
+  }
+
+  public void visitPathname(@NotNull LispPathname o) {
+    visitPsiElement(o);
+  }
+
+  public void visitRadixNumber(@NotNull LispRadixNumber o) {
+    visitPsiElement(o);
+  }
+
+  public void visitRatio(@NotNull LispRatio o) {
+    visitPsiElement(o);
+  }
+
+  public void visitReal(@NotNull LispReal o) {
+    visitPsiElement(o);
+  }
+
+  public void visitRealPair(@NotNull LispRealPair o) {
     visitPsiElement(o);
   }
 
@@ -31,12 +83,20 @@ public class LispVisitor extends PsiElementVisitor {
     visitPsiElement(o);
   }
 
-  public void visitSugar(@NotNull LispSugar o) {
+  public void visitStructure(@NotNull LispStructure o) {
     visitPsiElement(o);
   }
 
   public void visitSymbol(@NotNull LispSymbol o) {
     visitNamedElement(o);
+  }
+
+  public void visitTested(@NotNull LispTested o) {
+    visitPsiElement(o);
+  }
+
+  public void visitVector(@NotNull LispVector o) {
+    visitPsiElement(o);
   }
 
   public void visitNamedElement(@NotNull LispNamedElement o) {

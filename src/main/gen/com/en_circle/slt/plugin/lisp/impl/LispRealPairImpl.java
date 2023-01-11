@@ -1,24 +1,25 @@
 // This is a generated file. Not intended for manual editing.
 package com.en_circle.slt.plugin.lisp.impl;
 
-import com.en_circle.slt.plugin.lisp.psi.*;
+import com.en_circle.slt.plugin.lisp.psi.LispReal;
+import com.en_circle.slt.plugin.lisp.psi.LispRealPair;
+import com.en_circle.slt.plugin.lisp.psi.LispVisitor;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.util.PsiTreeUtil;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-public class LispSexprImpl extends ASTWrapperPsiElement implements LispSexpr {
+public class LispRealPairImpl extends ASTWrapperPsiElement implements LispRealPair {
 
-  public LispSexprImpl(@NotNull ASTNode node) {
+  public LispRealPairImpl(@NotNull ASTNode node) {
     super(node);
   }
 
   public void accept(@NotNull LispVisitor visitor) {
-    visitor.visitSexpr(this);
+    visitor.visitRealPair(this);
   }
 
   @Override
@@ -28,21 +29,9 @@ public class LispSexprImpl extends ASTWrapperPsiElement implements LispSexpr {
   }
 
   @Override
-  @Nullable
-  public LispComment getComment() {
-    return findChildByClass(LispComment.class);
-  }
-
-  @Override
-  @Nullable
-  public LispDatum getDatum() {
-    return findChildByClass(LispDatum.class);
-  }
-
-  @Override
   @NotNull
-  public List<LispEnhancement> getEnhancementList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, LispEnhancement.class);
+  public List<LispReal> getRealList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, LispReal.class);
   }
 
 }

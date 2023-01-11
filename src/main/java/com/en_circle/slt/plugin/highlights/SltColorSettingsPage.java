@@ -32,7 +32,7 @@ public class SltColorSettingsPage implements ColorSettingsPage {
             new AttributesDescriptor("Special form", CommonLispHighlighterColors.SPECIAL_FORM),
             new AttributesDescriptor("Function call", CommonLispHighlighterColors.FUNCTION),
             new AttributesDescriptor("Macro call", CommonLispHighlighterColors.MACRO),
-            new AttributesDescriptor("Syntactic sugar", CommonLispHighlighterColors.SUGAR),
+            new AttributesDescriptor("Reader macro", CommonLispHighlighterColors.SUGAR),
     };
 
     @Override

@@ -17,8 +17,14 @@ public class CommonLispStaticHighlighter extends SyntaxHighlighterBase {
     static {
         SyntaxHighlighterBase.fillMap(colors, CommonLispHighlighterColors.COMMENT, LispTypes.COMMENT);
         SyntaxHighlighterBase.fillMap(colors, CommonLispHighlighterColors.PARENTS, LispTypes.LPAREN, LispTypes.RPAREN);
-        SyntaxHighlighterBase.fillMap(colors, CommonLispHighlighterColors.NUMBER, LispTypes.NUMBER_TOKEN);
+        SyntaxHighlighterBase.fillMap(colors, CommonLispHighlighterColors.NUMBER,
+                LispTypes.BIT_ARRAY, LispTypes.BINARY_NUMBER_TOKEN, LispTypes.HEX_NUMBER_TOKEN, LispTypes.RADIX_NUMBER_TOKEN,
+                LispTypes.REAL_NUMBER, LispTypes.INTEGER_NUMBER);
         SyntaxHighlighterBase.fillMap(colors, CommonLispHighlighterColors.STRING, LispTypes.STRING_TOKEN);
+        SyntaxHighlighterBase.fillMap(colors, CommonLispHighlighterColors.SUGAR,
+                LispTypes.FUNCTION, LispTypes.UNINTERN, LispTypes.REFERENCE_SET, LispTypes.REFERENCE_LABEL,
+                LispTypes.TEST_SUCCESS, LispTypes.TEST_FALURE, LispTypes.EVAL_VALUE, LispTypes.ARRAY_START,
+                LispTypes.PATHNAME_INDICATOR, LispTypes.STRUCTURE_TOKEN);
     }
 
     @Override

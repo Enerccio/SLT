@@ -12,12 +12,12 @@ public class SltCommenter implements Commenter {
 
     @Override
     public @Nullable String getBlockCommentPrefix() {
-        return "*|";
+        return "#|";
     }
 
     @Override
     public @Nullable String getBlockCommentSuffix() {
-        return "|*";
+        return "|#";
     }
 
     @Override

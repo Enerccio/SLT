@@ -4,6 +4,8 @@ import com.intellij.lexer.FlexLexer;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.TokenType;
 import com.en_circle.slt.plugin.lisp.psi.LispTypes;
+import com.en_circle.slt.plugin.lisp.LispLexerUtils;
+import com.en_circle.slt.plugin.lisp.number.LispNumberLexerAdapter;
 
 %%
 
@@ -16,123 +18,191 @@ import com.en_circle.slt.plugin.lisp.psi.LispTypes;
 %eof}
 
 %{
-  StringBuffer comment = new StringBuffer();
-  StringBuffer string = new StringBuffer();
-  StringBuffer identifier = new StringBuffer();
 
-  IElementType processIdentifier(boolean unread) {
-        String value = identifier.toString();
-        if ("*|".equals(value)) {
-            yybegin(BLOCKCOMMENT);
-            return null;
-        }
-        yybegin(YYINITIAL);
-        if (unread)
+LispNumberLexerAdapter numberLexer = new LispNumberLexerAdapter();
+int escapeCount = 0;
+StringBuffer tokenBuffer = new StringBuffer();
+
+IElementType processBuffer(boolean unget) {
+      if (unget)
           yypushback(1);
-        return LispTypes.IDENTIFIER_TOKEN;
-    }
+      return LispLexerUtils.processToken(numberLexer, tokenBuffer.toString());
+}
+
 %}
 
+%state LINE_COMMENT
 %state STRING
-%state IDENTIFIER
-%state BLOCKCOMMENT
+%state STRING_ESCAPE
+%state SHARPSIGN
+%state BIT_ARRAY
+%state CHARACTER
+%state BLOCK_COMMENT
+%state BLOCK_COMMENT_TEST
+%state BINARY_NUM
+%state OCTAL_NUM
+%state RADIX_NUM
+%state HEX_NUM
+%state STEP8
+%state STEP8ESCAPE
+%state STEP9
+%state STEP9ESCAPE
 
-WHITE_SPACE=[\ \n\t\f\r]
-END_OF_LINE_COMMENT=(";")[^\r\n]*
-LPAREN=["("]
-RPAREN=[")"]
-COMMA=[","]
-AMPERSAND=["@"]
-BACKQUOTE=["`"]
-QUOTE=["'"]
-DOT=["."]
-HASHTAG=["#"]
-INTEGER_LITERAL = 0 | [1-9][0-9]*
-BIN_LITERAL = (0b)[0-1]*
-OCT_LITERAL = (0o)[0-7]*
-HEX_LITERAL = (0x)[(1-9)|(a-f)|(A-F)]*
-FLOAT_LITERAL = {INTEGER_LITERAL}\.{INTEGER_LITERAL}
-IDENTIFIER_TOKEN_START=[^\ \r\n\f\r\t\(\)\,\@`\'\"0123456789\.]
+WHITESPACE_CHARACTER=[\r\n\t\ ]
+CONSTITUENT_CHARACTER=[!$%&*+\-\./0-9:<=>?@A-Za-z\[\]\^_{}~]
+TERMINATING_MACRO_CHAR=[\"'\(\),;`]
 
 %%
 
-<YYINITIAL> {END_OF_LINE_COMMENT}
-    { yybegin(YYINITIAL); return LispTypes.COMMENT; }
-<YYINITIAL> {WHITE_SPACE}+
-    { yybegin(YYINITIAL); return TokenType.WHITE_SPACE; }
+<YYINITIAL> [\(] { yybegin(YYINITIAL); return LispTypes.LPAREN;  }
+<YYINITIAL> [\)] { yybegin(YYINITIAL); return LispTypes.RPAREN;  }
+<YYINITIAL> [\'] { yybegin(YYINITIAL); return LispTypes.QUOTE;  }
+<YYINITIAL> [;] { yybegin(LINE_COMMENT); }
+<YYINITIAL> [\"] { yybegin(STRING); }
+<YYINITIAL> [`] { yybegin(YYINITIAL); return LispTypes.BACKQUOTE;  }
+<YYINITIAL> [,] { yybegin(YYINITIAL); return LispTypes.COMMA;  }
+<YYINITIAL> [#] { yybegin(SHARPSIGN); }
 
-<YYINITIAL> {LPAREN}
-    { yybegin(YYINITIAL); return LispTypes.LPAREN; }
-<YYINITIAL> {RPAREN}
-    { yybegin(YYINITIAL); return LispTypes.RPAREN; }
-<YYINITIAL> {AMPERSAND}
-    { yybegin(YYINITIAL); return LispTypes.AMPERSAND; }
-<YYINITIAL> {COMMA}
-    { yybegin(YYINITIAL); return LispTypes.COMMA; }
-<YYINITIAL> {BACKQUOTE}
-    { yybegin(YYINITIAL); return LispTypes.BACKQUOTE; }
-<YYINITIAL> {DOT}
-    { yybegin(YYINITIAL); return LispTypes.DOT; }
-<YYINITIAL> {HASHTAG}
-  { yybegin(YYINITIAL); return LispTypes.HASHTAG; }
-<YYINITIAL> {QUOTE}
-    { yybegin(YYINITIAL); return LispTypes.QUOTE; }
-<YYINITIAL> {INTEGER_LITERAL}|{BIN_LITERAL}|{OCT_LITERAL}|{HEX_LITERAL}|{FLOAT_LITERAL}
-    { yybegin(YYINITIAL); return LispTypes.NUMBER_TOKEN; }
+<YYINITIAL> {WHITESPACE_CHARACTER}+ { yybegin(YYINITIAL); return TokenType.WHITE_SPACE; }
+<YYINITIAL> ["|"] { yybegin(STEP9); escapeCount=1; tokenBuffer.setLength(0); }
+<YYINITIAL> {CONSTITUENT_CHARACTER} { yybegin(STEP8); escapeCount=0; tokenBuffer.setLength(0); tokenBuffer.append(yytext()); }
 
-<YYINITIAL> \"
-    { string.setLength(0); yybegin(STRING); }
-<YYINITIAL> {IDENTIFIER_TOKEN_START}
-    { identifier.setLength(0); identifier.append(yytext()); yybegin(IDENTIFIER); }
+<YYINITIAL> <<EOF>> { return null; }
+<YYINITIAL> [^] { yybegin(YYINITIAL); return TokenType.ERROR_ELEMENT; }
 
-<BLOCKCOMMENT> {
-    [^\*]+ { comment.append(yytext()); }
-
-    <<EOF>> { yybegin(YYINITIAL); return LispTypes.COMMENT; }
-
-    \* {
-        if (comment.toString().endsWith("|")) {
-            yybegin(YYINITIAL); return LispTypes.COMMENT;
-        } else {
-            comment.append(yytext());
-        }
-    }
+<LINE_COMMENT> {
+    [\r\n] { yybegin(YYINITIAL); return LispTypes.LINE_COMMENT; }
+    <<EOF>> { yybegin(YYINITIAL); return LispTypes.LINE_COMMENT; }
+    [^] { }
 }
 
 <STRING> {
-    \"                             { yybegin(YYINITIAL);
-                                     return LispTypes.STRING_TOKEN; }
-    [^\"\\]+                   { string.append( yytext() ); }
-    \\t                            { string.append('\t'); }
-    \\n                            { string.append('\n'); }
+    [\"] { yybegin(YYINITIAL); return LispTypes.STRING_TOKEN; }
+    [\\] { yybegin(STRING_ESCAPE); }
 
-    \\r                            { string.append('\r'); }
-    \\\"                           { string.append('\"'); }
-    \\                             { string.append('\\'); }
+    <<EOF>> { yybegin(YYINITIAL); return TokenType.ERROR_ELEMENT; }
+    [^] { }
+}
 
-   <<EOF>> { yybegin(YYINITIAL);
-                                                return LispTypes.STRING_TOKEN; }
-  }
+<STRING_ESCAPE> {
+    [^] { yybegin(STRING); }
+    <<EOF>> { yybegin(YYINITIAL); return TokenType.ERROR_ELEMENT; }
+}
 
-<IDENTIFIER> {
-    [\ \r\n\f\r\t\(\)\,\@`\'\"\;\#]
-      {
-            IElementType ret = processIdentifier(true);
-            if (ret != null) {
-                return ret;
-            }
-      }
+<SHARPSIGN> {
+    [0-9] { }
 
-    <<EOF>> {
-          IElementType ret = processIdentifier(false);
-          if (ret != null) {
-              return ret;
-          }
-      }
+    [\b\t\n\r\ ] { yybegin(YYINITIAL); return TokenType.ERROR_ELEMENT; }
+    [!\"$%&] { yybegin(YYINITIAL); return LispTypes.UNDEFINED_SEQUENCE;  }
+    ["#"] { yybegin(YYINITIAL); return LispTypes.REFERENCE_LABEL; }
+    ["'"] { yybegin(YYINITIAL); return LispTypes.FUNCTION; }
+    ["("] { yybegin(YYINITIAL); return LispTypes.HASH_LPAREN; }
+    ["*"] { yybegin(BIT_ARRAY); }
+    [","] { yybegin(YYINITIAL); return LispTypes.UNDEFINED_SEQUENCE; }
+    [":"] { yybegin(YYINITIAL); return LispTypes.UNINTERN; }
+    [";"] { yybegin(YYINITIAL); return LispTypes.UNDEFINED_SEQUENCE; }
+    ["="] { yybegin(YYINITIAL); return LispTypes.REFERENCE_SET; }
+    [>?@\[] { yybegin(YYINITIAL); return LispTypes.UNDEFINED_SEQUENCE; }
+    ["\\"] { yybegin(CHARACTER); }
+    [\]\^_`] { yybegin(YYINITIAL); return LispTypes.UNDEFINED_SEQUENCE; }
+    ["|"] { yybegin(BLOCK_COMMENT); }
+    [~{}] { yybegin(YYINITIAL); return LispTypes.UNDEFINED_SEQUENCE; }
+    ["+"] { yybegin(YYINITIAL); return LispTypes.TEST_SUCCESS; }
+    ["-"] { yybegin(YYINITIAL); return LispTypes.TEST_FALURE; }
+    ["."] { yybegin(YYINITIAL); return LispTypes.EVAL_VALUE; }
+    [/] { yybegin(YYINITIAL); return LispTypes.UNDEFINED_SEQUENCE; }
+    [aA] { yybegin(YYINITIAL); return LispTypes.ARRAY_START; }
+    [bB] { yybegin(BINARY_NUM); }
+    [cC] { yybegin(YYINITIAL); return LispTypes.REAL_PAIR_START; }
+    [d-n] { yybegin(YYINITIAL); return LispTypes.UNDEFINED_SEQUENCE; }
+    [D-N] { yybegin(YYINITIAL); return LispTypes.UNDEFINED_SEQUENCE; }
+    [oO] { yybegin(OCTAL_NUM); }
+    [pP] { yybegin(YYINITIAL); return LispTypes.PATHNAME_INDICATOR; }
+    [qQ] { yybegin(YYINITIAL); return LispTypes.UNDEFINED_SEQUENCE; }
+    [rR] { yybegin(RADIX_NUM); }
+    [sS] { yybegin(YYINITIAL); return LispTypes.STRUCTURE_TOKEN; }
+    [t-w] { yybegin(YYINITIAL); return LispTypes.UNDEFINED_SEQUENCE; }
+    [T-W] { yybegin(YYINITIAL); return LispTypes.UNDEFINED_SEQUENCE; }
+    [xX] { yybegin(HEX_NUM); }
+    [y-z] { yybegin(YYINITIAL); return LispTypes.UNDEFINED_SEQUENCE; }
+    [Y-Z] { yybegin(YYINITIAL); return LispTypes.UNDEFINED_SEQUENCE; }
 
-    [^\ \r\n\f\t\r\(\)\,\@`\'\"\;]+
-      { identifier.append( yytext() ); }
-  }
+    [^] { yybegin(YYINITIAL); return TokenType.ERROR_ELEMENT; }
+}
 
-[^]                              { throw new Error("Illegal character <"+
-                                                    yytext()+">"); }
+<BIT_ARRAY> {
+    [0|1] { }
+
+    [^] { yybegin(YYINITIAL); return LispTypes.BIT_ARRAY; }
+}
+
+<CHARACTER> {
+    [^] { yybegin(YYINITIAL); return LispTypes.CHARACTER; }
+}
+
+<BLOCK_COMMENT> {
+    ["|"] { yybegin(BLOCK_COMMENT_TEST); }
+
+    <<EOF>> { yybegin(YYINITIAL); return TokenType.ERROR_ELEMENT; }
+    [^] { }
+}
+
+<BLOCK_COMMENT_TEST> {
+    ["#"] { yybegin(YYINITIAL); return LispTypes.BLOCK_COMMENT; }
+    [^] { yybegin(BLOCK_COMMENT); }
+}
+
+<BINARY_NUM> {
+    [01/] { }
+
+    <<EOF>> { yybegin(YYINITIAL); return TokenType.ERROR_ELEMENT; }
+    [^] { yybegin(YYINITIAL); return LispTypes.BINARY_NUMBER_TOKEN; }
+}
+
+<OCTAL_NUM> {
+    [0-7/] { }
+
+    <<EOF>> { yybegin(YYINITIAL); return TokenType.ERROR_ELEMENT; }
+    [^] { yybegin(YYINITIAL); return LispTypes.OCTAL_NUMBER_TOKEN; }
+}
+
+<RADIX_NUM> {
+    [0-9a-zA-Z/] { }
+
+    <<EOF>> { yybegin(YYINITIAL); return TokenType.ERROR_ELEMENT; }
+    [^] { yybegin(YYINITIAL); return LispTypes.RADIX_NUMBER_TOKEN; }
+}
+
+
+<HEX_NUM> {
+    [0-9a-fA-F/] { }
+
+    <<EOF>> { yybegin(YYINITIAL); return TokenType.ERROR_ELEMENT; }
+    [^] { yybegin(YYINITIAL); return LispTypes.HEX_NUMBER_TOKEN; }
+}
+
+<STEP8> {
+    {CONSTITUENT_CHARACTER} | "#" { tokenBuffer.append(yytext()); }
+    \\ { yybegin(STEP8ESCAPE); }
+    "|" { yybegin(STEP9); escapeCount++; }
+    {TERMINATING_MACRO_CHAR} { yybegin(YYINITIAL); return processBuffer(true); }
+    {WHITESPACE_CHARACTER} { yybegin(YYINITIAL); return processBuffer(true); }
+    <<EOF>> { yybegin(YYINITIAL); return processBuffer(false); }
+}
+
+<STEP8ESCAPE> {
+     <<EOF>> { yybegin(YYINITIAL); return TokenType.ERROR_ELEMENT; }
+     [^] { yybegin(STEP8); tokenBuffer.append(yytext()); }
+}
+
+<STEP9> {
+    {CONSTITUENT_CHARACTER} | {TERMINATING_MACRO_CHAR} | {WHITESPACE_CHARACTER} | "#"  { tokenBuffer.append(yytext()); }
+    \\ { yybegin(STEP9ESCAPE); }
+     "|" { yybegin(STEP8); escapeCount++; }
+     <<EOF>> { yybegin(YYINITIAL); return TokenType.ERROR_ELEMENT; }
+}
+
+<STEP9ESCAPE> {
+     <<EOF>> { yybegin(YYINITIAL); return TokenType.ERROR_ELEMENT; }
+     [^] { yybegin(STEP9); tokenBuffer.append(yytext()); }
+}

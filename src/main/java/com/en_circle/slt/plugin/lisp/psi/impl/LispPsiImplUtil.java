@@ -36,7 +36,7 @@ public class LispPsiImplUtil {
     }
 
     public static String getName(LispSymbol element) {
-        ASTNode identifier = element.getNode().findChildByType(LispTypes.IDENTIFIER_TOKEN);
+        ASTNode identifier = element.getNode().findChildByType(LispTypes.SYMBOL_TOKEN);
         assert identifier != null;
         return identifier.getText();
     }
@@ -53,10 +53,10 @@ public class LispPsiImplUtil {
     }
 
     public static PsiElement setName(LispSymbol element, String newName) {
-        ASTNode identifier = element.getNode().findChildByType(LispTypes.IDENTIFIER_TOKEN);
+        ASTNode identifier = element.getNode().findChildByType(LispTypes.SYMBOL_TOKEN);
         if (identifier != null) {
             LispSymbol symbol = createSymbol(element.getProject(), newName);
-            ASTNode newNameNode = symbol.getNode().findChildByType(LispTypes.IDENTIFIER_TOKEN);
+            ASTNode newNameNode = symbol.getNode().findChildByType(LispTypes.SYMBOL_TOKEN);
             assert newNameNode != null;
             element.getNode().replaceChild(identifier, newNameNode);
         }
@@ -64,7 +64,7 @@ public class LispPsiImplUtil {
     }
 
     public static PsiElement getNameIdentifier(LispSymbol element) {
-        ASTNode identifier = element.getNode().findChildByType(LispTypes.IDENTIFIER_TOKEN);
+        ASTNode identifier = element.getNode().findChildByType(LispTypes.SYMBOL_TOKEN);
         if (identifier != null) {
             return identifier.getPsi();
         } else {

@@ -1,16 +1,12 @@
 // This is a generated file. Not intended for manual editing.
 package com.en_circle.slt.plugin.lisp.impl;
 
-import java.util.List;
-import org.jetbrains.annotations.*;
-import com.intellij.lang.ASTNode;
-import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiElementVisitor;
-import com.intellij.psi.util.PsiTreeUtil;
-import static com.en_circle.slt.plugin.lisp.psi.LispTypes.*;
-import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.en_circle.slt.plugin.lisp.psi.*;
-import com.en_circle.slt.plugin.lisp.psi.impl.LispPsiImplUtil;
+import com.intellij.extapi.psi.ASTWrapperPsiElement;
+import com.intellij.lang.ASTNode;
+import com.intellij.psi.PsiElementVisitor;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class LispNumberImpl extends ASTWrapperPsiElement implements LispNumber {
 
@@ -26,6 +22,42 @@ public class LispNumberImpl extends ASTWrapperPsiElement implements LispNumber {
   public void accept(@NotNull PsiElementVisitor visitor) {
     if (visitor instanceof LispVisitor) accept((LispVisitor)visitor);
     else super.accept(visitor);
+  }
+
+  @Override
+  @Nullable
+  public LispBinaryNumber getBinaryNumber() {
+    return findChildByClass(LispBinaryNumber.class);
+  }
+
+  @Override
+  @Nullable
+  public LispHexNumber getHexNumber() {
+    return findChildByClass(LispHexNumber.class);
+  }
+
+  @Override
+  @Nullable
+  public LispInteger getInteger() {
+    return findChildByClass(LispInteger.class);
+  }
+
+  @Override
+  @Nullable
+  public LispOctalNumber getOctalNumber() {
+    return findChildByClass(LispOctalNumber.class);
+  }
+
+  @Override
+  @Nullable
+  public LispRadixNumber getRadixNumber() {
+    return findChildByClass(LispRadixNumber.class);
+  }
+
+  @Override
+  @Nullable
+  public LispRatio getRatio() {
+    return findChildByClass(LispRatio.class);
   }
 
 }

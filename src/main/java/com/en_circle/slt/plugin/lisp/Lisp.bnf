@@ -18,21 +18,54 @@
 
 lispFile ::= sexpr*
 
-sexpr ::= sugar* (pair|list|atom|COMMENT)
+sexpr ::= (enhancement* datum) | comment
+
+comment ::= LINE_COMMENT | BLOCK_COMMENT
+
+enhancement ::= REFERENCE_SET | REFERENCE_LABEL | TEST_SUCCESS | COMMA | BACKQUOTE | QUOTE | FUNCTION
+
+datum ::= tested | evaled | pathname | UNDEFINED_SEQUENCE | BIT_ARRAY | CHARACTER
+            | number | real_pair
+            | symbol
+            | string | vector | array | structure | list | pair
+
+tested ::= (TEST_SUCCESS | TEST_FALURE) sexpr
+
+evaled ::= EVAL_VALUE sexpr
+
+pathname ::= PATHNAME_INDICATOR sexpr
+
+vector ::= HASH_LPAREN sexpr* RPAREN
+
+array ::= ARRAY_START list
+
+structure ::= STRUCTURE_TOKEN list
 
 list ::= LPAREN sexpr* RPAREN
 
 pair ::= LPAREN sexpr+ DOT sexpr RPAREN
 
-sugar ::= (QUOTE | BACKQUOTE | (COMMA AMPERSAND?) | (HASHTAG COMMA?))
-
-atom ::= number | string | symbol
-
-number ::= NUMBER_TOKEN
-
 string ::= STRING_TOKEN
 
-symbol ::= IDENTIFIER_TOKEN {
+number ::= binary_number | octal_number | hex_number | radix_number | integer | ratio
+
+binary_number ::= BINARY_NUMBER_TOKEN
+
+octal_number ::= OCTAL_NUMBER_TOKEN
+
+hex_number ::= HEX_NUMBER_TOKEN
+
+radix_number ::= RADIX_NUMBER_TOKEN
+
+real_pair ::= REAL_PAIR_START LPAREN real real RPAREN
+
+real ::= REAL_NUMBER
+
+integer ::= INTEGER_NUMBER
+
+ratio ::= RATIO_NUMBER
+
+symbol ::= UNINTERN? SYMBOL_TOKEN {
     mixin="com.en_circle.slt.plugin.lisp.psi.impl.LispNamedElementImpl"
   implements="com.en_circle.slt.plugin.lisp.psi.LispNamedElement"
   methods=[getName setName getNameIdentifier]
