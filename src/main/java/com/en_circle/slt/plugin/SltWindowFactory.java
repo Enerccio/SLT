@@ -23,6 +23,7 @@ public class SltWindowFactory implements ToolWindowFactory {
             SltDebuggers debugger = new SltDebuggers(toolWindow);
             ContentFactory contentFactory = ContentFactory.SERVICE.getInstance();
             Content content = contentFactory.createContent(debugger.getContent(), "SBCL Debuggers", false);
+            debugger.setSelf(content);
             toolWindow.getContentManager().addContent(content);
         }
     }

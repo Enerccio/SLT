@@ -1,5 +1,32 @@
-(:new-features
-    (:swank :quicklisp :asdf3.3 :asdf3.2 :asdf3.1 :asdf3 :asdf2 :asdf :os-unix :non-base-chars-exist-p
-    :asdf-unicode :arena-allocator :x86-64 :gencgc :64-bit :ansi-cl :common-lisp
-    :elf :ieee-floating-point :linux :little-endian :package-local-nicknames
-    :sb-core-compression :sb-ldb :sb-package-locks :sb-thread :sb-unicode :sbcl :unix))
+(:debug 1 1 ("arithmetic error DIVISION-BY-ZERO signalled
+Operation was (/ 1 0)." "   [Condition of type DIVISION-BY-ZERO]" nil) (("RETRY" "Retry SLIME interactive evaluation request.") ("*ABORT" "Return to SLIME's top level.") ("ABORT" "abort thread (#<THREAD \"worker\" RUNNING {10020D5AA3}>)")) ((0 "(SB-KERNEL::INTEGER-/-INTEGER 1 0)") (1 "(/ 1 0)") (2 "(SB-INT:SIMPLE-EVAL-IN-LEXENV (/ 1 0) #<NULL-LEXENV>)") (3 "(EVAL (/ 1 0))") (4 "((LAMBDA NIL :IN SWANK:SLT-EVAL))" (:restartable t)) (5 "(SWANK::CALL-WITH-RETRY-RESTART \"Retry SLIME interactive evaluation request.\" #<FUNCTION (LAMBDA NIL :IN SWANK:SLT-EVAL) {10020F821B}>)" (:restartable t)) (6 "(SWANK::CALL-WITH-BUFFER-SYNTAX NIL #<FUNCTION (LAMBDA NIL :IN SWANK:SLT-EVAL) {10020F81FB}>)" (:restartable t)) (7 "(SWANK:SLT-EVAL \"(/ 1 0) ..)" (:restartable t)) (8 "(SB-INT:SIMPLE-EVAL-IN-LEXENV (SWANK:SLT-EVAL \"(/ 1 0) ..)") (9 "(EVAL (SWANK:SLT-EVAL \"(/ 1 0) ..)") (10 "(SWANK:EVAL-FOR-EMACS (SWANK:SLT-EVAL \"(/ 1 0) ..)" (:restartable t)) (11 "((LAMBDA NIL :IN SWANK::SPAWN-WORKER-THREAD))" (:restartable t)) (12 "(SWANK/SBCL::CALL-WITH-BREAK-HOOK #<FUNCTION SWANK:SWANK-DEBUGGER-HOOK> #<FUNCTION (LAMBDA NIL :IN SWANK::SPAWN-WORKER-THREAD) {536458DB}>)") (13 "((FLET SWANK/BACKEND:CALL-WITH-DEBUGGER-HOOK :IN \"/usr/share/common-lisp/source/swank/swank/sbcl.lisp\") #<FUNCTION SWANK:SWANK-DEBUGGER-HOOK> #<FUNCTION (LAMBDA NIL :IN SWANK::SPAWN-WORKER-THREAD) {53..") (14 "((LAMBDA NIL :IN SWANK::SPAWN-WORKER-THREAD))" (:restartable t)) (15 "((FLET SB-UNIX::BODY :IN SB-THREAD::RUN))") (16 "((FLET \"WITHOUT-INTERRUPTS-BODY-132\" :IN SB-THREAD::RUN))") (17 "((FLET SB-UNIX::BODY :IN SB-THREAD::RUN))") (18 "((FLET \"WITHOUT-INTERRUPTS-BODY-125\" :IN SB-THREAD::RUN))") (19 "(SB-THREAD::RUN)")) (3))
+
+(:debug 2 1
+    ("The variable X is unbound." "   [Condition of type UNBOUND-VARIABLE]" nil)
+     (("CONTINUE" "Retry using X.")
+      ("USE-VALUE" "Use specified value.")
+      ("STORE-VALUE" "Set specified value and use it.")
+      ("RETRY" "Retry SLIME interactive evaluation request.")
+      ("*ABORT" "Return to SLIME's top level.")
+      ("ABORT" "abort thread (#<THREAD \"worker\" RUNNING {100247F633}>)"))
+     ((0 "(SB-INT:SIMPLE-EVAL-IN-LEXENV X #<NULL-LEXENV>)")
+      (1 "(SB-INT:SIMPLE-EVAL-IN-LEXENV (+ X 5) #<NULL-LEXENV>)")
+      (2 "(EVAL (+ X 5))")
+      (3 "((LAMBDA NIL :IN SWANK:SLT-EVAL))" (:restartable t))
+      (4 "(SWANK::CALL-WITH-RETRY-RESTART \"Retry SLIME interactive evaluation request.\" #<FUNCTION (LAMBDA NIL :IN SWANK:SLT-EVAL) {10024A8E1B}>)" (:restartable t))
+      (5 "(SWANK::CALL-WITH-BUFFER-SYNTAX NIL #<FUNCTION (LAMBDA NIL :IN SWANK:SLT-EVAL) {10024A8DFB}>)" (:restartable t))
+      (6 "(SWANK:SLT-EVAL \"(+ x 5) ..)" (:restartable t))
+      (7 "(SB-INT:SIMPLE-EVAL-IN-LEXENV (SWANK:SLT-EVAL \"(+ x 5) ..)")
+      (8 "(EVAL (SWANK:SLT-EVAL \"(+ x 5) ..)")
+      (9 "(SWANK:EVAL-FOR-EMACS (SWANK:SLT-EVAL \"(+ x 5) ..)" (:restartable t))
+      (10 "((LAMBDA NIL :IN SWANK::SPAWN-WORKER-THREAD))" (:restartable t))
+      (11 "(SWANK/SBCL::CALL-WITH-BREAK-HOOK #<FUNCTION SWANK:SWANK-DEBUGGER-HOOK> #<FUNCTION (LAMBDA NIL :IN SWANK::SPAWN-WORKER-THREAD) {536458DB}>)")
+      (12 "((FLET SWANK/BACKEND:CALL-WITH-DEBUGGER-HOOK :IN \"/usr/share/common-lisp/source/swank/swank/sbcl.lisp\") #<FUNCTION SWANK:SWANK-DEBUGGER-HOOK> #<FUNCTION (LAMBDA NIL :IN SWANK::SPAWN-WORKER-THREAD) {53..")
+      (13 "((LAMBDA NIL :IN SWANK::SPAWN-WORKER-THREAD))" (:restartable t))
+      (14 "((FLET SB-UNIX::BODY :IN SB-THREAD::RUN))")
+      (15 "((FLET \"WITHOUT-INTERRUPTS-BODY-132\" :IN SB-THREAD::RUN))")
+      (16 "((FLET SB-UNIX::BODY :IN SB-THREAD::RUN))")
+      (17 "((FLET \"WITHOUT-INTERRUPTS-BODY-125\" :IN SB-THREAD::RUN))")
+      (18 "(SB-THREAD::RUN)")
+      (19 "(\"foreign function: call_into_lisp_\")"))
+     (9))

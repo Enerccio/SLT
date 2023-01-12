@@ -5,7 +5,9 @@ import com.en_circle.slt.plugin.SltCommonLispLanguage;
 import com.en_circle.slt.plugin.SltCommonLispParserDefinition;
 import com.en_circle.slt.plugin.lisp.lisp.*;
 import com.en_circle.slt.plugin.lisp.psi.LispCoreProjectEnvironment;
+import com.en_circle.slt.plugin.swank.debug.SltDebugInfo;
 import com.en_circle.slt.plugin.swank.requests.SltEval;
+import com.en_circle.slt.plugin.swank.requests.SltInvokeNthRestart;
 import com.en_circle.slt.plugin.swank.requests.SwankEvalAndGrab;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
@@ -32,15 +34,17 @@ public class SlimeListener implements SwankClient.SwankReply {
     private final boolean fromUi;
     private final Map<BigInteger, SlimeRequest> requests = Collections.synchronizedMap(new HashMap<>());
     private final RequestResponseLogger logger;
+    private final DebugInterface debugInterface;
 
-    public SlimeListener(Project project, boolean fromUi, RequestResponseLogger logger) {
+    public SlimeListener(Project project, boolean fromUi, RequestResponseLogger logger, DebugInterface debugInterface) {
         this.project = project;
         this.fromUi = fromUi;
         this.logger = logger;
+        this.debugInterface = debugInterface;
     }
 
     public void call(SlimeRequest request, SwankClient client) {
-        BigInteger requestId = nextRpc();
+        BigInteger requestId = request.getRequestId() == null ? nextRpc() : request.getRequestId();
         requests.put(requestId, request);
         SwankPacket packet = request.createPacket(requestId);
         if (logger != null) {
@@ -84,6 +88,12 @@ public class SlimeListener implements SwankClient.SwankReply {
                 LispContainer reply = (LispContainer) element;
                 if (isReturn(reply)) {
                     processReturn(reply);
+                } else if (isDebug(reply)) {
+                    processDebug(reply);
+                } else if (isDebugReturn(reply)) {
+                    processDebugReturn(reply);
+                } else if (isDebugActivate(reply)) {
+                    processDebugActivate(reply);
                 }
             }
         }
@@ -124,15 +134,71 @@ public class SlimeListener implements SwankClient.SwankReply {
                 SwankEvalAndGrab evalAndGrab = (SwankEvalAndGrab) request;
                 evalAndGrab.processReply((LispContainer) reply.getItems().get(1), this::parse);
             }
+
+            if (request instanceof SltInvokeNthRestart) {
+                SltInvokeNthRestart restart = (SltInvokeNthRestart) request;
+                restart.processReply((LispContainer) reply.getItems().get(1));
+            }
         } finally {
             requests.remove(replyId.getValue());
         }
+    }
+
+    private boolean isDebug(LispContainer reply) {
+        return reply.getItems().size() > 0 &&
+                reply.getItems().get(0) instanceof LispSymbol &&
+                ":debug".equals(((LispSymbol) reply.getItems().get(0)).getValue());
+    }
+
+    private void processDebug(LispContainer reply) {
+        SltDebugInfo debugInfo = new SltDebugInfo(reply);
+        if (debugInterface != null) {
+            debugInterface.onDebugCreate(debugInfo);
+        }
+    }
+
+    private void processDebugReturn(LispContainer reply) {
+        if (debugInterface != null) {
+            BigInteger threadId = ((LispInteger) reply.getItems().get(1)).getValue();
+            BigInteger level = ((LispInteger) reply.getItems().get(1)).getValue();
+            debugInterface.onDebugReturn(threadId, level);
+        }
+    }
+
+    private void processDebugActivate(LispContainer reply) {
+        if (debugInterface != null) {
+            BigInteger threadId = ((LispInteger) reply.getItems().get(1)).getValue();
+            BigInteger level = ((LispInteger) reply.getItems().get(1)).getValue();
+            debugInterface.onDebugActivate(threadId, level);
+        }
+    }
+
+    private boolean isDebugReturn(LispContainer reply) {
+        return reply.getItems().size() > 0 &&
+                reply.getItems().get(0) instanceof LispSymbol &&
+                ":debug-return".equals(((LispSymbol) reply.getItems().get(0)).getValue());
+    }
+
+    private boolean isDebugActivate(LispContainer reply) {
+        return reply.getItems().size() > 0 &&
+                reply.getItems().get(0) instanceof LispSymbol &&
+                ":debug-activate".equals(((LispSymbol) reply.getItems().get(0)).getValue());
     }
 
     public interface RequestResponseLogger {
 
         void logRequest(String request);
         void logResponse(String response);
+
+    }
+
+    public interface DebugInterface {
+
+        void onDebugCreate(SltDebugInfo info);
+
+        void onDebugActivate(BigInteger debugId, BigInteger level);
+
+        void onDebugReturn(BigInteger debugId, BigInteger level);
 
     }
 

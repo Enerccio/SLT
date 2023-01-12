@@ -6,6 +6,7 @@ import com.en_circle.slt.plugin.lisp.lisp.LispElementType;
 import com.en_circle.slt.plugin.lisp.lisp.LispString;
 import com.en_circle.slt.plugin.lisp.lisp.LispSymbol;
 import com.en_circle.slt.plugin.swank.*;
+import com.en_circle.slt.plugin.swank.SlimeListener.DebugInterface;
 import com.en_circle.slt.plugin.swank.SlimeListener.RequestResponseLogger;
 import com.en_circle.slt.plugin.swank.SwankServer.SwankServerListener;
 import com.en_circle.slt.plugin.swank.requests.SwankEvalAndGrab;
@@ -29,6 +30,7 @@ public class SltSBCL {
     private SlimeListener slimeListener;
     private Project project;
     private RequestResponseLogger logger;
+    private DebugInterface debugInterface;
     private final List<SBCLServerListener> serverListeners = Collections.synchronizedList(new ArrayList<>());
     private final Map<String, SymbolState> symbolInformation = Collections.synchronizedMap(new HashMap<>());
 
@@ -50,7 +52,7 @@ public class SltSBCL {
                 .build();
         SwankServer.startSbcl(c);
 
-        slimeListener = new SlimeListener(project, true, logger);
+        slimeListener = new SlimeListener(project, true, logger, debugInterface);
         client = new SwankClient("127.0.0.1", SltState.getInstance().port, slimeListener);
 
         for (SBCLServerListener listener : serverListeners) {
@@ -60,6 +62,10 @@ public class SltSBCL {
 
     public void setRequestResponseLogger(RequestResponseLogger logger) {
         this.logger = logger;
+    }
+
+    public void setDebugInterface(DebugInterface debugInterface) {
+        this.debugInterface = debugInterface;
     }
 
     public void sendToSbcl(SlimeRequest request) throws Exception {

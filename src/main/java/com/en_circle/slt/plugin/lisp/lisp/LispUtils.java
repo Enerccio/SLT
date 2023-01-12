@@ -13,6 +13,7 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiRecursiveVisitor;
 import com.intellij.psi.tree.IElementType;
+import org.codehaus.plexus.util.StringUtils;
 import org.jetbrains.annotations.NotNull;
 
 import java.math.BigInteger;
@@ -28,6 +29,11 @@ public class LispUtils {
         source.accept(new LispVisitorImpl(elements));
 
         return elements;
+    }
+
+    public static String unescape(String text) {
+        text = StringUtils.replace(text, "\\\"", "\"");
+        return text;
     }
 
     private static class LispVisitorImpl extends LispVisitor implements PsiRecursiveVisitor {

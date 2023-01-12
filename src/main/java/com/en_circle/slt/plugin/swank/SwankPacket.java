@@ -113,6 +113,22 @@ public class SwankPacket {
         return new SwankPacket(formatted);
     }
 
+    public static SwankPacket invokeNthRestart(BigInteger option, BigInteger level,
+                                               String restartArg, String restartArgs, BigInteger threadId, BigInteger continuation) {
+        restartArg = StringUtils.replace(restartArg, "\\", "\\\\");
+        restartArg = StringUtils.replace(restartArg, "\"", "\\\"");
+        restartArgs = StringUtils.replace(restartArgs, "\\", "\\\\");
+        restartArgs = StringUtils.replace(restartArgs, "\"", "\\\"");
+        String formatted = String.format("(:emacs-rex (swank:invoke-nth-restart-slt '%s '%s \"%s\" \"%s\") \"cl-user\" %s %s)",
+                level, option, restartArg, restartArgs, threadId, continuation);
+        return new SwankPacket(formatted);
+    }
+
+    public static SwankPacket throwToToplevel(BigInteger threadId, BigInteger continuation) {
+        String formatted = String.format("(:emacs-rex (swank:throw-to-toplevel) \"cl-user\" %s %s)", threadId, continuation);
+        return new SwankPacket(formatted);
+    }
+
     private int length;
     private String expressionSource;
 

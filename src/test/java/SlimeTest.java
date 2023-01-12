@@ -1,4 +1,6 @@
 import com.en_circle.slt.plugin.swank.*;
+import com.en_circle.slt.plugin.swank.SlimeListener.DebugInterface;
+import com.en_circle.slt.plugin.swank.debug.SltDebugInfo;
 import org.awaitility.Awaitility;
 
 import java.math.BigInteger;
@@ -12,7 +14,23 @@ public class SlimeTest {
             AtomicLong sent = new AtomicLong();
             AtomicLong expected = new AtomicLong();
             SwankServer.startSbcl(new SwankServerConfiguration.Builder().build());
-            SlimeListener listener = new SlimeListener(null, false, null);
+            SlimeListener listener = new SlimeListener(null, false, null, new DebugInterface() {
+                @Override
+                public void onDebugCreate(SltDebugInfo info) {
+
+
+                }
+
+                @Override
+                public void onDebugActivate(BigInteger debugId, BigInteger level) {
+
+                }
+
+                @Override
+                public void onDebugReturn(BigInteger debugId, BigInteger level) {
+
+                }
+            });
             try (SwankClient client = new SwankClient("127.0.0.1", 4005, packet -> {
                 listener.onSwankMessage(packet);
                 expected.addAndGet(1);

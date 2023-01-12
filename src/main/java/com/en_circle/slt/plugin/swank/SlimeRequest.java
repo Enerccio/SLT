@@ -6,4 +6,8 @@ public abstract  class SlimeRequest {
 
     public abstract SwankPacket createPacket(BigInteger requestId);
 
+    public BigInteger getRequestId() {
+        return null;
+    }
+
 }

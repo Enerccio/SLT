@@ -28,6 +28,30 @@
                 (let ((*compile-print* t) (*compile-verbose* nil))
                     (swank-slt-compile-region string filename lineno charno))))))
 
+(defslimefun invoke-nth-restart-slt (sldb-level n args rest)
+    (when (= sldb-level *sldb-level*)
+        (let ((restart (nth-restart n))
+              (parsed-args (from-string args))
+              (parsed-rest (from-string rest)))
+            (when restart
+                (if (or parsed-args parsed-rest)
+                    (apply #'invoke-restart (concatenate 'list (list restart) parsed-args parsed-rest))
+                    (invoke-restart restart))))))
+
+(defun format-restarts-for-emacs ()
+  "Return a list of restarts for *swank-debugger-condition* in a
+format suitable for Emacs."
+  (let ((*print-right-margin* most-positive-fixnum))
+    (loop for restart in *sldb-restarts* collect
+          (list (format nil "~:[~;*~]~a"
+                        (eq restart *sldb-quit-restart*)
+                        (restart-name restart))
+                (with-output-to-string (stream)
+                  (without-printing-errors (:object restart
+                                            :stream stream
+                                            :msg "<<error printing restart>>")
+                    (princ restart stream)))
+                (swank-backend:arglist (slot-value restart 'function))))))
 
 (in-package swank/sbcl)
 
