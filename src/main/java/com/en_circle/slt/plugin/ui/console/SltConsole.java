@@ -26,11 +26,11 @@ public class SltConsole implements SltComponent {
     private static final Logger LOG = LoggerFactory.getLogger(SltConsole.class);
 
     private TabInfo tabInfo;
-    private LanguageConsoleView languageConsole;
+    protected LanguageConsoleView languageConsole;
     private final JPanel content;
-    private final Project project;
+    protected final Project project;
 
-    private String currentModule = "cl-user";
+    protected String currentModule = "cl-user";
 
     public SltConsole(Project project) {
         this.content = new JPanel(new BorderLayout());
@@ -41,7 +41,7 @@ public class SltConsole implements SltComponent {
     public TabInfo create() {
         languageConsole = new LanguageConsoleBuilder()
                 .build(project, SltCommonLispLanguage.INSTANCE);
-        languageConsole.setPrompt(">>> ");
+        languageConsole.setPrompt(currentModule + "> ");
 
         ConsoleExecuteAction action = new ConsoleExecuteAction(languageConsole, new SltConsoleExecuteActionHandler(languageConsole) {
 
@@ -61,7 +61,7 @@ public class SltConsole implements SltComponent {
         return tabInfo;
     }
 
-    private void eval(String data) {
+    protected void eval(String data) {
         try {
             if (StringUtils.isNotBlank(data)) {
                 SltSBCL.getInstance().sendToSbcl(SltEval.eval(data, currentModule,

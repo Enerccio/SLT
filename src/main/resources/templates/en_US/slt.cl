@@ -2,14 +2,18 @@
 
 (defpackage :slt-core
     (:use :cl :swank)
-    (:export analyze-symbol compile-region))
+    (:export analyze-symbol analyze-symbols read-fix-packages))
 
 ; swank/slime overrides
 
-(in-package swank/backend)
+(in-package sb-debug)
 
-(definterface swank-slt-compile-region (string filename lineno charno)
-    "SLT Region compilation")
+(export 'frame-code-location)
+(export 'frame-call)
+(export 'ensure-printable-object)
+(export 'code-location-source-form)
+
+(in-package swank/backend)
 
 (in-package :swank)
 
@@ -20,13 +24,6 @@
                 (let ((values (multiple-value-list (eval (from-string string)))))
                     (finish-output)
                     (format-values-for-echo-area values))))))
-
-(defslimefun slt-compile-region (string filename lineno charno)
-    (with-buffer-syntax ()
-        (collect-notes
-            (lambda ()
-                (let ((*compile-print* t) (*compile-verbose* nil))
-                    (swank-slt-compile-region string filename lineno charno))))))
 
 (defslimefun invoke-nth-restart-slt (sldb-level n args rest)
     (when (= sldb-level *sldb-level*)
@@ -53,36 +50,40 @@ format suitable for Emacs."
                     (princ restart stream)))
                 (swank-backend:arglist (slot-value restart 'function))))))
 
-(in-package swank/sbcl)
+(defun print-frame-call-place (frame)
+    (multiple-value-bind (name args info)
+            (SB-DEBUG:frame-call frame)
+        (declare (ignore args info))
+        (let ((name (SB-DEBUG:ensure-printable-object name)))
+            name)))
 
-(defimplementation swank-slt-compile-region (string filename lineno charno)
-    (let ((*buffer-tmpfile* (temp-file-name)))
-        (labels ((load-it (filename)
-                    (cond (*trap-load-time-warnings*
-                                (with-compilation-hooks () (load filename)))
-                          (t (load filename))))
-                  (cf ()
-                    (with-compiler-policy NIL
-                        (with-compilation-unit
-                            (:source-plist (list :slt-source filename
-                                                 :slt-lineno lineno
-                                                 :slt-charno charno)
-                             :source-namestring filename
-                             :allow-other-keys t)
-                            (compile-file *buffer-tmpfile* :external-format :utf-8)))))
-            (with-open-file (s *buffer-tmpfile* :direction :output :if-exists :error
-                                 :external-format :utf-8)
-                (write-string string s))
-            (unwind-protect
-                (multiple-value-bind (output-file warningsp failurep)
-                        (with-compilation-hooks () (cf))
-                    (declare (ignore warningsp))
-                    (when output-file
-                        (load-it output-file))
-                    (not failurep))
-                (ignore-errors
-                    (delete-file *buffer-tmpfile*)
-                    (delete-file (compile-file-pathname *buffer-tmpfile*)))))))
+(defslimefun backtrace (start end)
+  (loop for frame in (compute-backtrace start end)
+        for i from start collect
+        (list i (frame-to-string frame)
+                (print-frame-call-place frame)
+                (frame-source-location i)
+                (let ((pkg (frame-package i)))
+                    (cond
+                        (pkg (package-name pkg))
+                        (T NIL))))))
+
+(defslimefun compile-string-region-slt (string buffer offset filename)
+  "Compile STRING (exerpted from BUFFER at POSITION).
+Record compiler notes signalled as `compiler-condition's."
+    (with-buffer-syntax ()
+      (collect-notes
+       (lambda ()
+         (let ((*compile-print* t) (*compile-verbose* nil))
+           (swank-compile-string string
+                                 :buffer buffer
+                                 :position offset
+                                 :filename filename))))))
+
+(export 'slt-eval)
+(export 'compile-string-region-slt)
+
+(in-package swank/sbcl)
 
 (in-package :slt-core)
 
@@ -90,7 +91,7 @@ format suitable for Emacs."
     (eq (sb-cltl2:variable-information test-sym) :special))
 
 (defun analyze-symbol (test-sym)
-    (let ((*standard-output* (make-string-output-stream)))
+    (cons test-sym (let ((*standard-output* (make-string-output-stream)))
         (cond
             ((special-operator-p test-sym) (list :special-form NIL))
             ((macro-function test-sym) (progn
@@ -108,6 +109,26 @@ format suitable for Emacs."
             ((constantp test-sym) (progn
                                     (describe test-sym)
                                     (list :constant (get-output-stream-string *standard-output*))))
-            (T (list NIL NIL)))))
+            (T (list NIL NIL))))))
+
+(defun analyze-symbols (symbols)
+   (map 'list #'analyze-symbol symbols))
+
+(defun read-fix-packages (str)
+    (remove-if-not #'identity
+        (handler-bind (
+               (sb-ext:package-locked-error
+                (lambda (c)
+                    (declare (ignore c))
+                    (let ((restart (find-restart :ignore-all)))
+                        (when restart
+                            (invoke-restart restart)))))
+               (T
+                (lambda (c)
+                    (declare (ignore c))
+                    (let ((restart (find-restart 'use-value)))
+                        (when restart
+                            (invoke-restart restart NIL))))))
+           (eclector.reader:read-from-string str))))
 
 (in-package :cl-user)

@@ -72,11 +72,11 @@ class LispLexer implements FlexLexer {
 
   /* The ZZ_CMAP_A table has 256 entries */
   static final char ZZ_CMAP_A[] = zzUnpackCMap(
-    "\11\0\1\1\1\14\2\0\1\14\22\0\1\1\1\17\1\10\1\12\3\17\1\6\1\4\1\5\1\20\1\23"+
-    "\1\3\1\24\1\25\1\26\2\40\6\41\2\16\1\21\1\7\1\2\1\22\3\17\1\27\1\30\1\31\3"+
-    "\42\10\32\1\33\1\34\1\32\1\35\1\36\4\32\1\37\2\32\1\17\1\15\3\17\1\11\1\27"+
-    "\1\30\1\31\3\42\10\32\1\33\1\34\1\32\1\35\1\36\4\32\1\37\2\32\1\17\1\13\2"+
-    "\17\201\0");
+    "\11\0\1\1\1\14\1\0\1\1\1\14\22\0\1\1\1\17\1\10\1\12\3\17\1\6\1\4\1\5\1\20"+
+    "\1\23\1\3\1\24\1\25\1\26\2\40\6\41\2\16\1\21\1\7\1\2\1\22\3\17\1\27\1\30\1"+
+    "\31\3\42\10\32\1\33\1\34\1\32\1\35\1\36\4\32\1\37\2\32\1\17\1\15\3\17\1\11"+
+    "\1\27\1\30\1\31\3\42\10\32\1\33\1\34\1\32\1\35\1\36\4\32\1\37\2\32\1\17\1"+
+    "\13\2\17\201\0");
 
   /** 
    * Translates DFA states to action switch labels.
@@ -771,7 +771,7 @@ IElementType processBuffer(boolean unget) {
             // fall through
           case 88: break;
           case 37: 
-            { yybegin(YYINITIAL); return LispTypes.BIT_ARRAY;
+            { yybegin(YYINITIAL); yypushback(1); return LispTypes.BIT_ARRAY;
             } 
             // fall through
           case 89: break;
@@ -791,22 +791,22 @@ IElementType processBuffer(boolean unget) {
             // fall through
           case 92: break;
           case 41: 
-            { yybegin(YYINITIAL); return LispTypes.BINARY_NUMBER_TOKEN;
+            { yybegin(YYINITIAL); yypushback(1); return LispTypes.BINARY_NUMBER_TOKEN;
             } 
             // fall through
           case 93: break;
           case 42: 
-            { yybegin(YYINITIAL); return LispTypes.OCTAL_NUMBER_TOKEN;
+            { yybegin(YYINITIAL); yypushback(1); return LispTypes.OCTAL_NUMBER_TOKEN;
             } 
             // fall through
           case 94: break;
           case 43: 
-            { yybegin(YYINITIAL); return LispTypes.RADIX_NUMBER_TOKEN;
+            { yybegin(YYINITIAL); yypushback(1); return LispTypes.RADIX_NUMBER_TOKEN;
             } 
             // fall through
           case 95: break;
           case 44: 
-            { yybegin(YYINITIAL); return LispTypes.HEX_NUMBER_TOKEN;
+            { yybegin(YYINITIAL); yypushback(1); return LispTypes.HEX_NUMBER_TOKEN;
             } 
             // fall through
           case 96: break;

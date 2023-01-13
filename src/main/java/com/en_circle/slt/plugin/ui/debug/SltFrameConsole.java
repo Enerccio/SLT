@@ -1,0 +1,50 @@
+package com.en_circle.slt.plugin.ui.debug;
+
+import com.en_circle.slt.plugin.SltSBCL;
+import com.en_circle.slt.plugin.swank.requests.EvalStringInFrameEval;
+import com.en_circle.slt.plugin.ui.console.SltConsole;
+import com.intellij.execution.ui.ConsoleViewContentType;
+import com.intellij.openapi.project.Project;
+import com.intellij.openapi.ui.Messages;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.math.BigInteger;
+
+public class SltFrameConsole extends SltConsole {
+    private static final Logger LOG = LoggerFactory.getLogger(SltFrameConsole.class);
+
+    private final BigInteger threadId;
+    private final BigInteger frame;
+    private final Runnable onChange;
+
+    public SltFrameConsole(Project project, BigInteger threadId, BigInteger frame, Runnable onChange, String module) {
+        super(project);
+        this.threadId = threadId;
+        this.frame = frame;
+        this.onChange = onChange;
+        this.currentModule = module;
+    }
+
+    @Override
+    protected void eval(String data) {
+        try {
+            if (StringUtils.isNotBlank(data)) {
+                SltSBCL.getInstance().sendToSbcl(EvalStringInFrameEval.evalInFrame(data, frame, threadId, currentModule,
+                        result -> {
+                            languageConsole.print(result + "\n", ConsoleViewContentType.NORMAL_OUTPUT);
+                            onChange.run();
+                        }));
+            }
+        } catch (Exception e) {
+            LOG.warn("Error starting sbcl", e);
+            Messages.showErrorDialog(project, e.getMessage(), "Failed to Start SBCL");
+        }
+    }
+
+    @Override
+    public String getTitle() {
+        return "Frame REPL";
+    }
+}

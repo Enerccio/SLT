@@ -6,6 +6,7 @@ import com.en_circle.slt.plugin.swank.SlimeListener.DebugInterface;
 import com.en_circle.slt.plugin.swank.SwankServer.SwankServerOutput;
 import com.en_circle.slt.plugin.swank.debug.SltDebugInfo;
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.ui.content.Content;
 import com.intellij.ui.tabs.impl.JBTabsImpl;
@@ -107,5 +108,9 @@ public class SltDebuggers implements DebugInterface, SBCLServerListener {
     @Override
     public void onOutputChanged(SwankServerOutput output, String newData) {
 
+    }
+
+    public Project getProject() {
+        return toolWindow.getProject();
     }
 }

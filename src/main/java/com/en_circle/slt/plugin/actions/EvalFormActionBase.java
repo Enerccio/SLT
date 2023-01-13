@@ -6,7 +6,6 @@ import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.ex.EditorEx;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.roots.ProjectFileIndex;
-import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiDocumentManager;
 import com.intellij.psi.PsiElement;
@@ -45,12 +44,12 @@ public abstract class EvalFormActionBase extends EvalActionBase {
             if (vf != null) {
                 VirtualFile contentRoot = index.getContentRootForFile(vf);
                 if (contentRoot != null && list != null) {
-                    String filename = VfsUtil.getRelativePath(vf, contentRoot);
+                    String filename = vf.getPath();;
                     int offset = list.getTextOffset();
                     int lineno = editor.getDocument().getLineNumber(offset);
                     int charno = offset - editor.getDocument().getLineStartOffset(lineno);
                     hasEvalRegion = true;
-                    evaluateRegion(event.getProject(), forms, filename, lineno, charno, () -> {});
+                    evaluateRegion(event.getProject(), forms, filename, offset, lineno, charno, () -> {});
                 }
             }
 

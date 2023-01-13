@@ -57,6 +57,16 @@ public class SwankPacket {
         return new SwankPacket(formatted);
     }
 
+    public static SwankPacket evalInFrame(String sexpression, BigInteger frame, String packageName, BigInteger thread, BigInteger continuation) {
+        packageName = StringUtils.replace(packageName, "\\", "\\\\");
+        packageName = StringUtils.replace(packageName, "\"", "\\\"");
+        sexpression = StringUtils.replace(sexpression, "\\", "\\\\");
+        sexpression = StringUtils.replace(sexpression, "\"", "\\\"");
+        String formatted = String.format("(:emacs-rex (swank:eval-string-in-frame \"%s\" %s \"%s\") \"%s\" %s %s)",
+                sexpression, frame, packageName, packageName, thread, continuation);
+        return new SwankPacket(formatted);
+    }
+
     public static SwankPacket evalRegion(String region, BigInteger continuation) {
         return evalRegion(region, "cl-user", "T", continuation);
     }
@@ -93,23 +103,24 @@ public class SwankPacket {
         return new SwankPacket(formatted);
     }
 
-    public static SwankPacket swankSltEvalRegion(String code, String filename, int lineno, int charno, BigInteger continuation) {
-        return swankSltEvalRegion(code, filename, lineno, charno, "cl-user", continuation);
+    public static SwankPacket swankEvalRegion(String code, String filename, int bufferPosition, BigInteger continuation) {
+        return swankEvalRegion(code, filename, bufferPosition, "cl-user", continuation);
     }
 
-    public static SwankPacket swankSltEvalRegion(String code, String filename, int lineno, int charno, String packageName, BigInteger continuation) {
-        return swankSltEvalRegion(code, filename, lineno, charno, packageName, "T", continuation);
+    public static SwankPacket swankEvalRegion(String code, String filename, int bufferPosition, String packageName, BigInteger continuation) {
+        return swankEvalRegion(code, filename, bufferPosition, packageName, "T", continuation);
     }
 
-    public static SwankPacket swankSltEvalRegion(String code, String filename, int lineno, int charno, String packageName, String thread, BigInteger continuation) {
+    public static SwankPacket swankEvalRegion(String code, String filename, int bufferPosition,
+                                              String packageName, String thread, BigInteger continuation) {
         packageName = StringUtils.replace(packageName, "\\", "\\\\");
         packageName = StringUtils.replace(packageName, "\"", "\\\"");
         code = StringUtils.replace(code, "\\", "\\\\");
         code = StringUtils.replace(code, "\"", "\\\"");
         filename = StringUtils.replace(filename, "\\", "\\\\");
         filename = StringUtils.replace(filename, "\"", "\\\"");
-        String formatted = String.format("(:emacs-rex (swank:slt-compile-region \"%s\" \"%s\" %s %s) \"%s\" %s %s)",
-                code, filename, lineno, charno, packageName, thread, continuation);
+        String formatted = String.format("(:emacs-rex (swank:compile-string-region-slt \"%s\" \"%s\" %s \"%s\") \"%s\" %s %s)",
+                code, filename, bufferPosition, filename, packageName, thread, continuation);
         return new SwankPacket(formatted);
     }
 
@@ -126,6 +137,18 @@ public class SwankPacket {
 
     public static SwankPacket throwToToplevel(BigInteger threadId, BigInteger continuation) {
         String formatted = String.format("(:emacs-rex (swank:throw-to-toplevel) \"cl-user\" %s %s)", threadId, continuation);
+        return new SwankPacket(formatted);
+    }
+
+    public static SwankPacket frameLocals(BigInteger frame, BigInteger threadId, BigInteger continuation) {
+        return frameLocals(frame, threadId, "cl-user", continuation);
+    }
+
+    public static SwankPacket frameLocals(BigInteger frame, BigInteger threadId, String packageName, BigInteger continuation) {
+        packageName = StringUtils.replace(packageName, "\\", "\\\\");
+        packageName = StringUtils.replace(packageName, "\"", "\\\"");
+        String formatted = String.format("(:emacs-rex (swank:frame-locals-and-catch-tags %s) \"%s\" %s %s)",
+                frame, packageName, threadId, continuation);
         return new SwankPacket(formatted);
     }
 

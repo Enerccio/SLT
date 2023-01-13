@@ -36,6 +36,16 @@ public class LispUtils {
         return text;
     }
 
+    public static boolean hasPValue(LispContainer src, com.en_circle.slt.plugin.lisp.lisp.LispSymbol lispSymbol) {
+        int ix = src.getItems().indexOf(lispSymbol);
+        return ix >= 0 && ix % 2 == 0 && ix < src.getItems().size() - 1;
+    }
+
+    public static LispElement pvalue(LispContainer src, com.en_circle.slt.plugin.lisp.lisp.LispSymbol lispSymbol) {
+        int ix = src.getItems().indexOf(lispSymbol);
+        return src.getItems().get(ix + 1);
+    }
+
     private static class LispVisitorImpl extends LispVisitor implements PsiRecursiveVisitor {
 
         private final Stack<List<LispElement>> stack;

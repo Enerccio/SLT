@@ -7,6 +7,7 @@ import com.en_circle.slt.plugin.lisp.lisp.*;
 import com.en_circle.slt.plugin.lisp.psi.LispCoreProjectEnvironment;
 import com.en_circle.slt.plugin.swank.debug.SltDebugInfo;
 import com.en_circle.slt.plugin.swank.requests.SltEval;
+import com.en_circle.slt.plugin.swank.requests.SltFrameLocalsAndCatchTags;
 import com.en_circle.slt.plugin.swank.requests.SltInvokeNthRestart;
 import com.en_circle.slt.plugin.swank.requests.SwankEvalAndGrab;
 import com.intellij.openapi.application.ApplicationManager;
@@ -138,6 +139,11 @@ public class SlimeListener implements SwankClient.SwankReply {
             if (request instanceof SltInvokeNthRestart) {
                 SltInvokeNthRestart restart = (SltInvokeNthRestart) request;
                 restart.processReply((LispContainer) reply.getItems().get(1));
+            }
+
+            if (request instanceof SltFrameLocalsAndCatchTags) {
+                SltFrameLocalsAndCatchTags frames = (SltFrameLocalsAndCatchTags) request;
+                frames.processReply((LispContainer) reply.getItems().get(1));
             }
         } finally {
             requests.remove(replyId.getValue());

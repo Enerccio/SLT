@@ -18,6 +18,10 @@ public class LispLexerUtils {
             }
         }
 
+        if (":".equals(token)) {
+            return TokenType.ERROR_ELEMENT;
+        }
+
         IElementType number = new LispNumberParser().parse(lexer, token);
         if (number != null) {
             return number;

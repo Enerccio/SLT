@@ -48,7 +48,7 @@ IElementType processBuffer(boolean unget) {
 %state STEP9
 %state STEP9ESCAPE
 
-WHITESPACE_CHARACTER=[\r\n\t\ ]
+WHITESPACE_CHARACTER=[\r\n\t\ \x0c\x0a]
 CONSTITUENT_CHARACTER=[!$%&*+\-\./0-9:<=>?@A-Za-z\[\]\^_{}~]
 TERMINATING_MACRO_CHAR=[\"'\(\),;`]
 
@@ -133,7 +133,7 @@ TERMINATING_MACRO_CHAR=[\"'\(\),;`]
 <BIT_ARRAY> {
     [0|1] { }
 
-    [^] { yybegin(YYINITIAL); return LispTypes.BIT_ARRAY; }
+    [^] { yybegin(YYINITIAL); yypushback(1); return LispTypes.BIT_ARRAY; }
 }
 
 <CHARACTER> {
@@ -156,21 +156,21 @@ TERMINATING_MACRO_CHAR=[\"'\(\),;`]
     [01/] { }
 
     <<EOF>> { yybegin(YYINITIAL); return TokenType.ERROR_ELEMENT; }
-    [^] { yybegin(YYINITIAL); return LispTypes.BINARY_NUMBER_TOKEN; }
+    [^] { yybegin(YYINITIAL); yypushback(1); return LispTypes.BINARY_NUMBER_TOKEN; }
 }
 
 <OCTAL_NUM> {
     [0-7/] { }
 
     <<EOF>> { yybegin(YYINITIAL); return TokenType.ERROR_ELEMENT; }
-    [^] { yybegin(YYINITIAL); return LispTypes.OCTAL_NUMBER_TOKEN; }
+    [^] { yybegin(YYINITIAL); yypushback(1); return LispTypes.OCTAL_NUMBER_TOKEN; }
 }
 
 <RADIX_NUM> {
     [0-9a-zA-Z/] { }
 
     <<EOF>> { yybegin(YYINITIAL); return TokenType.ERROR_ELEMENT; }
-    [^] { yybegin(YYINITIAL); return LispTypes.RADIX_NUMBER_TOKEN; }
+    [^] { yybegin(YYINITIAL); yypushback(1); return LispTypes.RADIX_NUMBER_TOKEN; }
 }
 
 
@@ -178,7 +178,7 @@ TERMINATING_MACRO_CHAR=[\"'\(\),;`]
     [0-9a-fA-F/] { }
 
     <<EOF>> { yybegin(YYINITIAL); return TokenType.ERROR_ELEMENT; }
-    [^] { yybegin(YYINITIAL); return LispTypes.HEX_NUMBER_TOKEN; }
+    [^] { yybegin(YYINITIAL); yypushback(1); return LispTypes.HEX_NUMBER_TOKEN; }
 }
 
 <STEP8> {

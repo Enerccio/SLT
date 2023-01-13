@@ -7,7 +7,6 @@ import com.intellij.openapi.editor.CaretModel;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.roots.ProjectFileIndex;
-import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
@@ -29,7 +28,7 @@ public class EvalRegionAction extends EvalActionBase {
             if (vf != null) {
                 VirtualFile contentRoot = index.getContentRootForFile(vf);
                 if (contentRoot != null) {
-                    String filename = VfsUtil.getRelativePath(vf, contentRoot);
+                    String filename = vf.getPath();
                     CaretModel caretModel = editor.getCaretModel();
                     List<Caret> carets = caretModel.getAllCarets();
                     hasEvalRegion = true;
@@ -60,7 +59,7 @@ public class EvalRegionAction extends EvalActionBase {
                 int offset = caret.getOffset();
                 int lineno = editor.getDocument().getLineNumber(offset);
                 int charno = offset - editor.getDocument().getLineStartOffset(lineno);
-                evaluateRegion(editor.getProject(), text, filename, lineno, charno,continueEvaluation);
+                evaluateRegion(editor.getProject(), text, filename, offset, lineno, charno, continueEvaluation);
             }
         }
     }

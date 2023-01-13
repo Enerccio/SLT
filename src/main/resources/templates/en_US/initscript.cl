@@ -1,5 +1,6 @@
 (load "~qlpath~")
 (ql:quickload :swank)
+(ql:quickload :eclector)
 
 (setf *default-pathname-defaults* (truename "~cwd~"))
 

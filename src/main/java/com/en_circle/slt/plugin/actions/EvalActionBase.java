@@ -43,10 +43,10 @@ public abstract class EvalActionBase extends AnAction {
         }
     }
 
-    protected void evaluateRegion(Project project, String buffer, String filename, int lineno, int charno, Runnable callback) {
+    protected void evaluateRegion(Project project, String buffer, String filename, int bufferPosition, int lineno, int charno, Runnable callback) {
         try {
             SltSBCL.getInstance().sendToSbcl(SwankEvalFromVirtualFile
-                    .eval(buffer, filename, lineno, charno, result -> callback.run()), true);
+                    .eval(buffer, filename, bufferPosition, lineno, charno, result -> callback.run()), true);
         } catch (Exception e) {
             LOG.warn("Error starting sbcl", e);
             Messages.showErrorDialog(project, e.getMessage(), "Failed to Start SBCL");
