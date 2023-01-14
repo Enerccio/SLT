@@ -100,6 +100,11 @@
                 class="com.en_circle.slt.plugin.actions.EvalFile">
             <add-to-group group-id="ProjectViewPopupMenuRunGroup" anchor="last"/>
         </action>
+
+        <action id="com.en_circle.slt.plugin.actions.toolbar.GlobalPackageSelectorAction"
+                class="com.en_circle.slt.plugin.actions.toolbar.GlobalPackageSelectorAction">
+            <add-to-group group-id="MainToolBar" anchor="first"/>
+        </action>
     </actions>
 
 </idea-plugin>

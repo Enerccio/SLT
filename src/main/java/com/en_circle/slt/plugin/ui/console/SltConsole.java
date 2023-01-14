@@ -23,19 +23,27 @@ import org.slf4j.LoggerFactory;
 import javax.swing.*;
 import java.awt.*;
 
-public class SltConsole implements SltComponent {
+public abstract class SltConsole implements SltComponent {
     private static final Logger log = LoggerFactory.getLogger(SltConsole.class);
 
     private TabInfo tabInfo;
     protected LanguageConsoleView languageConsole;
-    private final JPanel content;
+    protected final JPanel content;
     protected final Project project;
 
-    protected String currentModule = "cl-user";
+    protected String currentModule = "CL-USER";
 
     public SltConsole(Project project) {
         this.content = new JPanel(new BorderLayout());
         this.project = project;
+    }
+
+    protected void setPackage(String packageName) {
+        if (packageName == null) {
+            packageName = "CL-USER";
+        }
+        currentModule = packageName;
+        languageConsole.setPrompt(currentModule + ">");
     }
 
     @Override

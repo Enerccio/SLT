@@ -2,7 +2,7 @@
 
 (defpackage :slt-core
     (:use :cl :swank)
-    (:export analyze-symbol analyze-symbols read-fix-packages))
+    (:export analyze-symbol analyze-symbols read-fix-packages list-package-names))
 
 ; swank/slime overrides
 
@@ -153,5 +153,10 @@ format suitable for Emacs."
             (error (lambda (c)
                    (format *error-output* "general error: ~S ~%" c))))
        (eclector.reader:read-from-string str)))
+
+(defun list-package-names ()
+    (let ((packages (list-all-packages)))
+        (loop for package in packages collect
+            (package-name package))))
 
 (in-package :cl-user)

@@ -7,6 +7,7 @@ import com.en_circle.slt.plugin.SltSBCL.SBCLServerListener;
 import com.en_circle.slt.plugin.swank.SwankServer;
 import com.en_circle.slt.plugin.swank.SwankServer.SwankServerOutput;
 import com.en_circle.slt.plugin.ui.console.SltConsole;
+import com.en_circle.slt.plugin.ui.console.SltREPL;
 import com.intellij.icons.AllIcons;
 import com.intellij.icons.AllIcons.Actions;
 import com.intellij.icons.AllIcons.General;
@@ -127,7 +128,7 @@ public class SltCoreWindow implements SBCLServerListener {
     }
 
     private void addRepl() {
-        SltConsole console = new SltConsole(this.project);
+        SltConsole console = new SltREPL(this.project);
         components.add(console);
         tabs.addTab(console.create());
         console.getTabInfo().setTabLabelActions(new DefaultActionGroup(

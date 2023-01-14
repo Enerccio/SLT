@@ -40,7 +40,7 @@ public class SwankPacket {
     }
 
     public static SwankPacket sltEval(String sexpression, BigInteger continuation) {
-        return sltEval(sexpression, "cl-user", continuation);
+        return sltEval(sexpression, "CL-USER", continuation);
     }
 
     public static SwankPacket sltEval(String sexpression, String packageName, BigInteger continuation) {
@@ -52,7 +52,7 @@ public class SwankPacket {
         packageName = StringUtils.replace(packageName, "\"", "\\\"");
         sexpression = StringUtils.replace(sexpression, "\\", "\\\\");
         sexpression = StringUtils.replace(sexpression, "\"", "\\\"");
-        String formatted = String.format("(:emacs-rex (swank:slt-eval \"%s\") :%s %s %s)",
+        String formatted = String.format("(:emacs-rex (swank:slt-eval \"%s\") %s %s %s)",
                 sexpression, packageName, thread, continuation);
         return new SwankPacket(formatted);
     }
@@ -68,7 +68,7 @@ public class SwankPacket {
     }
 
     public static SwankPacket evalRegion(String region, BigInteger continuation) {
-        return evalRegion(region, "cl-user", "T", continuation);
+        return evalRegion(region, "CL-USER", "T", continuation);
     }
 
     public static SwankPacket evalRegion(String region, String packageName, BigInteger continuation) {
@@ -86,7 +86,7 @@ public class SwankPacket {
     }
 
     public static SwankPacket swankEvalAndGrab(String sexpression, BigInteger continuation) {
-        return swankEvalAndGrab(sexpression, "cl-user", continuation);
+        return swankEvalAndGrab(sexpression, "CL-USER", continuation);
     }
 
     public static SwankPacket swankEvalAndGrab(String sexpression, String packageName, BigInteger continuation) {
@@ -104,7 +104,7 @@ public class SwankPacket {
     }
 
     public static SwankPacket swankEvalRegion(String code, String filename, int bufferPosition, BigInteger continuation) {
-        return swankEvalRegion(code, filename, bufferPosition, "cl-user", continuation);
+        return swankEvalRegion(code, filename, bufferPosition, "CL-USER", continuation);
     }
 
     public static SwankPacket swankEvalRegion(String code, String filename, int bufferPosition, String packageName, BigInteger continuation) {
@@ -130,18 +130,18 @@ public class SwankPacket {
         restartArg = StringUtils.replace(restartArg, "\"", "\\\"");
         restartArgs = StringUtils.replace(restartArgs, "\\", "\\\\");
         restartArgs = StringUtils.replace(restartArgs, "\"", "\\\"");
-        String formatted = String.format("(:emacs-rex (swank:invoke-nth-restart-slt '%s '%s \"%s\" \"%s\") :cl-user %s %s)",
+        String formatted = String.format("(:emacs-rex (swank:invoke-nth-restart-slt '%s '%s \"%s\" \"%s\") :CL-USER %s %s)",
                 level, option, restartArg, restartArgs, threadId, continuation);
         return new SwankPacket(formatted);
     }
 
     public static SwankPacket throwToToplevel(BigInteger threadId, BigInteger continuation) {
-        String formatted = String.format("(:emacs-rex (swank:throw-to-toplevel) :cl-user %s %s)", threadId, continuation);
+        String formatted = String.format("(:emacs-rex (swank:throw-to-toplevel) :CL-USER %s %s)", threadId, continuation);
         return new SwankPacket(formatted);
     }
 
     public static SwankPacket frameLocals(BigInteger frame, BigInteger threadId, BigInteger continuation) {
-        return frameLocals(frame, threadId, "cl-user", continuation);
+        return frameLocals(frame, threadId, "CL-USER", continuation);
     }
 
     public static SwankPacket frameLocals(BigInteger frame, BigInteger threadId, String packageName, BigInteger continuation) {
@@ -153,7 +153,7 @@ public class SwankPacket {
     }
 
     public static SwankPacket loadFile(String file, BigInteger continuation) {
-        return loadFile(file, "cl-user", continuation);
+        return loadFile(file, "CL-USER", continuation);
     }
 
     public static SwankPacket loadFile(String file, String packageName, BigInteger continuation) {
