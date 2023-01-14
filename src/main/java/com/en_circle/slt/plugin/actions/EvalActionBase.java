@@ -27,7 +27,7 @@ public abstract class EvalActionBase extends AnAction {
         event.getPresentation().setEnabledAndVisible(false);
 
         Editor editor = event.getData(CommonDataKeys.EDITOR);
-        if (editor != null) {
+        if (editor != null && event.getProject() != null) {
             PsiFile file = PsiDocumentManager.getInstance(Objects.requireNonNull(editor.getProject())).getPsiFile(editor.getDocument());
             if (file != null && SltCommonLispFileType.INSTANCE.equals(file.getFileType())) {
                 event.getPresentation().setEnabledAndVisible(SltSBCL.getInstance().hasEventsSet());

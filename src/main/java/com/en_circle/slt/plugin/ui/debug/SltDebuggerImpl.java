@@ -54,7 +54,7 @@ public class SltDebuggerImpl implements SltDebugger {
     private final SltDebuggers parent;
     private BigInteger lastDebugId;
     private JPanel singleFrameComponent;
-    private List<JPanel> stackframes = new ArrayList<>();
+    private final List<JPanel> stackframes = new ArrayList<>();
 
     public SltDebuggerImpl(SltDebuggers parent) {
         this.parent = parent;

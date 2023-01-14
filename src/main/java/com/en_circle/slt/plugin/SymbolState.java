@@ -5,6 +5,7 @@ import com.intellij.openapi.vfs.VirtualFile;
 
 import java.lang.ref.WeakReference;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 public class SymbolState {
@@ -30,4 +31,23 @@ public class SymbolState {
         CONSTANT, KEYWORD, SPECIAL_VARIABLE
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        SymbolState that = (SymbolState) o;
+
+        if (!Objects.equals(name, that.name)) return false;
+        if (!Objects.equals(packageName, that.packageName)) return false;
+        return Objects.equals(symbolName, that.symbolName);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = name != null ? name.hashCode() : 0;
+        result = 31 * result + (packageName != null ? packageName.hashCode() : 0);
+        result = 31 * result + (symbolName != null ? symbolName.hashCode() : 0);
+        return result;
+    }
 }

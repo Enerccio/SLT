@@ -118,6 +118,15 @@ public class SltFrameInfo {
         }
 
         @Override
+        public String getColumnName(int column) {
+            switch (column) {
+                case 0: return "Name";
+                case 1: return "Value";
+            }
+            return null;
+        }
+
+        @Override
         public int getRowCount() {
             return locals.size();
         }

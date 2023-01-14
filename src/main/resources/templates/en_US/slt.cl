@@ -122,43 +122,36 @@ format suitable for Emacs."
 (defun analyze-symbols (symbols)
    (map 'list #'analyze-symbol symbols))
 
+(defun reader-recover (c)
+    (declare (ignorable c))
+       (let ((restart (find-restart 'eclector.reader:recover)))
+           (when restart
+               (invoke-restart restart))))
+
+(defun reader-recover (c)
+    (declare (ignorable c))
+       (let ((restart (find-restart 'eclector.reader:recover)))
+           (when restart
+               (invoke-restart restart))))
+
+(defun reader-user-anyway (c)
+    (declare (ignorable c))
+    (let ((restart (find-restart 'eclector.reader::use-anyway)))
+        (when restart
+            (invoke-restart restart))))
+
 (defun read-fix-packages (str)
-    (handler-bind (
-           (sb-ext:package-locked-error
-                (lambda (c)
-                    (declare (ignorable c))
-                    (let ((restart (find-restart :ignore-all)))
-                        (when restart
-                            (invoke-restart restart)))))
-           (ECLECTOR.READER:SYMBOL-IS-NOT-EXTERNAL
-                (lambda (c)
-                    (declare (ignorable c))
-                    (let ((restart (find-restart 'eclector.reader::use-anyway)))
-                        (when restart
-                            (invoke-restart restart)))))
-           (ECLECTOR.READER:SYMBOL-DOES-NOT-EXIST
-               (lambda (c)
-                   (declare (ignorable c))
-                   (let ((restart (find-restart 'eclector.reader:recover)))
-                       (when restart
-                           (invoke-restart restart)))))
-           (ECLECTOR.READER:PACKAGE-DOES-NOT-EXIST
-               (lambda (c)
-                   (declare (ignorable c))
-                   (let ((restart (find-restart 'eclector.reader:recover)))
-                       (when restart
-                           (invoke-restart restart)))))
-           (error (lambda (c)
-                   (format *error-output* "general error: ~S ~%" c)))
-                           #|
-           (error
-            (lambda (c)
-                (declare (ignorable c))
-                (let ((restart (find-restart 'use-value)))
-                    (when restart
-                        (invoke-restart restart NIL)))))
-                        |#
-                        )
+    (handler-bind
+           ((ECLECTOR.READER:SYMBOL-NAME-MUST-NOT-END-WITH-PACKAGE-MARKER
+                #'reader-recover)
+            (ECLECTOR.READER:SYMBOL-IS-NOT-EXTERNAL
+                #'reader-user-anyway)
+            (ECLECTOR.READER:SYMBOL-DOES-NOT-EXIST
+                #'reader-recover)
+            (ECLECTOR.READER:PACKAGE-DOES-NOT-EXIST
+                #'reader-recover)
+            (error (lambda (c)
+                   (format *error-output* "general error: ~S ~%" c))))
        (eclector.reader:read-from-string str)))
 
 (in-package :cl-user)

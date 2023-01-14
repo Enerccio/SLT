@@ -5,6 +5,7 @@ import com.en_circle.slt.plugin.lisp.lisp.*;
 import com.en_circle.slt.plugin.swank.SwankServer;
 import com.en_circle.slt.plugin.swank.components.SourceLocation;
 import com.en_circle.slt.plugin.swank.requests.SwankEvalAndGrab;
+import com.google.common.collect.Lists;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiElement;
@@ -76,7 +77,17 @@ public class SltSBCLSymbolCache extends Thread {
     }
 
     private SymbolState getOrCreateBinding(String packageName, String symbolName) {
-        if (symbolName.contains(":")) {
+        if (symbolName.contains("::")) {
+            String[] parts = symbolName.split(Pattern.quote("::"));
+            if (parts.length > 1) {
+                if (StringUtils.isBlank(parts[0])) {
+                    packageName = null;
+                } else {
+                    packageName = parts[0];
+                    symbolName = parts[1];
+                }
+            }
+        } else if (symbolName.contains(":")) {
             String[] parts = symbolName.split(Pattern.quote(":"));
             if (parts.length > 1) {
                 if (StringUtils.isBlank(parts[0])) {
@@ -94,6 +105,27 @@ public class SltSBCLSymbolCache extends Thread {
     }
 
     private void refreshSymbols(List<SymbolState> refreshStates) throws Exception {
+        HashSet<SymbolState> duplicityState = new HashSet<>();
+        List<SymbolState> withoutDuplicity = refreshStates.stream()
+                        .filter(s -> {
+                            boolean isDuplicit = duplicityState.contains(s);
+                            duplicityState.add(s);
+                            return !isDuplicit;
+                        }).filter(this::removeBad).collect(Collectors.toList());
+        Lists.partition(withoutDuplicity, 500).forEach(list -> {
+                    try {
+                        refreshSymbolsBatched(list);
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
+                });
+    }
+
+    private boolean removeBad(SymbolState symbolState) {
+        return !symbolState.symbolName.contains(":");
+    }
+
+    private void refreshSymbolsBatched(List<SymbolState> refreshStates) throws Exception {
         String request = "(" +
                 refreshStates.stream().map(x -> x.name.toUpperCase() + " ").collect(Collectors.joining()) + ")";
         request = StringUtils.replace(request, "\"", "\\\"");

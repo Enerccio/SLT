@@ -24,12 +24,13 @@
     <extensions defaultExtensionNs="com.intellij">
         <internalFileTemplate name="Common Lisp CL File.cl"/>
         <internalFileTemplate name="Common Lisp Lisp File.lisp"/>
+        <internalFileTemplate name="Asdf System.asdf"/>
 
         <applicationService
             serviceImplementation="com.en_circle.slt.plugin.SltState" />
 
         <fileType
-                name="Common Lisp" language="Common Lisp" extensions="cl;lisp"
+                name="Common Lisp" language="Common Lisp" extensions="cl;lisp;asdf"
                 fieldName="INSTANCE"
                 implementationClass="com.en_circle.slt.plugin.SltCommonLispFileType"/>
 
@@ -102,6 +103,13 @@
                 text="Evaluate File">
             <add-to-group group-id="EditorPopupMenu" anchor="after" relative-to-action="com.en_circle.slt.plugin.actions.EvalNextFormAction" />
             <keyboard-shortcut keymap="$default" first-keystroke="ctrl alt T"/>
+        </action>
+
+        <action id="com.en_circle.slt.plugin.actions.EvalFile"
+                icon="/icons/evalFile.svg"
+                class="com.en_circle.slt.plugin.actions.EvalFile"
+                text="Evaluate File">
+            <add-to-group group-id="ProjectViewPopupMenuRunGroup" anchor="last"/>
         </action>
     </actions>
 
