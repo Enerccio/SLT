@@ -1,5 +1,6 @@
 package com.en_circle.slt.plugin.settings;
 
+import com.en_circle.slt.plugin.SltBundle;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBTextField;
 import com.intellij.util.ui.FormBuilder;
@@ -16,8 +17,10 @@ public class SltSettingsComponent {
 
     public SltSettingsComponent() {
         root = FormBuilder.createFormBuilder()
-                .addLabeledComponent(new JBLabel("SBCL executable:"), sbclExecutable, 1, false)
-                .addLabeledComponent(new JBLabel("Quicklisp path:"), quicklispStartScript, 1, false)
+                .addLabeledComponent(new JBLabel(SltBundle.message("slt.ui.settings.executable")),
+                        sbclExecutable, 1, false)
+                .addLabeledComponent(new JBLabel(SltBundle.message("slt.ui.settings.qlpath")),
+                        quicklispStartScript, 1, false)
                 .addComponentFillVertically(new JPanel(), 0)
                 .getPanel();
     }

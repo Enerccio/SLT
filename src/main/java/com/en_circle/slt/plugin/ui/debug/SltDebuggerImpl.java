@@ -1,5 +1,6 @@
 package com.en_circle.slt.plugin.ui.debug;
 
+import com.en_circle.slt.plugin.SltBundle;
 import com.en_circle.slt.plugin.SltSBCL;
 import com.en_circle.slt.plugin.SltUIConstants;
 import com.en_circle.slt.plugin.swank.debug.SltDebugAction;
@@ -47,7 +48,7 @@ import java.util.List;
 import java.util.Map;
 
 public class SltDebuggerImpl implements SltDebugger {
-    private static final Logger LOG = LoggerFactory.getLogger(SltDebuggerImpl.class);
+    private static final Logger log = LoggerFactory.getLogger(SltDebuggerImpl.class);
 
     private final JComponent content;
     private final TabInfo tabInfo;
@@ -60,9 +61,10 @@ public class SltDebuggerImpl implements SltDebugger {
         this.parent = parent;
         this.content = new JPanel(new BorderLayout());
         this.tabInfo = new TabInfo(this.content);
-        this.tabInfo.setText("DEBUGGER #");
+        this.tabInfo.setText(SltBundle.message("slt.ui.debugger.title"));
         this.tabInfo.setBlinkCount(5);
-        this.tabInfo.setTabLabelActions(new DefaultActionGroup(new AnAction("Close", "", Actions.Close) {
+        this.tabInfo.setTabLabelActions(new DefaultActionGroup(
+                new AnAction(SltBundle.message("slt.ui.debugger.close"), "", Actions.Close) {
             @Override
             public void actionPerformed(@NotNull AnActionEvent e) {
                 close();
@@ -78,7 +80,7 @@ public class SltDebuggerImpl implements SltDebugger {
 
     @Override
     public void redraw(SltDebugInfo debugInfo) {
-        this.tabInfo.setText("DEBUGGER #" + debugInfo.getThreadId());
+        this.tabInfo.setText(SltBundle.message("slt.ui.debugger.title") + debugInfo.getThreadId());
         this.stackframes.clear();
 
         this.content.removeAll();
@@ -98,9 +100,9 @@ public class SltDebuggerImpl implements SltDebugger {
 
         JPanel infoPanel = new JPanel();
         infoPanel.setLayout(new BoxLayout(infoPanel, BoxLayout.X_AXIS));
-        infoPanel.add(new Label("Error Message: "));
+        infoPanel.add(new Label(SltBundle.message("slt.ui.debugger.errormessage") + " "));
         infoPanel.add(errorName);
-        infoPanel.add(new Label("Condition: "));
+        infoPanel.add(new Label(SltBundle.message("slt.ui.debugger.condition") + " "));
         infoPanel.add(condition);
         content.add(infoPanel, BorderLayout.NORTH);
 
@@ -143,7 +145,7 @@ public class SltDebuggerImpl implements SltDebugger {
 
         JBScrollPane pane = new JBScrollPane(actionsPanel);
         JPanel actionsPanelDecorator = new JPanel(new BorderLayout());
-        actionsPanelDecorator.setBorder(BorderFactory.createTitledBorder("Actions"));
+        actionsPanelDecorator.setBorder(BorderFactory.createTitledBorder(SltBundle.message("slt.ui.debugger.actions")));
         actionsPanelDecorator.add(pane, BorderLayout.CENTER);
         splitter2.setFirstComponent(actionsPanelDecorator);
 
@@ -166,13 +168,14 @@ public class SltDebuggerImpl implements SltDebugger {
         }
 
         JPanel stackframesContainer = new JPanel(new BorderLayout());
-        stackframesContainer.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), "Frames"));
+        stackframesContainer.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(),
+                SltBundle.message("slt.ui.debugger.frames")));
         stackframesContainer.add(ScrollPaneFactory.createScrollPane(stackframes), BorderLayout.CENTER);
         splitter2.setSecondComponent(stackframesContainer);
 
         singleFrameComponent = new JPanel(new BorderLayout());
         TabInfo singleFrame = new TabInfo(singleFrameComponent);
-        singleFrame.setText("Frame");
+        singleFrame.setText(SltBundle.message("slt.ui.debugger.frame"));
         JBTabsImpl singleFrameParent = new JBTabsImpl(parent.getProject());
         singleFrameParent.addTab(singleFrame);
         splitter.setSecondComponent(singleFrameParent);
@@ -189,19 +192,20 @@ public class SltDebuggerImpl implements SltDebugger {
                 SltSBCL.getInstance().sendToSbcl(SltInvokeNthRestart.nthRestart(debugInfo.getThreadId(),
                         BigInteger.valueOf(ix), debugInfo.getDebugLevel(), "NIL", "NIL", () -> {}));
             } catch (Exception e) {
-                // TODO: log
+                log.warn(SltBundle.message("slt.error.sbclstart"), e);
+                Messages.showErrorDialog(parent.getProject(), e.getMessage(), SltBundle.message("slt.ui.errors.sbcl.start"));
             }
         } else {
             List<String> arguments = new ArrayList<>();
             String rest = "NIL";
             for (SltDebugArgument argument : action.getArguments()) {
                 if (!argument.isRest()) {
-                    String arg = Messages.showInputDialog("Single value or sexpression for argument: " + argument.getName(),
-                            "Specify Restart Argument",null);
+                    String arg = Messages.showInputDialog(SltBundle.message("slt.ui.debugger.arg.text") + " " + argument.getName(),
+                            SltBundle.message("slt.ui.debugger.arg.title"),null);
                     arguments.add(StringUtils.isBlank(arg) ? "NIL" : arg);
                 } else {
-                    String arg = Messages.showInputDialog("Expressions separated by space for rest argument " + argument.getName(),
-                            "Specify Restart Rest Arguments",null);
+                    String arg = Messages.showInputDialog(SltBundle.message("slt.ui.debugger.rest.text") + " " + argument.getName(),
+                            SltBundle.message("slt.ui.debugger.rest.title"),null);
                     if (StringUtils.isNotBlank(arg)) {
                         rest = "(" + arg + ")";
                     }
@@ -212,7 +216,8 @@ public class SltDebuggerImpl implements SltDebugger {
                 SltSBCL.getInstance().sendToSbcl(SltInvokeNthRestart.nthRestart(debugInfo.getThreadId(),
                         BigInteger.valueOf(ix), debugInfo.getDebugLevel(), args, rest, () -> {}));
             } catch (Exception e) {
-                // TODO: log
+                log.warn(SltBundle.message("slt.error.sbclstart"), e);
+                Messages.showErrorDialog(parent.getProject(), e.getMessage(), SltBundle.message("slt.ui.errors.sbcl.start"));
             }
         }
 
@@ -247,7 +252,8 @@ public class SltDebuggerImpl implements SltDebugger {
             }
         }
         try {
-            SltSBCL.getInstance().sendToSbcl(SltFrameLocalsAndCatchTags.getLocals(BigInteger.valueOf(ix), debugInfo.getThreadId(), result -> {
+            SltSBCL.getInstance().sendToSbcl(SltFrameLocalsAndCatchTags.getLocals(BigInteger.valueOf(ix),
+                    debugInfo.getThreadId(), result -> {
                 ApplicationManager.getApplication().invokeLater(() -> {
                     SltFrameInfo frameInfo = new SltFrameInfo(parent.getProject(), debugInfo.getThreadId(), BigInteger.valueOf(ix),
                             element.getFramePackage());
@@ -257,8 +263,8 @@ public class SltDebuggerImpl implements SltDebugger {
                 });
             }), true);
         } catch (Exception e) {
-            LOG.warn("Error starting sbcl", e);
-            Messages.showErrorDialog(parent.getProject(), e.getMessage(), "Failed to Start SBCL");
+            log.warn(SltBundle.message("slt.error.sbclstart"), e);
+            Messages.showErrorDialog(parent.getProject(), e.getMessage(), SltBundle.message("slt.ui.errors.sbcl.start"));
         }
     }
 
@@ -266,7 +272,8 @@ public class SltDebuggerImpl implements SltDebugger {
         try {
             SltSBCL.getInstance().sendToSbcl(new ThrowToToplevel(lastDebugId));
         } catch (Exception e) {
-            // TODO: log
+            log.warn(SltBundle.message("slt.error.sbclstart"), e);
+            Messages.showErrorDialog(parent.getProject(), e.getMessage(), SltBundle.message("slt.ui.errors.sbcl.start"));
         }
     }
 

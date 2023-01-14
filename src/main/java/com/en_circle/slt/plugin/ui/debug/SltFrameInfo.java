@@ -1,5 +1,6 @@
 package com.en_circle.slt.plugin.ui.debug;
 
+import com.en_circle.slt.plugin.SltBundle;
 import com.en_circle.slt.plugin.SltSBCL;
 import com.en_circle.slt.plugin.lisp.lisp.*;
 import com.en_circle.slt.plugin.swank.requests.SltFrameLocalsAndCatchTags;
@@ -22,7 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class SltFrameInfo {
-    private static final Logger LOG = LoggerFactory.getLogger(SltFrameInfo.class);
+    private static final Logger log = LoggerFactory.getLogger(SltFrameInfo.class);
 
     private final Project project;
     private final BigInteger threadId;
@@ -49,7 +50,7 @@ public class SltFrameInfo {
         localsTable.setFillsViewportHeight(true);
 
         TabInfo locals = new TabInfo(new JBScrollPane(localsTable));
-        locals.setText("Locals");
+        locals.setText(SltBundle.message("slt.ui.debugger.frame.locals"));
         tabs.addTab(locals);
 
         SltFrameConsole frameConsole = new SltFrameConsole(project, threadId, frameId, this::reloadLocals, module);
@@ -66,8 +67,8 @@ public class SltFrameInfo {
                 });
             }), false);
         } catch (Exception e) {
-            LOG.warn("Error starting sbcl", e);
-            Messages.showErrorDialog(project, e.getMessage(), "Failed to Start SBCL");
+            log.warn(SltBundle.message("slt.error.sbclstart"), e);
+            Messages.showErrorDialog(project, e.getMessage(), SltBundle.message("slt.ui.errors.sbcl.start"));
         }
     }
 
@@ -91,8 +92,8 @@ public class SltFrameInfo {
                     parsedLocals.add(l);
                 } catch (Exception ignored) {
                     Local l = new Local();
-                    l.name = "Failed to parse";
-                    l.value = "Failed to parse";
+                    l.name = SltBundle.message("slt.ui.debugger.frame.failedtoparse");
+                    l.value = SltBundle.message("slt.ui.debugger.frame.failedtoparse");
                     parsedLocals.add(l);
                 }
             }
@@ -120,8 +121,8 @@ public class SltFrameInfo {
         @Override
         public String getColumnName(int column) {
             switch (column) {
-                case 0: return "Name";
-                case 1: return "Value";
+                case 0: return SltBundle.message("slt.ui.debugger.frame.arg");
+                case 1: return SltBundle.message("slt.ui.debugger.frame.value");
             }
             return null;
         }

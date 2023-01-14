@@ -1,5 +1,6 @@
 package com.en_circle.slt.plugin.actions;
 
+import com.en_circle.slt.plugin.SltBundle;
 import com.en_circle.slt.plugin.SltCommonLispFileType;
 import com.en_circle.slt.plugin.SltSBCL;
 import com.en_circle.slt.plugin.swank.requests.LoadFile;
@@ -20,7 +21,7 @@ import org.slf4j.LoggerFactory;
 import java.util.Objects;
 
 public abstract class EvalActionBase extends AnAction {
-    private static final Logger LOG = LoggerFactory.getLogger(EvalActionBase.class);
+    private static final Logger log = LoggerFactory.getLogger(EvalActionBase.class);
 
     @Override
     public void update(@NotNull AnActionEvent event) {
@@ -39,8 +40,8 @@ public abstract class EvalActionBase extends AnAction {
         try {
             SltSBCL.getInstance().sendToSbcl(SltEval.eval(buffer, packageName, result -> callback.run()), true);
         } catch (Exception e) {
-            LOG.warn("Error starting sbcl", e);
-            Messages.showErrorDialog(project, e.getMessage(), "Failed to Start SBCL");
+            log.warn(SltBundle.message("slt.error.sbclstart"), e);
+            Messages.showErrorDialog(project, e.getMessage(), SltBundle.message("slt.ui.errors.sbcl.start"));
         }
     }
 
@@ -49,8 +50,8 @@ public abstract class EvalActionBase extends AnAction {
             SltSBCL.getInstance().sendToSbcl(SwankEvalFromVirtualFile
                     .eval(buffer, filename, bufferPosition, lineno, charno, packageName, result -> callback.run()), true);
         } catch (Exception e) {
-            LOG.warn("Error starting sbcl", e);
-            Messages.showErrorDialog(project, e.getMessage(), "Failed to Start SBCL");
+            log.warn(SltBundle.message("slt.error.sbclstart"), e);
+            Messages.showErrorDialog(project, e.getMessage(), SltBundle.message("slt.ui.errors.sbcl.start"));
         }
     }
 
@@ -58,8 +59,8 @@ public abstract class EvalActionBase extends AnAction {
         try {
             SltSBCL.getInstance().sendToSbcl(LoadFile.loadFile(filename), true);
         } catch (Exception e) {
-            LOG.warn("Error starting sbcl", e);
-            Messages.showErrorDialog(project, e.getMessage(), "Failed to Start SBCL");
+            log.warn(SltBundle.message("slt.error.sbclstart"), e);
+            Messages.showErrorDialog(project, e.getMessage(), SltBundle.message("slt.ui.errors.sbcl.start"));
         }
     }
 

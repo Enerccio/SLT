@@ -1,5 +1,8 @@
 package com.en_circle.slt.plugin.swank;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -10,6 +13,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class SwankClient implements AutoCloseable, Runnable {
+    private static final Logger log = LoggerFactory.getLogger(SwankClient.class);
     private static final AtomicInteger TC = new AtomicInteger();
 
     private Socket connection;
@@ -19,7 +23,7 @@ public class SwankClient implements AutoCloseable, Runnable {
     private final SwankReply callback;
     private final Thread readThread;
 
-    private ExecutorService swankExecutor;
+    private final ExecutorService swankExecutor;
 
     public SwankClient(String host, int port, SwankReply callback) {
         this.swankExecutor = Executors.newCachedThreadPool();
@@ -51,8 +55,9 @@ public class SwankClient implements AutoCloseable, Runnable {
                 try {
                     checkConnection();
                     value.writeTo(connection.getOutputStream());
-                } catch (Exception ignored) {
-                    // TODO: maybe log
+                } catch (Exception e) {
+                    log.error(e.getMessage());
+                    log.debug(e.getMessage(), e);
                 }
             }
         });

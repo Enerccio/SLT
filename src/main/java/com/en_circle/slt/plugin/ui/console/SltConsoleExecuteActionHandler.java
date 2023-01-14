@@ -11,11 +11,9 @@ import org.jetbrains.annotations.NotNull;
 public abstract class SltConsoleExecuteActionHandler extends BaseConsoleExecuteActionHandler  {
 
     private final SltConsoleEnterHandler enterHandler = new SltConsoleEnterHandler();
-    private final LanguageConsoleView consoleView;
 
     public SltConsoleExecuteActionHandler(LanguageConsoleView consoleView) {
         super(true);
-        this.consoleView = consoleView;
     }
 
     protected abstract void execute(String code);

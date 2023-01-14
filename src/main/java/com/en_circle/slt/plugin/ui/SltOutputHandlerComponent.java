@@ -1,5 +1,6 @@
 package com.en_circle.slt.plugin.ui;
 
+import com.en_circle.slt.plugin.SltBundle;
 import com.en_circle.slt.plugin.swank.SwankServer.SwankServerOutput;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.*;
@@ -43,14 +44,14 @@ public class SltOutputHandlerComponent implements SltComponent {
         toolbar.setTargetComponent(dataContainer);
         dataContainer.add(toolbar.getComponent(), BorderLayout.EAST);
 
-        controlGroup.add(new AnAction("Clear Text", "", AllIcons.Actions.GC) {
+        controlGroup.add(new AnAction(SltBundle.message("slt.ui.process.gl.clear"), "", AllIcons.Actions.GC) {
 
             @Override
             public void actionPerformed(@NotNull AnActionEvent e) {
                 area.setText("");
             }
         });
-        controlGroup.add(new ToggleAction("Soft Wrap", "", AllIcons.Actions.ToggleSoftWrap) {
+        controlGroup.add(new ToggleAction(SltBundle.message("slt.ui.process.gl.wrap"), "", AllIcons.Actions.ToggleSoftWrap) {
 
             @Override
             public boolean isSelected(@NotNull AnActionEvent e) {
@@ -63,7 +64,7 @@ public class SltOutputHandlerComponent implements SltComponent {
             }
 
         });
-        controlGroup.add(new ToggleAction("Scroll to End", "", AllIcons.RunConfigurations.Scroll_down) {
+        controlGroup.add(new ToggleAction(SltBundle.message("slt.ui.process.gl.scroll"), "", AllIcons.RunConfigurations.Scroll_down) {
 
             @Override
             public boolean isSelected(@NotNull AnActionEvent e) {
@@ -126,7 +127,8 @@ public class SltOutputHandlerComponent implements SltComponent {
 
     @Override
     public String getTitle() {
-        return getOutput() == SwankServerOutput.STDERR ? "Error Output" : "Standard Output";
+        return getOutput() == SwankServerOutput.STDERR ? SltBundle.message("slt.ui.process.log.error.title") :
+                SltBundle.message("slt.ui.process.log.output.title");
     }
 
 }

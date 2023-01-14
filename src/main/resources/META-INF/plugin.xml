@@ -1,26 +1,17 @@
 <!-- Plugin Configuration File. Read more: https://plugins.jetbrains.com/docs/intellij/plugin-configuration-file.html -->
 <idea-plugin>
-    <!-- Unique identifier of the plugin. It should be FQN. It cannot be changed between the plugin versions. -->
     <id>com.en_circle.slt.plugin</id>
 
-    <!-- Public plugin name should be written in Title Case.
-         Guidelines: https://plugins.jetbrains.com/docs/marketplace/plugin-overview-page.html#plugin-name -->
     <name>Slt</name>
 
-    <!-- A displayed Vendor name or Organization ID displayed on the Plugins Page. -->
     <vendor email="admin@en-circle.com" url="https://www.en-circle.com">En-circle</vendor>
 
-    <!-- Description of the plugin displayed on the Plugin Page and IDE Plugin Manager.
-         Simple HTML elements (text formatting, paragraphs, and lists) can be added inside of <![CDATA[ ]]> tag.
-         Guidelines: https://plugins.jetbrains.com/docs/marketplace/plugin-overview-page.html#plugin-description -->
     <description>Slt is a language plugin bringing in the Common Lisp into Jetbrains IDE lineup. Requires SBCL and Quicklisp.</description>
 
-    <!-- Product and plugin compatibility requirements.
-         Read more: https://plugins.jetbrains.com/docs/intellij/plugin-compatibility.html -->
     <depends>com.intellij.modules.platform</depends>
 
-    <!-- Extension points defined by the plugin.
-         Read more: https://plugins.jetbrains.com/docs/intellij/plugin-extension-points.html -->
+    <resource-bundle>messages.SltBundle</resource-bundle>
+
     <extensions defaultExtensionNs="com.intellij">
         <internalFileTemplate name="Common Lisp CL File.cl"/>
         <internalFileTemplate name="Common Lisp Lisp File.lisp"/>
@@ -71,44 +62,42 @@
     <actions>
         <action id="com.en_circle.slt.plugin.actions.EvalRegionAction"
                 icon="/icons/fileicon.svg"
-                class="com.en_circle.slt.plugin.actions.EvalRegionAction" text="Evaluate Selected Region">
+                class="com.en_circle.slt.plugin.actions.EvalRegionAction">
             <add-to-group group-id="EditorPopupMenu" anchor="last"/>
             <keyboard-shortcut keymap="$default" first-keystroke="ctrl alt R"/>
         </action>
 
         <action id="com.en_circle.slt.plugin.actions.EvalCurrentFormAction"
                 icon="/icons/fileicon.svg"
-                class="com.en_circle.slt.plugin.actions.EvalCurrentFormAction" text="Evaluate This S-Expression">
+                class="com.en_circle.slt.plugin.actions.EvalCurrentFormAction">
             <add-to-group group-id="EditorPopupMenu" anchor="after" relative-to-action="com.en_circle.slt.plugin.actions.EvalRegionAction" />
             <keyboard-shortcut keymap="$default" first-keystroke="ctrl alt F"/>
         </action>
 
         <action id="com.en_circle.slt.plugin.actions.EvalPreviousFormAction"
                 icon="/icons/fileicon.svg"
-                class="com.en_circle.slt.plugin.actions.EvalPreviousFormAction" text="Evaluate Previous S-Expression">
+                class="com.en_circle.slt.plugin.actions.EvalPreviousFormAction">
             <add-to-group group-id="EditorPopupMenu" anchor="after" relative-to-action="com.en_circle.slt.plugin.actions.EvalCurrentFormAction" />
             <keyboard-shortcut keymap="$default" first-keystroke="ctrl alt E"/>
         </action>
 
         <action id="com.en_circle.slt.plugin.actions.EvalNextFormAction"
                 icon="/icons/fileicon.svg"
-                class="com.en_circle.slt.plugin.actions.EvalNextFormAction" text="Evaluate Next S-Expression">
+                class="com.en_circle.slt.plugin.actions.EvalNextFormAction">
             <add-to-group group-id="EditorPopupMenu" anchor="after" relative-to-action="com.en_circle.slt.plugin.actions.EvalPreviousFormAction" />
             <keyboard-shortcut keymap="$default" first-keystroke="ctrl alt Q"/>
         </action>
 
         <action id="com.en_circle.slt.plugin.actions.EvalFileFromEditor"
                 icon="/icons/evalFile.svg"
-                class="com.en_circle.slt.plugin.actions.EvalFileFromEditor"
-                text="Evaluate File">
+                class="com.en_circle.slt.plugin.actions.EvalFileFromEditor">
             <add-to-group group-id="EditorPopupMenu" anchor="after" relative-to-action="com.en_circle.slt.plugin.actions.EvalNextFormAction" />
             <keyboard-shortcut keymap="$default" first-keystroke="ctrl alt T"/>
         </action>
 
         <action id="com.en_circle.slt.plugin.actions.EvalFile"
                 icon="/icons/evalFile.svg"
-                class="com.en_circle.slt.plugin.actions.EvalFile"
-                text="Evaluate File">
+                class="com.en_circle.slt.plugin.actions.EvalFile">
             <add-to-group group-id="ProjectViewPopupMenuRunGroup" anchor="last"/>
         </action>
     </actions>

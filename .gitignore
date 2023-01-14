@@ -1,3 +1,4 @@
+signcerts/
 .gradle
 build/
 !gradle/wrapper/gradle-wrapper.jar
@@ -42,3 +43,4 @@ bin/
 .DS_Store
 
 .idea
+/.run/Build Release.run.xml

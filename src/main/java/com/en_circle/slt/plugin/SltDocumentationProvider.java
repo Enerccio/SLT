@@ -20,19 +20,19 @@ public class SltDocumentationProvider extends AbstractDocumentationProvider {
             SymbolState state = SltSBCL.getInstance().refreshSymbolFromServer(packageName, text, element);
             switch (state.binding) {
                 case NONE:
-                    return "Symbol " + text;
+                    return SltBundle.message("slt.documentation.types.symbol") + " " + text;
                 case FUNCTION:
-                    return "Function " + text;
+                    return SltBundle.message("slt.documentation.types.function") + " " + text;
                 case MACRO:
-                    return "Macro " + text;
+                    return SltBundle.message("slt.documentation.types.macro") + " " + text;
                 case SPECIAL_FORM:
-                    return "Special Form " + text;
+                    return SltBundle.message("slt.documentation.types.specialform") + " " + text;
                 case CONSTANT:
-                    return "Constant Value " + text;
+                    return SltBundle.message("slt.documentation.types.constant") + " " + text;
                 case SPECIAL_VARIABLE:
-                    return "Special Variable " + text;
+                    return SltBundle.message("slt.documentation.types.specvariable") + " " + text;
                 case KEYWORD:
-                    return "Keyword " + text;
+                    return SltBundle.message("slt.documentation.types.keyword") + " " + text;
             }
         }
         return null;

@@ -1,5 +1,6 @@
 package com.en_circle.slt.plugin.ui;
 
+import com.en_circle.slt.plugin.SltBundle;
 import com.en_circle.slt.plugin.swank.SlimeListener.RequestResponseLogger;
 import com.en_circle.slt.plugin.swank.SwankServer.SwankServerOutput;
 import com.en_circle.slt.tools.BufferedString;
@@ -49,14 +50,14 @@ public class SltGeneralLog implements SltComponent, RequestResponseLogger {
                 area.setCaretPosition(area.getDocument().getLength());
         }));
 
-        controlGroup.add(new AnAction("Clear Text", "", AllIcons.Actions.GC) {
+        controlGroup.add(new AnAction(SltBundle.message("slt.ui.process.gl.clear"), "", AllIcons.Actions.GC) {
 
             @Override
             public void actionPerformed(@NotNull AnActionEvent e) {
                 bufferedString.clear();
             }
         });
-        controlGroup.add(new ToggleAction("Soft Wrap", "", AllIcons.Actions.ToggleSoftWrap) {
+        controlGroup.add(new ToggleAction(SltBundle.message("slt.ui.process.gl.wrap"), "", AllIcons.Actions.ToggleSoftWrap) {
 
             @Override
             public boolean isSelected(@NotNull AnActionEvent e) {
@@ -69,7 +70,7 @@ public class SltGeneralLog implements SltComponent, RequestResponseLogger {
             }
 
         });
-        controlGroup.add(new ToggleAction("Scroll to End", "", AllIcons.RunConfigurations.Scroll_down) {
+        controlGroup.add(new ToggleAction(SltBundle.message("slt.ui.process.gl.scroll"), "", AllIcons.RunConfigurations.Scroll_down) {
 
             @Override
             public boolean isSelected(@NotNull AnActionEvent e) {
@@ -125,7 +126,7 @@ public class SltGeneralLog implements SltComponent, RequestResponseLogger {
 
     @Override
     public String getTitle() {
-        return "Slime Log";
+        return SltBundle.message("slt.ui.process.gl.title");
     }
 
     @Override

@@ -23,7 +23,7 @@ public class SltCommonLispFileType extends LanguageFileType {
 
     @Override
     public @Label @NotNull String getDescription() {
-        return "Common Lisp source file";
+        return SltBundle.message("slt.file.description");
     }
 
     @Override

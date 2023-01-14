@@ -1,5 +1,6 @@
 package com.en_circle.slt.plugin.highlights;
 
+import com.en_circle.slt.plugin.SltBundle;
 import com.en_circle.slt.plugin.SltIconProvider;
 import com.en_circle.slt.templates.CodeHighlightTemplate;
 import com.intellij.openapi.editor.colors.TextAttributesKey;
@@ -20,18 +21,18 @@ public class SltColorSettingsPage implements ColorSettingsPage {
     public static final String DEMO_CODE = new CodeHighlightTemplate().render();
 
     private static final AttributesDescriptor[] DESCRIPTORS = new AttributesDescriptor[] {
-            new AttributesDescriptor("Parenthesis", CommonLispHighlighterColors.PARENTS),
-            new AttributesDescriptor("Number", CommonLispHighlighterColors.NUMBER),
-            new AttributesDescriptor("String literal", CommonLispHighlighterColors.STRING),
-            new AttributesDescriptor("Comment", CommonLispHighlighterColors.COMMENT),
-            new AttributesDescriptor("Keyword symbol", CommonLispHighlighterColors.KEYWORD),
-            new AttributesDescriptor("Helper symbol", CommonLispHighlighterColors.DEFUN_FORM),
-            new AttributesDescriptor("Special variable", CommonLispHighlighterColors.SPECIAL_VARIABLE),
-            new AttributesDescriptor("Constant variable", CommonLispHighlighterColors.CONSTANT),
-            new AttributesDescriptor("Special form", CommonLispHighlighterColors.SPECIAL_FORM),
-            new AttributesDescriptor("Function call", CommonLispHighlighterColors.FUNCTION),
-            new AttributesDescriptor("Macro call", CommonLispHighlighterColors.MACRO),
-            new AttributesDescriptor("Reader macro", CommonLispHighlighterColors.SUGAR),
+            new AttributesDescriptor(SltBundle.message("slt.ui.colorsettings.parenthesis"), CommonLispHighlighterColors.PARENTS),
+            new AttributesDescriptor(SltBundle.message("slt.ui.colorsettings.number"), CommonLispHighlighterColors.NUMBER),
+            new AttributesDescriptor(SltBundle.message("slt.ui.colorsettings.stringliteral"), CommonLispHighlighterColors.STRING),
+            new AttributesDescriptor(SltBundle.message("slt.ui.colorsettings.comment"), CommonLispHighlighterColors.COMMENT),
+            new AttributesDescriptor(SltBundle.message("slt.ui.colorsettings.keyword"), CommonLispHighlighterColors.KEYWORD),
+            new AttributesDescriptor(SltBundle.message("slt.ui.colorsettings.helper"), CommonLispHighlighterColors.DEFUN_FORM),
+            new AttributesDescriptor(SltBundle.message("slt.ui.colorsettings.specvariable"), CommonLispHighlighterColors.SPECIAL_VARIABLE),
+            new AttributesDescriptor(SltBundle.message("slt.ui.colorsettings.constant"), CommonLispHighlighterColors.CONSTANT),
+            new AttributesDescriptor(SltBundle.message("slt.ui.colorsettings.specialform"), CommonLispHighlighterColors.SPECIAL_FORM),
+            new AttributesDescriptor(SltBundle.message("slt.ui.colorsettings.function"), CommonLispHighlighterColors.FUNCTION),
+            new AttributesDescriptor(SltBundle.message("slt.ui.colorsettings.macro"), CommonLispHighlighterColors.MACRO),
+            new AttributesDescriptor(SltBundle.message("slt.ui.colorsettings.reader"), CommonLispHighlighterColors.SUGAR),
     };
 
     @Override
@@ -66,6 +67,6 @@ public class SltColorSettingsPage implements ColorSettingsPage {
 
     @Override
     public @NotNull @ConfigurableName String getDisplayName() {
-        return "Common Lisp";
+        return SltBundle.message("slt.commonlisp");
     }
 }

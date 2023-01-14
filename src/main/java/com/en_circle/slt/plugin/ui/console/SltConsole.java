@@ -1,5 +1,6 @@
 package com.en_circle.slt.plugin.ui.console;
 
+import com.en_circle.slt.plugin.SltBundle;
 import com.en_circle.slt.plugin.SltCommonLispLanguage;
 import com.en_circle.slt.plugin.SltSBCL;
 import com.en_circle.slt.plugin.swank.SwankServer;
@@ -23,7 +24,7 @@ import javax.swing.*;
 import java.awt.*;
 
 public class SltConsole implements SltComponent {
-    private static final Logger LOG = LoggerFactory.getLogger(SltConsole.class);
+    private static final Logger log = LoggerFactory.getLogger(SltConsole.class);
 
     private TabInfo tabInfo;
     protected LanguageConsoleView languageConsole;
@@ -68,8 +69,8 @@ public class SltConsole implements SltComponent {
                         result -> languageConsole.print(result + "\n", ConsoleViewContentType.NORMAL_OUTPUT)));
             }
         } catch (Exception e) {
-            LOG.warn("Error starting sbcl", e);
-            Messages.showErrorDialog(project, e.getMessage(), "Failed to Start SBCL");
+            log.warn(SltBundle.message("slt.error.sbclstart"), e);
+            Messages.showErrorDialog(project, e.getMessage(), SltBundle.message("slt.ui.errors.sbcl.start"));
         }
     }
 
@@ -105,7 +106,7 @@ public class SltConsole implements SltComponent {
 
     @Override
     public String getTitle() {
-        return "REPL";
+        return SltBundle.message("slt.ui.repl.title");
     }
 
     public void close() {

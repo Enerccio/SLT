@@ -1,5 +1,6 @@
 package com.en_circle.slt.plugin.ui;
 
+import com.en_circle.slt.plugin.SltBundle;
 import com.en_circle.slt.plugin.SltCommonLispFileType;
 import com.en_circle.slt.plugin.SltSBCL;
 import com.en_circle.slt.plugin.SltSBCL.SBCLServerListener;
@@ -30,14 +31,13 @@ import java.util.Collections;
 import java.util.List;
 
 public class SltCoreWindow implements SBCLServerListener {
-    private static final Logger LOG = Logger.getInstance(SltCoreWindow.class);
+    private static final Logger log = Logger.getInstance(SltCoreWindow.class);
 
-    private Project project;
+    private final Project project;
     private final JTextField process;
     private final JPanel content;
     private final JBTabsImpl tabs;
     private final List<SltComponent> components = Collections.synchronizedList(new ArrayList<>());
-    private final SltGeneralLog generalLog;
 
 
     public SltCoreWindow(ToolWindow toolWindow) {
@@ -49,13 +49,13 @@ public class SltCoreWindow implements SBCLServerListener {
         content = new JPanel(new BorderLayout());
         components.add(new SltOutputHandlerComponent(this, SwankServerOutput.STDOUT));
         components.add(new SltOutputHandlerComponent(this, SwankServerOutput.STDERR));
-        generalLog = new SltGeneralLog();
+        SltGeneralLog generalLog = new SltGeneralLog();
         components.add(generalLog);
         SltSBCL.getInstance().setRequestResponseLogger(generalLog);
 
         createSbclControls();
 
-        JLabel processLabel = new JLabel("SBCL Process Pid: ");
+        JLabel processLabel = new JLabel(SltBundle.message("slt.ui.process.processpid") + " ");
         process = new JTextField(20);
         process.setEditable(false);
         process.setMaximumSize(new Dimension(150, Integer.MAX_VALUE));
@@ -93,9 +93,8 @@ public class SltCoreWindow implements SBCLServerListener {
         try {
             SltSBCL.getInstance().start();
         } catch (Exception e) {
-            LOG.warn("Error starting sbcl", e);
-
-            Messages.showErrorDialog(project, e.getMessage(), "Failed to Start SBCL");
+            log.warn(SltBundle.message("slt.error.sbclstart"), e);
+            Messages.showErrorDialog(project, e.getMessage(), SltBundle.message("slt.ui.errors.sbcl.start"));
         }
 
         PsiManager psiManager = PsiManager.getInstance(project);
@@ -113,9 +112,8 @@ public class SltCoreWindow implements SBCLServerListener {
         try {
             SltSBCL.getInstance().stop();
         } catch (Exception e) {
-            LOG.warn("Error stopping sbcl", e);
-
-            Messages.showErrorDialog(project, e.getMessage(), "Failed to Stop SBCL");
+            log.warn(SltBundle.message("slt.error.sbclstop"), e);
+            Messages.showErrorDialog(project, e.getMessage(), SltBundle.message("slt.ui.errors.sbcl.stop"));
         }
     }
 
@@ -132,7 +130,8 @@ public class SltCoreWindow implements SBCLServerListener {
         SltConsole console = new SltConsole(this.project);
         components.add(console);
         tabs.addTab(console.create());
-        console.getTabInfo().setTabLabelActions(new DefaultActionGroup(new AnAction("Close", "", Actions.Close) {
+        console.getTabInfo().setTabLabelActions(new DefaultActionGroup(
+                new AnAction(SltBundle.message("slt.ui.repl.close"), "", Actions.Close) {
 
             @Override
             public void actionPerformed(@NotNull AnActionEvent e) {
@@ -189,7 +188,7 @@ public class SltCoreWindow implements SBCLServerListener {
     private class StartSbclAction extends AnAction {
 
         private StartSbclAction() {
-            super("Start SBCL Instance", "", AllIcons.RunConfigurations.TestState.Run);
+            super(SltBundle.message("slt.ui.process.startsbcl"), "", AllIcons.RunConfigurations.TestState.Run);
         }
 
         @Override
@@ -208,7 +207,7 @@ public class SltCoreWindow implements SBCLServerListener {
     private class StopSbclAction extends AnAction {
 
         private StopSbclAction() {
-            super("Stop SBCL Instance", "", AllIcons.Actions.Suspend);
+            super(SltBundle.message("slt.ui.process.stopsbcl"), "", AllIcons.Actions.Suspend);
         }
 
         @Override
@@ -227,7 +226,7 @@ public class SltCoreWindow implements SBCLServerListener {
     private class ConsoleWindowAction extends AnAction {
 
         private ConsoleWindowAction() {
-            super("Create SBCL REPL", "", General.Add);
+            super(SltBundle.message("slt.ui.process.openrepl"), "", General.Add);
         }
 
         @Override

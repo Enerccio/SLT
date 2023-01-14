@@ -1,5 +1,6 @@
 package com.en_circle.slt.plugin.ui.debug;
 
+import com.en_circle.slt.plugin.SltBundle;
 import com.en_circle.slt.plugin.SltSBCL;
 import com.en_circle.slt.plugin.swank.requests.EvalStringInFrameEval;
 import com.en_circle.slt.plugin.ui.console.SltConsole;
@@ -13,7 +14,7 @@ import org.slf4j.LoggerFactory;
 import java.math.BigInteger;
 
 public class SltFrameConsole extends SltConsole {
-    private static final Logger LOG = LoggerFactory.getLogger(SltFrameConsole.class);
+    private static final Logger log = LoggerFactory.getLogger(SltFrameConsole.class);
 
     private final BigInteger threadId;
     private final BigInteger frame;
@@ -38,13 +39,13 @@ public class SltFrameConsole extends SltConsole {
                         }));
             }
         } catch (Exception e) {
-            LOG.warn("Error starting sbcl", e);
-            Messages.showErrorDialog(project, e.getMessage(), "Failed to Start SBCL");
+            log.warn(SltBundle.message("slt.error.sbclstart"), e);
+            Messages.showErrorDialog(project, e.getMessage(), SltBundle.message("slt.ui.errors.sbcl.start"));
         }
     }
 
     @Override
     public String getTitle() {
-        return "Frame REPL";
+        return SltBundle.message("slt.ui.debugger.frame.repl");
     }
 }

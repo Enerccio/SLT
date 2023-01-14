@@ -8,6 +8,8 @@ This plugin is providing support for Common Lisp for JetBrains IDEs.
 Using modified SLIME/Swank protocol to commmunicate with SBCL providing 
 IDE capabilities for Common Lisp.
 
+![Image](https://i.imgur.com/xbDscTJ.png "Interactive Debugger")
+
 ## Requirements
 
 1) Intellij based IDE - tested on `Intellij Idea Community/Ultimate` but should workd on all major IDEs

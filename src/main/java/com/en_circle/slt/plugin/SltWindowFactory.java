@@ -16,13 +16,16 @@ public class SltWindowFactory implements ToolWindowFactory {
         {
             SltCoreWindow sltCoreWindow = new SltCoreWindow(toolWindow);
             ContentFactory contentFactory = ContentFactory.SERVICE.getInstance();
-            Content content = contentFactory.createContent(sltCoreWindow.getContent(), "SBCL Process", false);
+            Content content = contentFactory.createContent(sltCoreWindow.getContent(),
+                    SltBundle.message("slt.ui.process.title"), false);
             toolWindow.getContentManager().addContent(content);
         }
+
         {
             SltDebuggers debugger = new SltDebuggers(toolWindow);
             ContentFactory contentFactory = ContentFactory.SERVICE.getInstance();
-            Content content = contentFactory.createContent(debugger.getContent(), "SBCL Debuggers", false);
+            Content content = contentFactory.createContent(debugger.getContent(),
+                    SltBundle.message("slt.ui.debuggers.title"), false);
             debugger.setSelf(content);
             toolWindow.getContentManager().addContent(content);
         }
