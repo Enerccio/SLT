@@ -4,6 +4,8 @@
 [![0.1.0](https://badgen.net/github/milestones/enerccio/SLT/1)](https://github.com/enerccio/SLT/milestone/1)
 [![0.2.0](https://badgen.net/github/milestones/enerccio/SLT/2)](https://github.com/enerccio/SLT/milestone/2)
 
+**THIS PLUGIN IS EXPERIMENTAL and can crash at any time! Please report all bugs!**
+
 This plugin is providing support for Common Lisp for JetBrains IDEs. 
 Using modified SLIME/Swank protocol to commmunicate with SBCL providing 
 IDE capabilities for Common Lisp.
@@ -18,15 +20,31 @@ IDE capabilities for Common Lisp.
 
 ## Getting started
 
-Download plugin for your IDE from releases and install it via file. 
+Download plugin for your IDE from releases and install it via file.
+To find out which release applies to you check this table:
+
+| Jetbrains IDE Variant |         Plugin name pattern |
+|-----------------------|----------------------------:|
+| CLion                 | slt-_version_-signed-CL.zip |
+| GoLand                | slt-_version_-signed-GO.zip |
+| Intellij Community    | slt-_version_-signed-IC.zip |
+| Intellij Ultimate     | slt-_version_-signed-IU.zip |
+| PyCharm               | slt-_version_-signed-PY.zip |
+| PyCharm Community     | slt-_version_-signed-PC.zip |
+| Rider                 | slt-_version_-signed-RD.zip |
+
+PhpStorm is coming when I read how to build it correctly since just swapping
+the type does not work. 
 
 ## Compiling source
 
-Clone the repository and change gradle.properties for your IDE. Then use gradle to build the plugin. 
+Clone the repository and change gradle.properties for your IDE. 
+Then use gradle to build the plugin. 
 You can also open this as a project in Intellij Idea.
 
 ## Planned features / goals
 
+* [ ] Upload to marketplace when it has enough features
 * [x] REPL
 * [x] Interactive debugging
 * [ ] Walkable debugger without actions 

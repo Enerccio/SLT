@@ -1,6 +1,6 @@
 plugins {
     id("java")
-    id("org.jetbrains.intellij") version "1.11.0"
+    id("org.jetbrains.intellij") version "1.12.0"
 }
 
 group = "com.en_circle.slt"
@@ -26,9 +26,12 @@ sourceSets {
 // Configure Gradle IntelliJ Plugin
 // Read more: https://plugins.jetbrains.com/docs/intellij/tools-gradle-intellij-plugin.html
 intellij {
-    version.set("2022.1.4")
+    version.set("2022.1")
     pluginName.set("slt")
-    type.set(extra["targetIDE"].toString()) // Target IDE Platform
+    var ide = System.getenv("TARGET_IDE")
+    if (ide == null || "" == ide)
+        ide = extra["targetIDE"].toString()
+    type.set(ide) // Target IDE Platform
 
     plugins.set(listOf(
 
