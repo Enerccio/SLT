@@ -127,16 +127,19 @@ TERMINATING_MACRO_CHAR=[\"'\(\),;`]
     [y-z] { yybegin(YYINITIAL); return LispTypes.UNDEFINED_SEQUENCE; }
     [Y-Z] { yybegin(YYINITIAL); return LispTypes.UNDEFINED_SEQUENCE; }
 
+    <<EOF>> { yybegin(YYINITIAL); return TokenType.ERROR_ELEMENT; }
     [^] { yybegin(YYINITIAL); return TokenType.ERROR_ELEMENT; }
 }
 
 <BIT_ARRAY> {
     [0|1] { }
 
+    <<EOF>> { yybegin(YYINITIAL); yypushback(1); return LispTypes.BIT_ARRAY; }
     [^] { yybegin(YYINITIAL); yypushback(1); return LispTypes.BIT_ARRAY; }
 }
 
 <CHARACTER> {
+    <<EOF>> { yybegin(YYINITIAL); return TokenType.ERROR_ELEMENT; }
     [^] { yybegin(YYINITIAL); return LispTypes.CHARACTER; }
 }
 

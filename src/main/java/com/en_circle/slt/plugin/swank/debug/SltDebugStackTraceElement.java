@@ -1,50 +1,24 @@
 package com.en_circle.slt.plugin.swank.debug;
 
-import com.en_circle.slt.plugin.lisp.lisp.*;
+import com.en_circle.slt.plugin.lisp.lisp.LispContainer;
+import com.en_circle.slt.plugin.lisp.lisp.LispElement;
+import com.en_circle.slt.plugin.lisp.lisp.LispString;
+import com.en_circle.slt.plugin.lisp.lisp.LispUtils;
+import com.en_circle.slt.plugin.swank.components.SourceLocation;
 
 public class SltDebugStackTraceElement {
 
     private final String line;
     private final String detailedCall;
     private String framePackage = "cl-user";
-    private String location = "undefined";
-    private int position = -1;
-    private boolean isPrecise = false;
-    private boolean isFile = false;
+    private final SourceLocation location;
 
     public SltDebugStackTraceElement(LispContainer source) {
         String text = source.getItems().get(2).toString();
         this.line = LispUtils.unescape(text);
         text = source.getItems().get(1).toString();
         this.detailedCall = LispUtils.unescape(text);
-
-        try {
-            LispContainer src = (LispContainer) source.getItems().get(3);
-            if (src.getItems().get(0).equals(new LispSymbol(":location"))) {
-                for (int i=1; i<src.getItems().size(); i++) {
-                    LispContainer trait = (LispContainer) src.getItems().get(i);
-                    if (LispUtils.hasPValue(trait, new LispSymbol(":file"))) {
-                        this.location = ((LispString) LispUtils.pvalue(trait, new LispSymbol(":file"))).getValue();
-                        isFile = true;
-                    } else if (LispUtils.hasPValue(trait, new LispSymbol(":buffer"))) {
-                        this.location = ((LispString) LispUtils.pvalue(trait, new LispSymbol(":buffer"))).getValue();
-                        isFile = true;
-                    } else if (LispUtils.hasPValue(trait, new LispSymbol(":position"))) {
-                        LispInteger offset = (LispInteger)  LispUtils.pvalue(trait, new LispSymbol(":position"));
-                        position = offset.getValue().intValue();
-                    } else if (LispUtils.hasPValue(trait, new LispSymbol(":offset"))) {
-                        LispInteger offset = (LispInteger) LispUtils.pvalue(trait, new LispSymbol(":offset"));
-                        position = offset.getValue().intValue();
-                    }
-                }
-            }
-            if (isFile) {
-                isPrecise = true;
-            }
-        } catch (Exception ignored) {
-
-        }
-
+        this.location = new SourceLocation((LispContainer) source.getItems().get(3));
         LispElement packageInfo = source.getItems().get(4);
         if (packageInfo instanceof LispString) {
             framePackage = ((LispString) packageInfo).getValue();
@@ -63,19 +37,19 @@ public class SltDebugStackTraceElement {
     }
 
     public String getLocation() {
-        return location;
+        return location.getLocation();
     }
 
     public int getPosition() {
-        return position;
+        return location.getPosition();
     }
 
     public boolean isPrecise() {
-        return isPrecise;
+        return location.isPrecise();
     }
 
     public boolean isFile() {
-        return isFile;
+        return location.isFile();
     }
 
     public String getDetailedCall() {

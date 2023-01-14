@@ -17,6 +17,8 @@
 
 (in-package :swank)
 
+(export 'find-source-location)
+
 (defslimefun slt-eval (string)
     (let ((*echo-area-prefix* ""))
         (with-buffer-syntax ()
@@ -68,13 +70,11 @@ format suitable for Emacs."
                         (pkg (package-name pkg))
                         (T NIL))))))
 
-(defslimefun compile-string-region-slt (string buffer offset filename)
-  "Compile STRING (exerpted from BUFFER at POSITION).
-Record compiler notes signalled as `compiler-condition's."
+(defslimefun compile-string-region-slt (string buffer offset filename package)
     (with-buffer-syntax ()
       (collect-notes
        (lambda ()
-         (let ((*compile-print* t) (*compile-verbose* nil))
+         (let ((*compile-print* t) (*compile-verbose* nil) (*package* (find-package package)))
            (swank-compile-string string
                                  :buffer buffer
                                  :position offset
@@ -91,44 +91,74 @@ Record compiler notes signalled as `compiler-condition's."
     (eq (sb-cltl2:variable-information test-sym) :special))
 
 (defun analyze-symbol (test-sym)
-    (cons test-sym (let ((*standard-output* (make-string-output-stream)))
-        (cond
-            ((special-operator-p test-sym) (list :special-form NIL))
-            ((macro-function test-sym) (progn
-                                         (describe test-sym)
-                                         (list :macro (get-output-stream-string *standard-output*))))
-            ((fboundp test-sym) (progn
-                                  (describe test-sym)
-                                  (list :function (get-output-stream-string *standard-output*))))
-            ((specialp test-sym) (progn
-                                   (describe test-sym)
-                                   (list :special (get-output-stream-string *standard-output*))))
-            ((keywordp test-sym) (progn
-                                   (describe test-sym)
-                                   (list :keyword (get-output-stream-string *standard-output*))))
-            ((constantp test-sym) (progn
-                                    (describe test-sym)
-                                    (list :constant (get-output-stream-string *standard-output*))))
-            (T (list NIL NIL))))))
+    (cons test-sym
+        (let ((*standard-output* (make-string-output-stream)))
+            (cond
+                ((not test-sym) (list NIL NIL NIL))
+                ((special-operator-p test-sym) (list :special-form NIL NIL))
+                ((macro-function test-sym) (progn
+                                             (describe test-sym)
+                                             (list
+                                                :macro
+                                                (get-output-stream-string *standard-output*)
+                                                (swank:find-source-location (symbol-function test-sym)))))
+                ((fboundp test-sym) (progn
+                                      (describe test-sym)
+                                      (list
+                                        :function
+                                        (get-output-stream-string *standard-output*)
+                                        (swank:find-source-location (symbol-function test-sym)))))
+                ((specialp test-sym) (progn
+                                       (describe test-sym)
+                                       (list :special (get-output-stream-string *standard-output*) NIL)))
+                ((keywordp test-sym) (progn
+                                       (describe test-sym)
+                                       (list :keyword (get-output-stream-string *standard-output*) NIL)))
+                ((constantp test-sym) (progn
+                                        (describe test-sym)
+                                        (list :constant (get-output-stream-string *standard-output*) NIL)))
+                (T (list NIL NIL NIL))))))
 
 (defun analyze-symbols (symbols)
    (map 'list #'analyze-symbol symbols))
 
 (defun read-fix-packages (str)
-    (remove-if-not #'identity
-        (handler-bind (
-               (sb-ext:package-locked-error
+    (handler-bind (
+           (sb-ext:package-locked-error
                 (lambda (c)
-                    (declare (ignore c))
+                    (declare (ignorable c))
                     (let ((restart (find-restart :ignore-all)))
                         (when restart
                             (invoke-restart restart)))))
-               (T
+           (ECLECTOR.READER:SYMBOL-IS-NOT-EXTERNAL
                 (lambda (c)
-                    (declare (ignore c))
-                    (let ((restart (find-restart 'use-value)))
+                    (declare (ignorable c))
+                    (let ((restart (find-restart 'eclector.reader::use-anyway)))
                         (when restart
-                            (invoke-restart restart NIL))))))
-           (eclector.reader:read-from-string str))))
+                            (invoke-restart restart)))))
+           (ECLECTOR.READER:SYMBOL-DOES-NOT-EXIST
+               (lambda (c)
+                   (declare (ignorable c))
+                   (let ((restart (find-restart 'eclector.reader:recover)))
+                       (when restart
+                           (invoke-restart restart)))))
+           (ECLECTOR.READER:PACKAGE-DOES-NOT-EXIST
+               (lambda (c)
+                   (declare (ignorable c))
+                   (let ((restart (find-restart 'eclector.reader:recover)))
+                       (when restart
+                           (invoke-restart restart)))))
+           (error (lambda (c)
+                   (format *error-output* "general error: ~S ~%" c)))
+                           #|
+           (error
+            (lambda (c)
+                (declare (ignorable c))
+                (let ((restart (find-restart 'use-value)))
+                    (when restart
+                        (invoke-restart restart NIL)))))
+                        |#
+                        )
+       (eclector.reader:read-from-string str)))
 
 (in-package :cl-user)

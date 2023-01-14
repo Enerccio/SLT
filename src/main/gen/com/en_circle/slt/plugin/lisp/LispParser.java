@@ -156,12 +156,12 @@ public class LispParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // sexpr*
+  // toplevel*
   static boolean lispFile(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "lispFile")) return false;
     while (true) {
       int c = current_position_(b);
-      if (!sexpr(b, l + 1)) break;
+      if (!toplevel(b, l + 1)) break;
       if (!empty_element_parsed_guard_(b, "lispFile", c)) break;
     }
     return true;
@@ -414,6 +414,17 @@ public class LispParser implements PsiParser, LightPsiParser {
     boolean r;
     r = consumeToken(b, TEST_SUCCESS);
     if (!r) r = consumeToken(b, TEST_FALURE);
+    return r;
+  }
+
+  /* ********************************************************** */
+  // sexpr
+  public static boolean toplevel(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "toplevel")) return false;
+    boolean r;
+    Marker m = enter_section_(b, l, _NONE_, TOPLEVEL, "<toplevel>");
+    r = sexpr(b, l + 1);
+    exit_section_(b, l, m, r, false, null);
     return r;
   }
 

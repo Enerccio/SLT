@@ -1,5 +1,7 @@
 package com.en_circle.slt.plugin.actions;
 
+import com.en_circle.slt.plugin.SltSBCL;
+import com.en_circle.slt.plugin.lisp.LispParserUtil;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.CommonDataKeys;
 import com.intellij.openapi.editor.Caret;
@@ -8,11 +10,14 @@ import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.roots.ProjectFileIndex;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.psi.PsiDocumentManager;
+import com.intellij.psi.PsiFile;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class EvalRegionAction extends EvalActionBase {
 
@@ -38,7 +43,16 @@ public class EvalRegionAction extends EvalActionBase {
 
             if (!hasEvalRegion) {
                 String selectedText = editor.getSelectionModel().getSelectedText(false);
-                evaluate(editor.getProject(), selectedText, () -> {});
+                PsiDocumentManager psiMgr = PsiDocumentManager.getInstance(Objects.requireNonNull(editor.getProject()));
+                psiMgr.commitDocument(editor.getDocument());
+                PsiFile psiFile = psiMgr.getPsiFile(editor.getDocument());
+
+                if (psiFile != null) {
+                    int offset = editor.getSelectionModel().getSelectionStart();
+                    evaluate(editor.getProject(), selectedText, LispParserUtil.getPackage(psiFile, offset), () -> { });
+                } else {
+                    evaluate(editor.getProject(), selectedText, SltSBCL.getInstance().getGlobalPackage(), () -> { });
+                }
             }
         }
     }
@@ -59,7 +73,14 @@ public class EvalRegionAction extends EvalActionBase {
                 int offset = caret.getOffset();
                 int lineno = editor.getDocument().getLineNumber(offset);
                 int charno = offset - editor.getDocument().getLineStartOffset(lineno);
-                evaluateRegion(editor.getProject(), text, filename, offset, lineno, charno, continueEvaluation);
+                PsiDocumentManager psiMgr = PsiDocumentManager.getInstance(Objects.requireNonNull(editor.getProject()));
+                psiMgr.commitDocument(editor.getDocument());
+                PsiFile psiFile = psiMgr.getPsiFile(editor.getDocument());
+                String packageName = SltSBCL.getInstance().getGlobalPackage();
+                if (psiFile != null) {
+                    packageName = LispParserUtil.getPackage(psiFile, offset);
+                }
+                evaluateRegion(editor.getProject(), text, packageName, filename, offset, lineno, charno, continueEvaluation);
             }
         }
     }

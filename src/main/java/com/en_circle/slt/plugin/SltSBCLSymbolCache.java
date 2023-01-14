@@ -3,6 +3,7 @@ package com.en_circle.slt.plugin;
 import com.en_circle.slt.plugin.SymbolState.SymbolBinding;
 import com.en_circle.slt.plugin.lisp.lisp.*;
 import com.en_circle.slt.plugin.swank.SwankServer;
+import com.en_circle.slt.plugin.swank.components.SourceLocation;
 import com.en_circle.slt.plugin.swank.requests.SwankEvalAndGrab;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -12,6 +13,7 @@ import org.codehaus.plexus.util.StringUtils;
 
 import java.lang.ref.WeakReference;
 import java.util.*;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class SltSBCLSymbolCache extends Thread {
@@ -58,34 +60,42 @@ public class SltSBCLSymbolCache extends Thread {
 
     public SymbolState refreshSymbolFromServer(String packageName, String symbolName, PsiElement element) {
         SymbolState state = getOrCreateBinding(packageName, symbolName);
+        SymbolState undefinedSymbol = getOrCreateBinding(null, symbolName);
         state.containerFiles.add(new WeakReference<>(element.getContainingFile().getVirtualFile()));
         SymbolBinding currentBinding = state.binding;
-        if (currentBinding == SymbolBinding.NONE || cacheInvalid(state)) {
+        if (currentBinding == SymbolBinding.NONE) {
             symbolRefreshQueue.add(state);
+            if (undefinedSymbol.binding == SymbolBinding.NONE) {
+                symbolRefreshQueue.add(undefinedSymbol);
+            } else {
+                return undefinedSymbol;
+            }
         }
+
         return state;
     }
 
-    private boolean cacheInvalid(SymbolState state) {
-        if (state.timestamp == null)
-            return false;
-//        if (System.currentTimeMillis() - state.timestamp > 10000)
-//            return false;
-
-        return true;
-    }
-
     private SymbolState getOrCreateBinding(String packageName, String symbolName) {
-        return symbolInformation.computeIfAbsent(packageName + ":" + symbolName, fullname -> new SymbolState(fullname, symbolName));
+        if (symbolName.contains(":")) {
+            String[] parts = symbolName.split(Pattern.quote(":"));
+            if (parts.length > 1) {
+                if (StringUtils.isBlank(parts[0])) {
+                    packageName = null;
+                } else {
+                    packageName = parts[0];
+                    symbolName = parts[1];
+                }
+            }
+        }
+        String combinedName = StringUtils.isBlank(packageName) ? symbolName : (packageName + ":" + symbolName);
+        String pureName = symbolName;
+        String packageNameFinal = packageName;
+        return symbolInformation.computeIfAbsent(combinedName, fullname -> new SymbolState(fullname, packageNameFinal, pureName));
     }
 
     private void refreshSymbols(List<SymbolState> refreshStates) throws Exception {
-        Map<String, SymbolState> stateMap = new HashMap<>();
-        for (SymbolState state : refreshStates) {
-            stateMap.put(state.symbolName.toUpperCase(), state);
-        }
         String request = "(" +
-                stateMap.keySet().stream().map(x -> x + " ").collect(Collectors.joining()) + ")";
+                refreshStates.stream().map(x -> x.name.toUpperCase() + " ").collect(Collectors.joining()) + ")";
         request = StringUtils.replace(request, "\"", "\\\"");
 
         SltSBCL.getInstance().sendToSbcl(SwankEvalAndGrab.eval(
@@ -94,14 +104,20 @@ public class SltSBCLSymbolCache extends Thread {
                         request),
                 SltSBCL.getInstance().getGlobalPackage(), true, (result, stdout, parsed) -> {
                     Set<VirtualFile> toRefresh = new HashSet<>();
-
                     if (parsed.size() == 1 && parsed.get(0).getType() == LispElementType.CONTAINER) {
+                        int ix = 0;
                         LispContainer data = (LispContainer) parsed.get(0);
+                        assert refreshStates.size() == data.getItems().size();
                         for (LispElement element : data.getItems()) {
                             LispContainer list = (LispContainer) element;
-                            SymbolState state = stateMap.get(((LispSymbol) list.getItems().get(0)).getValue().toUpperCase());
-                            if (state != null) {
+                            String name = ((LispSymbol) list.getItems().get(0)).getValue().toUpperCase();
+                            if ("NIL".equals(name)) {
+                                ++ix;
+                                continue;
+                            }
 
+                            SymbolState state = refreshStates.get(ix++);
+                            if (state != null) {
                                 String symValue = ((LispSymbol) list.getItems().get(1)).getValue().toUpperCase();
                                 boolean changed = false;
                                 state.timestamp = System.currentTimeMillis();
@@ -140,6 +156,14 @@ public class SltSBCLSymbolCache extends Thread {
                                 if (list.getItems().get(2) instanceof LispString) {
                                     state.documentation = ((LispString) list.getItems().get(2)).getValue();
                                     if (!hasDoc) {
+                                        changed = true;
+                                    }
+                                }
+
+                                if (list.getItems().get(3) instanceof LispContainer) {
+                                    SourceLocation location = new SourceLocation((LispContainer) list.getItems().get(3));
+                                    if (!state.location.equals(location)) {
+                                        state.location = location;
                                         changed = true;
                                     }
                                 }

@@ -16,7 +16,9 @@
   psiImplUtilClass="com.en_circle.slt.plugin.lisp.psi.impl.LispPsiImplUtil"
 }
 
-lispFile ::= sexpr*
+lispFile ::= toplevel*
+
+toplevel ::= sexpr
 
 sexpr ::= (enhancement* datum) | comment
 

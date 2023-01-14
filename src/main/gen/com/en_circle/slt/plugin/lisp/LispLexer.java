@@ -548,42 +548,54 @@ IElementType processBuffer(boolean unget) {
               yybegin(YYINITIAL); return TokenType.ERROR_ELEMENT;
             }  // fall though
             case 73: break;
-            case BLOCK_COMMENT: {
+            case SHARPSIGN: {
               yybegin(YYINITIAL); return TokenType.ERROR_ELEMENT;
             }  // fall though
             case 74: break;
-            case BINARY_NUM: {
-              yybegin(YYINITIAL); return TokenType.ERROR_ELEMENT;
+            case BIT_ARRAY: {
+              yybegin(YYINITIAL); yypushback(1); return LispTypes.BIT_ARRAY;
             }  // fall though
             case 75: break;
-            case OCTAL_NUM: {
+            case CHARACTER: {
               yybegin(YYINITIAL); return TokenType.ERROR_ELEMENT;
             }  // fall though
             case 76: break;
-            case RADIX_NUM: {
+            case BLOCK_COMMENT: {
               yybegin(YYINITIAL); return TokenType.ERROR_ELEMENT;
             }  // fall though
             case 77: break;
-            case HEX_NUM: {
+            case BINARY_NUM: {
               yybegin(YYINITIAL); return TokenType.ERROR_ELEMENT;
             }  // fall though
             case 78: break;
-            case STEP8: {
-              yybegin(YYINITIAL); return processBuffer(false);
+            case OCTAL_NUM: {
+              yybegin(YYINITIAL); return TokenType.ERROR_ELEMENT;
             }  // fall though
             case 79: break;
-            case STEP8ESCAPE: {
+            case RADIX_NUM: {
               yybegin(YYINITIAL); return TokenType.ERROR_ELEMENT;
             }  // fall though
             case 80: break;
-            case STEP9: {
+            case HEX_NUM: {
               yybegin(YYINITIAL); return TokenType.ERROR_ELEMENT;
             }  // fall though
             case 81: break;
+            case STEP8: {
+              yybegin(YYINITIAL); return processBuffer(false);
+            }  // fall though
+            case 82: break;
+            case STEP8ESCAPE: {
+              yybegin(YYINITIAL); return TokenType.ERROR_ELEMENT;
+            }  // fall though
+            case 83: break;
+            case STEP9: {
+              yybegin(YYINITIAL); return TokenType.ERROR_ELEMENT;
+            }  // fall though
+            case 84: break;
             case STEP9ESCAPE: {
               yybegin(YYINITIAL); return TokenType.ERROR_ELEMENT;
             }  // fall though
-            case 82: break;
+            case 85: break;
             default:
         return null;
         }

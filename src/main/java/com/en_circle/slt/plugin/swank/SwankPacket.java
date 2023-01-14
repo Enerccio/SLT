@@ -52,7 +52,7 @@ public class SwankPacket {
         packageName = StringUtils.replace(packageName, "\"", "\\\"");
         sexpression = StringUtils.replace(sexpression, "\\", "\\\\");
         sexpression = StringUtils.replace(sexpression, "\"", "\\\"");
-        String formatted = String.format("(:emacs-rex (swank:slt-eval \"%s\") \"%s\" %s %s)",
+        String formatted = String.format("(:emacs-rex (swank:slt-eval \"%s\") :%s %s %s)",
                 sexpression, packageName, thread, continuation);
         return new SwankPacket(formatted);
     }
@@ -62,7 +62,7 @@ public class SwankPacket {
         packageName = StringUtils.replace(packageName, "\"", "\\\"");
         sexpression = StringUtils.replace(sexpression, "\\", "\\\\");
         sexpression = StringUtils.replace(sexpression, "\"", "\\\"");
-        String formatted = String.format("(:emacs-rex (swank:eval-string-in-frame \"%s\" %s \"%s\") \"%s\" %s %s)",
+        String formatted = String.format("(:emacs-rex (swank:eval-string-in-frame \"%s\" %s \"%s\") :%s %s %s)",
                 sexpression, frame, packageName, packageName, thread, continuation);
         return new SwankPacket(formatted);
     }
@@ -80,7 +80,7 @@ public class SwankPacket {
         packageName = StringUtils.replace(packageName, "\"", "\\\"");
         region = StringUtils.replace(region, "\\", "\\\\");
         region = StringUtils.replace(region, "\"", "\\\"");
-        String formatted = String.format("(:emacs-rex (swank:interactive-eval-region \"%s\") \"%s\" %s %s)",
+        String formatted = String.format("(:emacs-rex (swank:interactive-eval-region \"%s\") :%s %s %s)",
                 region, packageName, thread, continuation);
         return new SwankPacket(formatted);
     }
@@ -98,7 +98,7 @@ public class SwankPacket {
         packageName = StringUtils.replace(packageName, "\"", "\\\"");
         sexpression = StringUtils.replace(sexpression, "\\", "\\\\");
         sexpression = StringUtils.replace(sexpression, "\"", "\\\"");
-        String formatted = String.format("(:emacs-rex (swank:eval-and-grab-output \"%s\") \"%s\" %s %s)",
+        String formatted = String.format("(:emacs-rex (swank:eval-and-grab-output \"%s\") :%s %s %s)",
                 sexpression, packageName, thread, continuation);
         return new SwankPacket(formatted);
     }
@@ -119,8 +119,8 @@ public class SwankPacket {
         code = StringUtils.replace(code, "\"", "\\\"");
         filename = StringUtils.replace(filename, "\\", "\\\\");
         filename = StringUtils.replace(filename, "\"", "\\\"");
-        String formatted = String.format("(:emacs-rex (swank:compile-string-region-slt \"%s\" \"%s\" %s \"%s\") \"%s\" %s %s)",
-                code, filename, bufferPosition, filename, packageName, thread, continuation);
+        String formatted = String.format("(:emacs-rex (swank:compile-string-region-slt \"%s\" \"%s\" %s \"%s\" :%s) :%s %s %s)",
+                code, filename, bufferPosition, filename, packageName, packageName, thread, continuation);
         return new SwankPacket(formatted);
     }
 
@@ -130,13 +130,13 @@ public class SwankPacket {
         restartArg = StringUtils.replace(restartArg, "\"", "\\\"");
         restartArgs = StringUtils.replace(restartArgs, "\\", "\\\\");
         restartArgs = StringUtils.replace(restartArgs, "\"", "\\\"");
-        String formatted = String.format("(:emacs-rex (swank:invoke-nth-restart-slt '%s '%s \"%s\" \"%s\") \"cl-user\" %s %s)",
+        String formatted = String.format("(:emacs-rex (swank:invoke-nth-restart-slt '%s '%s \"%s\" \"%s\") :cl-user %s %s)",
                 level, option, restartArg, restartArgs, threadId, continuation);
         return new SwankPacket(formatted);
     }
 
     public static SwankPacket throwToToplevel(BigInteger threadId, BigInteger continuation) {
-        String formatted = String.format("(:emacs-rex (swank:throw-to-toplevel) \"cl-user\" %s %s)", threadId, continuation);
+        String formatted = String.format("(:emacs-rex (swank:throw-to-toplevel) :cl-user %s %s)", threadId, continuation);
         return new SwankPacket(formatted);
     }
 
@@ -147,8 +147,26 @@ public class SwankPacket {
     public static SwankPacket frameLocals(BigInteger frame, BigInteger threadId, String packageName, BigInteger continuation) {
         packageName = StringUtils.replace(packageName, "\\", "\\\\");
         packageName = StringUtils.replace(packageName, "\"", "\\\"");
-        String formatted = String.format("(:emacs-rex (swank:frame-locals-and-catch-tags %s) \"%s\" %s %s)",
+        String formatted = String.format("(:emacs-rex (swank:frame-locals-and-catch-tags %s) :%s %s %s)",
                 frame, packageName, threadId, continuation);
+        return new SwankPacket(formatted);
+    }
+
+    public static SwankPacket loadFile(String file, BigInteger continuation) {
+        return loadFile(file, "cl-user", continuation);
+    }
+
+    public static SwankPacket loadFile(String file, String packageName, BigInteger continuation) {
+        return loadFile(file, packageName, "T", continuation);
+    }
+
+    public static SwankPacket loadFile(String file, String packageName, String thread, BigInteger continuation) {
+        packageName = StringUtils.replace(packageName, "\\", "\\\\");
+        packageName = StringUtils.replace(packageName, "\"", "\\\"");
+        file = StringUtils.replace(file, "\\", "\\\\");
+        file = StringUtils.replace(file, "\"", "\\\"");
+        String formatted = String.format("(:emacs-rex (swank:load-file \"%s\") :%s %s %s)",
+                file, packageName, thread, continuation);
         return new SwankPacket(formatted);
     }
 

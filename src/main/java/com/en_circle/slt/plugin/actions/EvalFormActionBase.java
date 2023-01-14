@@ -1,5 +1,6 @@
 package com.en_circle.slt.plugin.actions;
 
+import com.en_circle.slt.plugin.lisp.LispParserUtil;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.CommonDataKeys;
 import com.intellij.openapi.editor.Document;
@@ -44,17 +45,21 @@ public abstract class EvalFormActionBase extends EvalActionBase {
             if (vf != null) {
                 VirtualFile contentRoot = index.getContentRootForFile(vf);
                 if (contentRoot != null && list != null) {
-                    String filename = vf.getPath();;
+                    String filename = vf.getPath();
                     int offset = list.getTextOffset();
                     int lineno = editor.getDocument().getLineNumber(offset);
                     int charno = offset - editor.getDocument().getLineStartOffset(lineno);
                     hasEvalRegion = true;
-                    evaluateRegion(event.getProject(), forms, filename, offset, lineno, charno, () -> {});
+                    evaluateRegion(event.getProject(), forms, LispParserUtil.getPackage(psiFile, offset), filename,
+                            offset, lineno, charno, () -> {});
                 }
             }
 
             if (!hasEvalRegion) {
-                evaluate(editor.getProject(), forms, () -> {});
+                if (list != null) {
+                    int offset = list.getTextOffset();
+                    evaluate(editor.getProject(), forms, LispParserUtil.getPackage(psiFile, offset), () -> { });
+                }
             }
         }
     }

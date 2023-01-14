@@ -33,8 +33,10 @@ public class BufferedString {
             String left = chunks.removeFirst();
             if (left.length() < diff) {
                 diff -= left.length();
+                size -= left.length();
             } else {
                 left = left.substring(0, left.length() - diff);
+                size -= diff;
                 chunks.addFirst(left);
                 break;
             }

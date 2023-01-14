@@ -95,6 +95,10 @@ public class LispVisitor extends PsiElementVisitor {
     visitPsiElement(o);
   }
 
+  public void visitToplevel(@NotNull LispToplevel o) {
+    visitPsiElement(o);
+  }
+
   public void visitVector(@NotNull LispVector o) {
     visitPsiElement(o);
   }

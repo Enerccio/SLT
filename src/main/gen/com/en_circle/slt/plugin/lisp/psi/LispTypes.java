@@ -30,6 +30,7 @@ public interface LispTypes {
   IElementType STRUCTURE = new LispElementType("STRUCTURE");
   IElementType SYMBOL = new LispElementType("SYMBOL");
   IElementType TESTED = new LispElementType("TESTED");
+  IElementType TOPLEVEL = new LispElementType("TOPLEVEL");
   IElementType VECTOR = new LispElementType("VECTOR");
 
   IElementType ARRAY_START = new LispTokenType("ARRAY_START");
@@ -133,6 +134,9 @@ public interface LispTypes {
       }
       else if (type == TESTED) {
         return new LispTestedImpl(node);
+      }
+      else if (type == TOPLEVEL) {
+        return new LispToplevelImpl(node);
       }
       else if (type == VECTOR) {
         return new LispVectorImpl(node);

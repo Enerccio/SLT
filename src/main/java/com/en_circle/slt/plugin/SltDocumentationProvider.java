@@ -1,5 +1,6 @@
 package com.en_circle.slt.plugin;
 
+import com.en_circle.slt.plugin.lisp.LispParserUtil;
 import com.en_circle.slt.plugin.lisp.psi.LispSymbol;
 import com.en_circle.slt.plugin.lisp.psi.impl.LispPsiImplUtil;
 import com.intellij.lang.documentation.AbstractDocumentationProvider;
@@ -15,7 +16,8 @@ public class SltDocumentationProvider extends AbstractDocumentationProvider {
     public @Nullable @Nls String getQuickNavigateInfo(PsiElement element, PsiElement originalElement) {
         String text = LispPsiImplUtil.getSExpressionHead(element);
         if (text != null) {
-            SymbolState state = SltSBCL.getInstance().refreshSymbolFromServer(SltSBCL.getInstance().getGlobalPackage(), text, element);
+            String packageName = LispParserUtil.getPackage(element);
+            SymbolState state = SltSBCL.getInstance().refreshSymbolFromServer(packageName, text, element);
             switch (state.binding) {
                 case NONE:
                     return "Symbol " + text;
@@ -40,7 +42,8 @@ public class SltDocumentationProvider extends AbstractDocumentationProvider {
     public @Nullable @Nls String generateDoc(PsiElement element, @Nullable PsiElement originalElement) {
         if (element instanceof LispSymbol) {
             String text = element.getText();
-            SymbolState state = SltSBCL.getInstance().refreshSymbolFromServer(SltSBCL.getInstance().getGlobalPackage(), text, element);
+            String packageName = LispParserUtil.getPackage(element);
+            SymbolState state = SltSBCL.getInstance().refreshSymbolFromServer(packageName, text, element);
             return asHtml(state.documentation);
         }
         return null;

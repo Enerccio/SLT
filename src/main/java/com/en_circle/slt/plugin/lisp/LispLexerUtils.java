@@ -18,7 +18,7 @@ public class LispLexerUtils {
             }
         }
 
-        if (":".equals(token)) {
+        if (token.endsWith(":")) {
             return TokenType.ERROR_ELEMENT;
         }
 

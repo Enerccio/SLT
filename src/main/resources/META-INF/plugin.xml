@@ -62,6 +62,9 @@
 
         <!-- Functional annotators -->
         <annotator language="Common Lisp" implementationClass="com.en_circle.slt.plugin.actions.annotators.MacroExpandAnnotator"/>
+
+        <lang.directNavigationProvider
+                implementation="com.en_circle.slt.plugin.references.SltDirectNavigationProvider"/>
     </extensions>
 
     <actions>
@@ -91,6 +94,14 @@
                 class="com.en_circle.slt.plugin.actions.EvalNextFormAction" text="Evaluate Next S-Expression">
             <add-to-group group-id="EditorPopupMenu" anchor="after" relative-to-action="com.en_circle.slt.plugin.actions.EvalPreviousFormAction" />
             <keyboard-shortcut keymap="$default" first-keystroke="ctrl alt Q"/>
+        </action>
+
+        <action id="com.en_circle.slt.plugin.actions.EvalFileFromEditor"
+                icon="/icons/evalFile.svg"
+                class="com.en_circle.slt.plugin.actions.EvalFileFromEditor"
+                text="Evaluate File">
+            <add-to-group group-id="EditorPopupMenu" anchor="after" relative-to-action="com.en_circle.slt.plugin.actions.EvalNextFormAction" />
+            <keyboard-shortcut keymap="$default" first-keystroke="ctrl alt T"/>
         </action>
     </actions>
 

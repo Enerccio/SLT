@@ -116,6 +116,10 @@ public class SltSBCL {
         return SltSBCLSymbolCache.INSTANCE.refreshSymbolFromServer(packageName, symbolName, element);
     }
 
+    public boolean hasEventsSet() {
+        return logger != null;
+    }
+
     public interface SBCLServerListener extends SwankServerListener {
 
         void onPreStart();
