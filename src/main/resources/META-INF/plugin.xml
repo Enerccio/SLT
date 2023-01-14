@@ -101,10 +101,11 @@
             <add-to-group group-id="ProjectViewPopupMenuRunGroup" anchor="last"/>
         </action>
 
-        <action id="com.en_circle.slt.plugin.actions.toolbar.GlobalPackageSelectorAction"
-                class="com.en_circle.slt.plugin.actions.toolbar.GlobalPackageSelectorAction">
-            <add-to-group group-id="MainToolBar" anchor="first"/>
-        </action>
+        <!-- Removed until I can find how to put it in toolbar ... -->
+<!--        <action id="com.en_circle.slt.plugin.actions.toolbar.GlobalPackageSelectorAction"-->
+<!--                class="com.en_circle.slt.plugin.actions.toolbar.GlobalPackageSelectorAction">-->
+<!--            <add-to-group group-id="MainToolBar" anchor="first"/>-->
+<!--        </action>-->
     </actions>
 
 </idea-plugin>
