@@ -4,7 +4,7 @@ plugins {
 }
 
 group = "com.en_circle.slt"
-version = "1.0-SNAPSHOT"
+version = "0.1.0"
 
 repositories {
     mavenCentral()
@@ -27,7 +27,8 @@ sourceSets {
 // Read more: https://plugins.jetbrains.com/docs/intellij/tools-gradle-intellij-plugin.html
 intellij {
     version.set("2022.1.4")
-    type.set("IC") // Target IDE Platform
+    pluginName.set("slt")
+    type.set(extra["targetIDE"].toString()) // Target IDE Platform
 
     plugins.set(listOf(
 
