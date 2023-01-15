@@ -39,6 +39,8 @@ public class SltFrameInfo {
     private final JComponent content;
     private SltInspector inspector;
     private JBTable localsTable;
+    private JBTabs tabs;
+    private TabInfo inspectorTab;
 
     public SltFrameInfo(Project project, BigInteger threadId, BigInteger frameId, String module) {
         this.project = project;
@@ -52,7 +54,7 @@ public class SltFrameInfo {
     }
 
     private void create() {
-        JBTabs tabs = new JBTabsImpl(project);
+        tabs = new JBTabsImpl(project);
 
         localsTable = new JBTable(new FrameTableModel(new ArrayList<>()));
         localsTable.setFillsViewportHeight(true);
@@ -62,10 +64,12 @@ public class SltFrameInfo {
             @Override
             public void mouseClicked(MouseEvent e) {
                 int row = localsTable.rowAtPoint(e.getPoint());
-                int column = localsTable.columnAtPoint(e.getPoint());
-                if (column == 0) {
-                    FrameTableModel model = (FrameTableModel) localsTable.getModel();
-                    openInspector(model.locals.get(row));
+                if (row >= 0) {
+                    int column = localsTable.columnAtPoint(e.getPoint());
+                    if (column == 0) {
+                        FrameTableModel model = (FrameTableModel) localsTable.getModel();
+                        openInspector(model.locals.get(row));
+                    }
                 }
             }
         });
@@ -79,8 +83,8 @@ public class SltFrameInfo {
         TabInfo consoleTab = frameConsole.create();
         tabs.addTab(consoleTab);
 
-        inspector = new SltInspector();
-        TabInfo inspectorTab = new TabInfo(new JBScrollPane(inspector.getContent()));
+        inspector = new SltInspector(project, threadId);
+        inspectorTab = new TabInfo(new JBScrollPane(inspector.getContent()));
         inspectorTab.setText(SltBundle.message("slt.ui.debugger.frame.inspector"));
         tabs.addTab(inspectorTab);
 
@@ -105,7 +109,8 @@ public class SltFrameInfo {
     }
 
     private void openInspector(Local local) {
-
+        inspector.loadLocal(local, frameId);
+        tabs.select(inspectorTab, true);
     }
 
     private void reloadLocals() {
@@ -156,9 +161,9 @@ public class SltFrameInfo {
         }
     }
 
-    private static class Local {
+    public static class Local {
 
-        private int ix;
+        int ix;
         private String name;
         private String value;
 

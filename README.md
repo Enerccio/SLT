@@ -74,6 +74,10 @@ You can also open this as a project in Intellij Idea.
 * [ ] Upload to marketplace when it has enough features
 * [x] REPL
 * [x] Interactive debugging
+* [ ] Inspection
+  * [x] Basic inspection
+  * [ ] Actions
+  * [ ] Inspection eval
 * [ ] Walkable debugger without actions 
 * [ ] Breakpoints
 * [x] Documentation 

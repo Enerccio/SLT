@@ -252,7 +252,7 @@ public class SltDebuggerImpl implements SltDebugger, Disposable {
         try {
             SltLispEnvironmentProvider.getInstance().sendToLisp(SltFrameLocalsAndCatchTags.getLocals(BigInteger.valueOf(ix),
                     debugInfo.getThreadId(), result -> {
-                ApplicationManager.getApplication().invokeLater(() -> {
+                 ApplicationManager.getApplication().runWriteAction(() -> {
                     SltFrameInfo frameInfo = new SltFrameInfo(parent.getProject(), debugInfo.getThreadId(), BigInteger.valueOf(ix),
                             element.getFramePackage());
                     singleFrameComponent.removeAll();

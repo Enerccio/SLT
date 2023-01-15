@@ -14,6 +14,7 @@ import com.intellij.execution.console.LanguageConsoleView;
 import com.intellij.execution.ui.ConsoleViewContentType;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
+import com.intellij.openapi.util.Disposer;
 import com.intellij.ui.tabs.TabInfo;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -49,6 +50,7 @@ public abstract class SltConsole implements SltComponent {
     public TabInfo create() {
         languageConsole = new LanguageConsoleBuilder()
                 .build(project, SltCommonLispLanguage.INSTANCE);
+        Disposer.register(project, languageConsole);
         languageConsole.setPrompt(currentModule + "> ");
 
         ConsoleExecuteAction action = new ConsoleExecuteAction(languageConsole, new SltConsoleExecuteActionHandler(languageConsole) {

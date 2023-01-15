@@ -144,8 +144,18 @@ public class SlimeListener implements SwankClient.SwankReply {
             }
 
             if (request instanceof SltInspectFrameVar) {
-                SltInspectFrameVar frames = (SltInspectFrameVar) request;
-                frames.processReply((LispContainer) reply.getItems().get(1));
+                SltInspectFrameVar frameVar = (SltInspectFrameVar) request;
+                frameVar.processReply((LispContainer) reply.getItems().get(1));
+            }
+
+            if (request instanceof SltInspectNth) {
+                SltInspectNth inspectNth = (SltInspectNth) request;
+                inspectNth.processReply((LispContainer) reply.getItems().get(1));
+            }
+
+            if (request instanceof SltInspectorAction) {
+                SltInspectorAction action = (SltInspectorAction) request;
+                action.processReply((LispContainer) reply.getItems().get(1));
             }
         } finally {
             requests.remove(replyId.getValue());
