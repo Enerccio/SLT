@@ -49,7 +49,7 @@ public class SltSettingsConfigurable implements Configurable {
     public void apply() throws ConfigurationException {
         SltState settings = SltState.getInstance();
         boolean restartServer = false;
-        if (!settings.sbclExecutable.equals(component.getSbclExecutable())) {
+        if (!component.getSbclExecutable().equals(settings.sbclExecutable)) {
             restartServer = true;
         }
         if (component.getPort() != settings.port) {
@@ -60,6 +60,9 @@ public class SltSettingsConfigurable implements Configurable {
         }
 
         settings.sbclExecutable = component.getSbclExecutable();
+        settings.port = component.getPort();
+        settings.quicklispStartScript = component.getQuicklispStartScript();
+
         if (restartServer && SwankServer.INSTANCE.isActive()) {
             if (Messages.YES == Messages.showYesNoDialog(
                     SltBundle.message("slt.ui.settings.restart.prompt"),
