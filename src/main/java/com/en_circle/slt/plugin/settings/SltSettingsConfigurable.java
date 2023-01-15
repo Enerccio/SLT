@@ -3,6 +3,7 @@ package com.en_circle.slt.plugin.settings;
 import com.en_circle.slt.plugin.SltBundle;
 import com.en_circle.slt.plugin.SltSBCL;
 import com.en_circle.slt.plugin.SltState;
+import com.en_circle.slt.plugin.swank.SwankServer;
 import com.intellij.openapi.options.Configurable;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.project.ProjectManager;
@@ -59,7 +60,7 @@ public class SltSettingsConfigurable implements Configurable {
         }
 
         settings.sbclExecutable = component.getSbclExecutable();
-        if (restartServer) {
+        if (restartServer && SwankServer.INSTANCE.isActive()) {
             if (Messages.YES == Messages.showYesNoDialog(
                     SltBundle.message("slt.ui.settings.restart.prompt"),
                     SltBundle.message("slt.ui.settings.restart.title"),
