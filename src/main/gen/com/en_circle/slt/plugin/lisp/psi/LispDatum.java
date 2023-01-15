@@ -10,6 +10,9 @@ public interface LispDatum extends PsiElement {
   LispArray getArray();
 
   @Nullable
+  LispCompoundSymbol getCompoundSymbol();
+
+  @Nullable
   LispEvaled getEvaled();
 
   @Nullable
@@ -32,9 +35,6 @@ public interface LispDatum extends PsiElement {
 
   @Nullable
   LispStructure getStructure();
-
-  @Nullable
-  LispSymbol getSymbol();
 
   @Nullable
   LispTested getTested();

@@ -65,8 +65,9 @@ public class LispParserUtil extends GeneratedParserUtilBase {
                     LispSexpr packageName = sexpressions.get(1);
                     if (packageName.getDatum() != null) {
                         LispDatum datum = packageName.getDatum();
-                        if (datum.getSymbol() != null) {
-                            String text = datum.getSymbol().getText();
+                        if (datum.getCompoundSymbol() != null) {
+                            LispCompoundSymbol symbolElement = datum.getCompoundSymbol();
+                            String text = symbolElement.getSymbol().getText();
                             if (text.startsWith(":")) {
                                 return text.substring(1);
                             } else if (!text.contains(":")) {
@@ -86,9 +87,9 @@ public class LispParserUtil extends GeneratedParserUtilBase {
     private static String getAsSymbol(LispSexpr seSymbol) {
         LispDatum datum = seSymbol.getDatum();
         if (datum != null) {
-            LispSymbol symbol = datum.getSymbol();
+            LispCompoundSymbol symbol = datum.getCompoundSymbol();
             if (symbol != null) {
-                return symbol.getName();
+                return symbol.getSymbol().getName();
             }
         }
         return null;
