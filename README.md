@@ -59,6 +59,13 @@ You can also open this as a project in Intellij Idea.
 * [ ] List of modified top level forms that are yet to be evaluated
 * [ ] Actually make an IDE, ie just plugin with dependencies as one application, not a plugin
 
+### Far futures / possible goals 
+
+* [ ] Virtual Environment à la pycharm so you can specify which interpret instance you want
+* [ ] Automatic download of lisp interpret and quicklisp
+* [ ] Different lisp interpreter support 
+* [ ] Remote connections to interpreters
+
 ## License
 
 This project is licensed under [Apache License v2](LICENSE.txt).
