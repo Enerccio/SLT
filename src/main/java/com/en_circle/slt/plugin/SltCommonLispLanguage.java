@@ -1,6 +1,5 @@
 package com.en_circle.slt.plugin;
 
-import com.en_circle.slt.plugin.swank.SwankServer;
 import com.intellij.lang.Language;
 
 public class SltCommonLispLanguage extends Language {

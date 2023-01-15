@@ -2,7 +2,6 @@ package com.en_circle.slt.plugin;
 
 import com.en_circle.slt.plugin.SymbolState.SymbolBinding;
 import com.en_circle.slt.plugin.lisp.lisp.*;
-import com.en_circle.slt.plugin.swank.SwankServer;
 import com.en_circle.slt.plugin.swank.components.SourceLocation;
 import com.en_circle.slt.plugin.swank.requests.SwankEvalAndGrab;
 import com.google.common.collect.Lists;
@@ -17,9 +16,9 @@ import java.util.*;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-public class SltSBCLSymbolCache extends Thread {
+public class SltLispEnvironmentSymbolCache extends Thread {
 
-    public static final SltSBCLSymbolCache INSTANCE = new SltSBCLSymbolCache();
+    public static final SltLispEnvironmentSymbolCache INSTANCE = new SltLispEnvironmentSymbolCache();
     static {
         INSTANCE.start();
     }
@@ -27,7 +26,7 @@ public class SltSBCLSymbolCache extends Thread {
     private final Map<String, SymbolState> symbolInformation = Collections.synchronizedMap(new HashMap<>());
     private final List<SymbolState> symbolRefreshQueue = Collections.synchronizedList(new ArrayList<>());
 
-    private SltSBCLSymbolCache() {
+    private SltLispEnvironmentSymbolCache() {
         setDaemon(true);
         setName("SBCL Symbol Cache Thread");
     }
@@ -36,7 +35,7 @@ public class SltSBCLSymbolCache extends Thread {
     public void run() {
         while (true) {
             try {
-                if (SwankServer.INSTANCE.isActive()) {
+                if (SltLispEnvironmentProvider.getInstance().isLispEnvironmentActive()) {
                     while (symbolRefreshQueue.isEmpty()) {
                         Thread.sleep(1000);
                     }
@@ -130,11 +129,11 @@ public class SltSBCLSymbolCache extends Thread {
                 refreshStates.stream().map(x -> x.name.toUpperCase() + " ").collect(Collectors.joining()) + ")";
         request = StringUtils.replace(request, "\"", "\\\"");
 
-        SltSBCL.getInstance().sendToSbcl(SwankEvalAndGrab.eval(
+        SltLispEnvironmentProvider.getInstance().sendToLisp(SwankEvalAndGrab.eval(
                 String.format(
                         "(slt-core:analyze-symbols (slt-core:read-fix-packages \"%s\"))",
                         request),
-                SltSBCL.getInstance().getGlobalPackage(), true, (result, stdout, parsed) -> {
+                SltLispEnvironmentProvider.getInstance().getGlobalPackage(), true, (result, stdout, parsed) -> {
                     Set<VirtualFile> toRefresh = new HashSet<>();
                     if (parsed.size() == 1 && parsed.get(0).getType() == LispElementType.CONTAINER) {
                         int ix = 0;

@@ -1,7 +1,7 @@
 package com.en_circle.slt.plugin.ui.debug;
 
 import com.en_circle.slt.plugin.SltBundle;
-import com.en_circle.slt.plugin.SltSBCL;
+import com.en_circle.slt.plugin.SltLispEnvironmentProvider;
 import com.en_circle.slt.plugin.swank.requests.EvalStringInFrameEval;
 import com.en_circle.slt.plugin.ui.console.SltConsole;
 import com.intellij.execution.ui.ConsoleViewContentType;
@@ -32,7 +32,7 @@ public class SltFrameConsole extends SltConsole {
     protected void eval(String data) {
         try {
             if (StringUtils.isNotBlank(data)) {
-                SltSBCL.getInstance().sendToSbcl(EvalStringInFrameEval.evalInFrame(data, frame, threadId, currentModule,
+                SltLispEnvironmentProvider.getInstance().sendToLisp(EvalStringInFrameEval.evalInFrame(data, frame, threadId, currentModule,
                         result -> {
                             languageConsole.print(result + "\n", ConsoleViewContentType.NORMAL_OUTPUT);
                             onChange.run();

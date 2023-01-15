@@ -1,7 +1,7 @@
 package com.en_circle.slt.plugin.ui.debug;
 
 import com.en_circle.slt.plugin.SltBundle;
-import com.en_circle.slt.plugin.SltSBCL;
+import com.en_circle.slt.plugin.SltLispEnvironmentProvider;
 import com.en_circle.slt.plugin.SltUIConstants;
 import com.en_circle.slt.plugin.swank.debug.SltDebugAction;
 import com.en_circle.slt.plugin.swank.debug.SltDebugArgument;
@@ -189,7 +189,7 @@ public class SltDebuggerImpl implements SltDebugger {
         int ix = debugInfo.getActions().indexOf(action);
         if (action.getArguments().isEmpty()) {
             try {
-                SltSBCL.getInstance().sendToSbcl(SltInvokeNthRestart.nthRestart(debugInfo.getThreadId(),
+                SltLispEnvironmentProvider.getInstance().sendToLisp(SltInvokeNthRestart.nthRestart(debugInfo.getThreadId(),
                         BigInteger.valueOf(ix), debugInfo.getDebugLevel(), "NIL", "NIL", () -> {}));
             } catch (Exception e) {
                 log.warn(SltBundle.message("slt.error.sbclstart"), e);
@@ -213,7 +213,7 @@ public class SltDebuggerImpl implements SltDebugger {
             }
             String args = arguments.size() == 0 ? "NIL" : "(" + String.join(" ", arguments) + ")";
             try {
-                SltSBCL.getInstance().sendToSbcl(SltInvokeNthRestart.nthRestart(debugInfo.getThreadId(),
+                SltLispEnvironmentProvider.getInstance().sendToLisp(SltInvokeNthRestart.nthRestart(debugInfo.getThreadId(),
                         BigInteger.valueOf(ix), debugInfo.getDebugLevel(), args, rest, () -> {}));
             } catch (Exception e) {
                 log.warn(SltBundle.message("slt.error.sbclstart"), e);
@@ -252,7 +252,7 @@ public class SltDebuggerImpl implements SltDebugger {
             }
         }
         try {
-            SltSBCL.getInstance().sendToSbcl(SltFrameLocalsAndCatchTags.getLocals(BigInteger.valueOf(ix),
+            SltLispEnvironmentProvider.getInstance().sendToLisp(SltFrameLocalsAndCatchTags.getLocals(BigInteger.valueOf(ix),
                     debugInfo.getThreadId(), result -> {
                 ApplicationManager.getApplication().invokeLater(() -> {
                     SltFrameInfo frameInfo = new SltFrameInfo(parent.getProject(), debugInfo.getThreadId(), BigInteger.valueOf(ix),
@@ -270,7 +270,7 @@ public class SltDebuggerImpl implements SltDebugger {
 
     private void close() {
         try {
-            SltSBCL.getInstance().sendToSbcl(new ThrowToToplevel(lastDebugId));
+            SltLispEnvironmentProvider.getInstance().sendToLisp(new ThrowToToplevel(lastDebugId));
         } catch (Exception e) {
             log.warn(SltBundle.message("slt.error.sbclstart"), e);
             Messages.showErrorDialog(parent.getProject(), e.getMessage(), SltBundle.message("slt.ui.errors.sbcl.start"));

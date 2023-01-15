@@ -1,11 +1,10 @@
 package com.en_circle.slt.plugin.ui;
 
 import com.en_circle.slt.plugin.SltBundle;
-import com.en_circle.slt.plugin.SltSBCL;
+import com.en_circle.slt.plugin.SltLispEnvironmentProvider;
 import com.en_circle.slt.plugin.lisp.lisp.LispContainer;
 import com.en_circle.slt.plugin.lisp.lisp.LispElement;
 import com.en_circle.slt.plugin.lisp.lisp.LispString;
-import com.en_circle.slt.plugin.swank.SwankServer;
 import com.en_circle.slt.plugin.swank.requests.SwankEvalAndGrab;
 import com.intellij.icons.AllIcons.Actions;
 import com.intellij.openapi.actionSystem.*;
@@ -55,7 +54,7 @@ public class PackageSelectorComponent {
 
     public void refresh() {
         try {
-            SltSBCL.getInstance().sendToSbcl(SwankEvalAndGrab.eval("(slt-core:list-package-names)", true, (result, stdout, parsed) -> {
+            SltLispEnvironmentProvider.getInstance().sendToLisp(SwankEvalAndGrab.eval("(slt-core:list-package-names)", true, (result, stdout, parsed) -> {
                 resolvePackages(parsed);
             }), false);
         } catch (Exception e) {
@@ -114,7 +113,7 @@ public class PackageSelectorComponent {
         public void update(@NotNull AnActionEvent e) {
             super.update(e);
 
-            e.getPresentation().setEnabled(SwankServer.INSTANCE.isActive());
+            e.getPresentation().setEnabled(SltLispEnvironmentProvider.getInstance().isLispEnvironmentActive());
         }
 
     }
@@ -134,7 +133,7 @@ public class PackageSelectorComponent {
         public void update(@NotNull AnActionEvent e) {
             super.update(e);
 
-            e.getPresentation().setEnabled(SwankServer.INSTANCE.isActive());
+            e.getPresentation().setEnabled(SltLispEnvironmentProvider.getInstance().isLispEnvironmentActive());
         }
     }
 

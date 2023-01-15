@@ -1,8 +1,8 @@
 package com.en_circle.slt.plugin.ui;
 
 import com.en_circle.slt.plugin.SltBundle;
+import com.en_circle.slt.plugin.environment.SltLispEnvironment.SltOutput;
 import com.en_circle.slt.plugin.swank.SlimeListener.RequestResponseLogger;
-import com.en_circle.slt.plugin.swank.SwankServer.SwankServerOutput;
 import com.en_circle.slt.tools.BufferedString;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.*;
@@ -110,7 +110,7 @@ public class SltGeneralLog implements SltComponent, RequestResponseLogger {
     }
 
     @Override
-    public void handleOutput(SwankServerOutput output, String data) {
+    public void handleOutput(SltOutput output, String data) {
 
     }
 

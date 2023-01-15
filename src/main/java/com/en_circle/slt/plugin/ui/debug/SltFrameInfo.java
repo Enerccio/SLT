@@ -1,7 +1,7 @@
 package com.en_circle.slt.plugin.ui.debug;
 
 import com.en_circle.slt.plugin.SltBundle;
-import com.en_circle.slt.plugin.SltSBCL;
+import com.en_circle.slt.plugin.SltLispEnvironmentProvider;
 import com.en_circle.slt.plugin.lisp.lisp.*;
 import com.en_circle.slt.plugin.swank.requests.SltFrameLocalsAndCatchTags;
 import com.intellij.openapi.application.ApplicationManager;
@@ -61,7 +61,7 @@ public class SltFrameInfo {
 
     private void reloadLocals() {
         try {
-            SltSBCL.getInstance().sendToSbcl(SltFrameLocalsAndCatchTags.getLocals(frameId, threadId, result -> {
+            SltLispEnvironmentProvider.getInstance().sendToLisp(SltFrameLocalsAndCatchTags.getLocals(frameId, threadId, result -> {
                 ApplicationManager.getApplication().invokeLater(() -> {
                     refreshFrameValues(result);
                 });

@@ -17,7 +17,7 @@ public class SltDocumentationProvider extends AbstractDocumentationProvider {
         String text = LispPsiImplUtil.getSExpressionHead(element);
         if (text != null) {
             String packageName = LispParserUtil.getPackage(element);
-            SymbolState state = SltSBCL.getInstance().refreshSymbolFromServer(packageName, text, element);
+            SymbolState state = SltLispEnvironmentProvider.getInstance().refreshSymbolFromServer(packageName, text, element);
             switch (state.binding) {
                 case NONE:
                     return SltBundle.message("slt.documentation.types.symbol") + " " + text;
@@ -43,7 +43,7 @@ public class SltDocumentationProvider extends AbstractDocumentationProvider {
         if (element instanceof LispSymbol) {
             String text = element.getText();
             String packageName = LispParserUtil.getPackage(element);
-            SymbolState state = SltSBCL.getInstance().refreshSymbolFromServer(packageName, text, element);
+            SymbolState state = SltLispEnvironmentProvider.getInstance().refreshSymbolFromServer(packageName, text, element);
             return asHtml(state.documentation);
         }
         return null;

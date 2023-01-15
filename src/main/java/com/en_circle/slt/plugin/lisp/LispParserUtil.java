@@ -1,6 +1,6 @@
 package com.en_circle.slt.plugin.lisp;
 
-import com.en_circle.slt.plugin.SltSBCL;
+import com.en_circle.slt.plugin.SltLispEnvironmentProvider;
 import com.en_circle.slt.plugin.lisp.lisp.LispUtils;
 import com.en_circle.slt.plugin.lisp.psi.*;
 import com.intellij.lang.ASTNode;
@@ -19,7 +19,7 @@ public class LispParserUtil extends GeneratedParserUtilBase {
         if (locationNode != null)
             return getPackage(locationNode.getPsi());
         else
-            return SltSBCL.getInstance().getGlobalPackage();
+            return SltLispEnvironmentProvider.getInstance().getGlobalPackage();
     }
 
     public static String getPackage(PsiElement element) {
@@ -38,7 +38,7 @@ public class LispParserUtil extends GeneratedParserUtilBase {
             previous = previous.getPrevSibling();
         }
 
-        return SltSBCL.getInstance().getGlobalPackage();
+        return SltLispEnvironmentProvider.getInstance().getGlobalPackage();
     }
 
     private static LispList isLispList(PsiElement form) {

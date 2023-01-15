@@ -2,7 +2,7 @@ package com.en_circle.slt.plugin.actions;
 
 import com.en_circle.slt.plugin.SltBundle;
 import com.en_circle.slt.plugin.SltCommonLispFileType;
-import com.en_circle.slt.plugin.SltSBCL;
+import com.en_circle.slt.plugin.SltLispEnvironmentProvider;
 import com.en_circle.slt.plugin.swank.requests.LoadFile;
 import com.en_circle.slt.plugin.swank.requests.SltEval;
 import com.en_circle.slt.plugin.swank.requests.SwankEvalFromVirtualFile;
@@ -31,14 +31,14 @@ public abstract class EvalActionBase extends AnAction {
         if (editor != null && event.getProject() != null) {
             PsiFile file = PsiDocumentManager.getInstance(Objects.requireNonNull(editor.getProject())).getPsiFile(editor.getDocument());
             if (file != null && SltCommonLispFileType.INSTANCE.equals(file.getFileType())) {
-                event.getPresentation().setEnabledAndVisible(SltSBCL.getInstance().hasEventsSet());
+                event.getPresentation().setEnabledAndVisible(SltLispEnvironmentProvider.getInstance().hasEventsSet());
             }
         }
     }
 
     protected void evaluate(Project project, String buffer, String packageName, Runnable callback) {
         try {
-            SltSBCL.getInstance().sendToSbcl(SltEval.eval(buffer, packageName, result -> callback.run()), true);
+            SltLispEnvironmentProvider.getInstance().sendToLisp(SltEval.eval(buffer, packageName, result -> callback.run()), true);
         } catch (Exception e) {
             log.warn(SltBundle.message("slt.error.sbclstart"), e);
             Messages.showErrorDialog(project, e.getMessage(), SltBundle.message("slt.ui.errors.sbcl.start"));
@@ -47,7 +47,7 @@ public abstract class EvalActionBase extends AnAction {
 
     protected void evaluateRegion(Project project, String buffer, String packageName, String filename, int bufferPosition, int lineno, int charno, Runnable callback) {
         try {
-            SltSBCL.getInstance().sendToSbcl(SwankEvalFromVirtualFile
+            SltLispEnvironmentProvider.getInstance().sendToLisp(SwankEvalFromVirtualFile
                     .eval(buffer, filename, bufferPosition, lineno, charno, packageName, result -> callback.run()), true);
         } catch (Exception e) {
             log.warn(SltBundle.message("slt.error.sbclstart"), e);
@@ -57,7 +57,7 @@ public abstract class EvalActionBase extends AnAction {
 
     protected void evaluateFile(Project project, String filename) {
         try {
-            SltSBCL.getInstance().sendToSbcl(LoadFile.loadFile(filename), true);
+            SltLispEnvironmentProvider.getInstance().sendToLisp(LoadFile.loadFile(filename), true);
         } catch (Exception e) {
             log.warn(SltBundle.message("slt.error.sbclstart"), e);
             Messages.showErrorDialog(project, e.getMessage(), SltBundle.message("slt.ui.errors.sbcl.start"));

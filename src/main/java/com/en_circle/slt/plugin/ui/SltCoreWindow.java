@@ -2,10 +2,12 @@ package com.en_circle.slt.plugin.ui;
 
 import com.en_circle.slt.plugin.SltBundle;
 import com.en_circle.slt.plugin.SltCommonLispFileType;
-import com.en_circle.slt.plugin.SltSBCL;
-import com.en_circle.slt.plugin.SltSBCL.SBCLServerListener;
-import com.en_circle.slt.plugin.swank.SwankServer;
-import com.en_circle.slt.plugin.swank.SwankServer.SwankServerOutput;
+import com.en_circle.slt.plugin.SltLispEnvironmentProvider;
+import com.en_circle.slt.plugin.SltLispEnvironmentProvider.SBCLServerListener;
+import com.en_circle.slt.plugin.SltState;
+import com.en_circle.slt.plugin.environment.SltLispEnvironment.SltOutput;
+import com.en_circle.slt.plugin.environment.SltSBCLEnvironment;
+import com.en_circle.slt.plugin.environment.SltSBCLEnvironmentConfiguration;
 import com.en_circle.slt.plugin.ui.console.SltConsole;
 import com.en_circle.slt.plugin.ui.console.SltREPL;
 import com.intellij.icons.AllIcons;
@@ -44,15 +46,21 @@ public class SltCoreWindow implements SBCLServerListener {
     public SltCoreWindow(ToolWindow toolWindow) {
         this.project = toolWindow.getProject();
 
-        SltSBCL.getInstance().addServerListener(this);
-        SltSBCL.getInstance().setProject(toolWindow.getProject());
+        SltLispEnvironmentProvider.getInstance().setEnvironmentProvider(SltSBCLEnvironment::new);
+        SltLispEnvironmentProvider.getInstance().setConfigurationBuilder(new SltSBCLEnvironmentConfiguration.Builder()
+                .setExecutable(SltState.getInstance().sbclExecutable)
+                .setPort(SltState.getInstance().port)
+                .setQuicklispStartScriptPath(SltState.getInstance().quicklispStartScript)
+                .setProjectDirectory(project.getBasePath()));
+        SltLispEnvironmentProvider.getInstance().addServerListener(this);
+        SltLispEnvironmentProvider.getInstance().setProject(toolWindow.getProject());
 
         content = new JPanel(new BorderLayout());
-        components.add(new SltOutputHandlerComponent(this, SwankServerOutput.STDOUT));
-        components.add(new SltOutputHandlerComponent(this, SwankServerOutput.STDERR));
+        components.add(new SltOutputHandlerComponent(this, SltOutput.STDOUT));
+        components.add(new SltOutputHandlerComponent(this, SltOutput.STDERR));
         SltGeneralLog generalLog = new SltGeneralLog();
         components.add(generalLog);
-        SltSBCL.getInstance().setRequestResponseLogger(generalLog);
+        SltLispEnvironmentProvider.getInstance().setRequestResponseLogger(generalLog);
 
         createSbclControls();
 
@@ -92,7 +100,7 @@ public class SltCoreWindow implements SBCLServerListener {
 
     public void start() {
         try {
-            SltSBCL.getInstance().start();
+            SltLispEnvironmentProvider.getInstance().start();
         } catch (Exception e) {
             log.warn(SltBundle.message("slt.error.sbclstart"), e);
             Messages.showErrorDialog(project, e.getMessage(), SltBundle.message("slt.ui.errors.sbcl.start"));
@@ -111,7 +119,7 @@ public class SltCoreWindow implements SBCLServerListener {
 
     public void stop() {
         try {
-            SltSBCL.getInstance().stop();
+            SltLispEnvironmentProvider.getInstance().stop();
         } catch (Exception e) {
             log.warn(SltBundle.message("slt.error.sbclstop"), e);
             Messages.showErrorDialog(project, e.getMessage(), SltBundle.message("slt.ui.errors.sbcl.stop"));
@@ -156,8 +164,7 @@ public class SltCoreWindow implements SBCLServerListener {
             component.onPostStart();
         }
 
-        Process p = SwankServer.getProcess();
-        process.setText("" + p.pid());
+        process.setText(SltLispEnvironmentProvider.getInstance().getEnvironment().getInformation().getPid());
     }
 
     @Override
@@ -176,7 +183,7 @@ public class SltCoreWindow implements SBCLServerListener {
     }
 
     @Override
-    public void onOutputChanged(SwankServerOutput output, String newData) {
+    public void onOutputChanged(SltOutput output, String newData) {
         for (SltComponent component : components) {
             component.handleOutput(output, newData);
         }
@@ -189,7 +196,7 @@ public class SltCoreWindow implements SBCLServerListener {
     private class StartSbclAction extends AnAction {
 
         private StartSbclAction() {
-            super(SltBundle.message("slt.ui.process.startsbcl"), "", AllIcons.RunConfigurations.TestState.Run);
+            super(SltBundle.message("slt.ui.process.startinstance"), "", AllIcons.RunConfigurations.TestState.Run);
         }
 
         @Override
@@ -201,14 +208,14 @@ public class SltCoreWindow implements SBCLServerListener {
         public void update(@NotNull AnActionEvent e) {
             super.update(e);
 
-            e.getPresentation().setEnabled(!SwankServer.INSTANCE.isActive());
+            e.getPresentation().setEnabled(!SltLispEnvironmentProvider.getInstance().isLispEnvironmentActive());
         }
     }
 
     private class StopSbclAction extends AnAction {
 
         private StopSbclAction() {
-            super(SltBundle.message("slt.ui.process.stopsbcl"), "", AllIcons.Actions.Suspend);
+            super(SltBundle.message("slt.ui.process.stopinstance"), "", AllIcons.Actions.Suspend);
         }
 
         @Override
@@ -220,14 +227,14 @@ public class SltCoreWindow implements SBCLServerListener {
         public void update(@NotNull AnActionEvent e) {
             super.update(e);
 
-            e.getPresentation().setEnabled(SwankServer.INSTANCE.isActive());
+            e.getPresentation().setEnabled(SltLispEnvironmentProvider.getInstance().isLispEnvironmentActive());
         }
     }
 
     private class ConsoleWindowAction extends AnAction {
 
         private ConsoleWindowAction() {
-            super(SltBundle.message("slt.ui.process.openrepl"), "", General.Add);
+            super(SltBundle.message("slt.ui.process.openrepl.sbcl"), "", General.Add);
         }
 
         @Override
@@ -239,7 +246,7 @@ public class SltCoreWindow implements SBCLServerListener {
         public void update(@NotNull AnActionEvent e) {
             super.update(e);
 
-            e.getPresentation().setEnabled(SwankServer.INSTANCE.isActive());
+            e.getPresentation().setEnabled(SltLispEnvironmentProvider.getInstance().isLispEnvironmentActive());
         }
     }
 

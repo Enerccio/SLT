@@ -1,6 +1,6 @@
 package com.en_circle.slt.plugin.highlights.annotators;
 
-import com.en_circle.slt.plugin.SltSBCL;
+import com.en_circle.slt.plugin.SltLispEnvironmentProvider;
 import com.en_circle.slt.plugin.SymbolState;
 import com.en_circle.slt.plugin.highlights.CommonLispHighlighterColors;
 import com.en_circle.slt.plugin.lisp.LispParserUtil;
@@ -17,7 +17,7 @@ public class SymbolAnnotator implements Annotator {
         if (element instanceof LispSymbol) {
             String text = element.getText();
             String packageName = LispParserUtil.getPackage(element);
-            SymbolState state = SltSBCL.getInstance().refreshSymbolFromServer(packageName, text, element);
+            SymbolState state = SltLispEnvironmentProvider.getInstance().refreshSymbolFromServer(packageName, text, element);
             setHighlight(element, text, holder, state);
         }
     }

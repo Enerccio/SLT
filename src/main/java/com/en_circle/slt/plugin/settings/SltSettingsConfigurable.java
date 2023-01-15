@@ -1,7 +1,7 @@
 package com.en_circle.slt.plugin.settings;
 
 import com.en_circle.slt.plugin.SltBundle;
-import com.en_circle.slt.plugin.SltSBCL;
+import com.en_circle.slt.plugin.SltLispEnvironmentProvider;
 import com.en_circle.slt.plugin.SltState;
 import com.intellij.openapi.options.Configurable;
 import com.intellij.openapi.options.ConfigurationException;
@@ -67,8 +67,8 @@ public class SltSettingsConfigurable implements Configurable {
                     SltBundle.message("slt.ui.settings.restart.no"),
                     Messages.getQuestionIcon())) {
                 try {
-                    SltSBCL.getInstance().stop();
-                    SltSBCL.getInstance().start();
+                    SltLispEnvironmentProvider.getInstance().stop();
+                    SltLispEnvironmentProvider.getInstance().start();
                 } catch (Exception e) {
                     log.warn(SltBundle.message("slt.error.sbclstart"), e);
                     Messages.showErrorDialog(ProjectManager.getInstance().getDefaultProject(),

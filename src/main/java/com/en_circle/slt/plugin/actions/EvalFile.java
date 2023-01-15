@@ -2,7 +2,7 @@ package com.en_circle.slt.plugin.actions;
 
 import com.en_circle.slt.plugin.SltBundle;
 import com.en_circle.slt.plugin.SltCommonLispFileType;
-import com.en_circle.slt.plugin.SltSBCL;
+import com.en_circle.slt.plugin.SltLispEnvironmentProvider;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.CommonDataKeys;
 import com.intellij.openapi.fileEditor.FileEditorManager;
@@ -35,7 +35,7 @@ public class EvalFile extends EvalActionBase {
             VirtualFile vf = event.getData(CommonDataKeys.VIRTUAL_FILE);
             if (vf != null) {
                 if (vf.getFileType().equals(SltCommonLispFileType.INSTANCE)) {
-                    event.getPresentation().setEnabledAndVisible(SltSBCL.getInstance().hasEventsSet());
+                    event.getPresentation().setEnabledAndVisible(SltLispEnvironmentProvider.getInstance().hasEventsSet());
                 }
             }
         }
