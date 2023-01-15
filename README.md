@@ -72,6 +72,7 @@ You can also open this as a project in Intellij Idea.
 ## Planned features / goals
 
 * [ ] Upload to marketplace when it has enough features
+* [ ] Automatic indentation
 * [x] REPL
 * [x] Interactive debugging
 * [ ] Inspection
