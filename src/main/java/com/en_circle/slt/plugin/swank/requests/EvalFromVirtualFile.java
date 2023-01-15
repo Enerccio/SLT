@@ -5,14 +5,14 @@ import com.en_circle.slt.plugin.swank.SwankPacket;
 
 import java.math.BigInteger;
 
-public class SwankEvalFromVirtualFile extends SlimeRequest {
+public class EvalFromVirtualFile extends SlimeRequest {
 
     public static SlimeRequest eval(String code, String filename, int bufferPosition, int lineno, int charno, Callback callback) {
         return eval(code, filename, bufferPosition, lineno, charno, "cl-user", callback);
     }
 
     public static SlimeRequest eval(String code, String filename, int bufferPosition, int lineno, int charno, String module, Callback callback) {
-        return new SwankEvalFromVirtualFile(code, module, filename, bufferPosition, lineno, charno, callback);
+        return new EvalFromVirtualFile(code, module, filename, bufferPosition, lineno, charno, callback);
     }
 
     protected final Callback callback;
@@ -23,7 +23,7 @@ public class SwankEvalFromVirtualFile extends SlimeRequest {
     protected final int lineno;
     protected final int charno;
 
-    protected SwankEvalFromVirtualFile(String code, String module, String filename, int bufferPosition, int lineno, int charno, Callback callback) {
+    protected EvalFromVirtualFile(String code, String module, String filename, int bufferPosition, int lineno, int charno, Callback callback) {
         this.callback = callback;
         this.module = module;
         this.code = code;

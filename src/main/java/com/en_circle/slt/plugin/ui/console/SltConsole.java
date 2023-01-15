@@ -4,7 +4,7 @@ import com.en_circle.slt.plugin.SltBundle;
 import com.en_circle.slt.plugin.SltCommonLispLanguage;
 import com.en_circle.slt.plugin.SltLispEnvironmentProvider;
 import com.en_circle.slt.plugin.environment.SltLispEnvironment.SltOutput;
-import com.en_circle.slt.plugin.swank.requests.SltEval;
+import com.en_circle.slt.plugin.swank.requests.Eval;
 import com.en_circle.slt.plugin.ui.SltComponent;
 import com.intellij.execution.console.ConsoleExecuteAction;
 import com.intellij.execution.console.ConsoleHistoryController;
@@ -74,7 +74,7 @@ public abstract class SltConsole implements SltComponent {
     protected void eval(String data) {
         try {
             if (StringUtils.isNotBlank(data)) {
-                SltLispEnvironmentProvider.getInstance().sendToLisp(SltEval.eval(data, currentModule,
+                SltLispEnvironmentProvider.getInstance().sendToLisp(Eval.eval(data, currentModule,
                         result -> languageConsole.print(result + "\n", ConsoleViewContentType.NORMAL_OUTPUT)));
             }
         } catch (Exception e) {

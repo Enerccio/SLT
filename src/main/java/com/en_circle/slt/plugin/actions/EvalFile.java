@@ -18,7 +18,7 @@ public class EvalFile extends EvalActionBase {
     public void actionPerformed(@NotNull AnActionEvent event) {
         VirtualFile vf = event.getData(CommonDataKeys.VIRTUAL_FILE);
         if (vf != null) {
-            evaluateFile(event.getProject(), vf.getPath());
+            evaluateFile(event.getProject(), vf.getPath(), vf);
             for (VirtualFile openedFiles : FileEditorManager.getInstance(Objects.requireNonNull(event.getProject()))
                     .getOpenFiles()) {
                 FileContentUtilCore.reparseFiles(openedFiles);

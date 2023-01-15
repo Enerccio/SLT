@@ -8,26 +8,20 @@ import com.en_circle.slt.plugin.swank.SwankPacket;
 
 import java.math.BigInteger;
 
-public class SltFrameLocalsAndCatchTags extends SlimeRequest {
+public class MacroexpandAll extends SlimeRequest {
 
-    public static SlimeRequest getLocals(BigInteger frame, BigInteger threadId, String module, Callback callback) {
-        return new SltFrameLocalsAndCatchTags(frame, threadId, module, callback);
+    public static SlimeRequest macroexpand(String form, String module, Callback callback) {
+        return new MacroexpandAll(form, module, callback);
     }
 
-    public static SlimeRequest getLocals(BigInteger frame, BigInteger threadId, Callback callback) {
-        return new SltFrameLocalsAndCatchTags(frame, threadId, "CL-USER", callback);
-    }
+    private final Callback callback;
+    private final String form;
+    private final String module;
 
-    protected final Callback callback;
-    protected final String module;
-    protected final BigInteger frame;
-    protected final BigInteger threadId;
-
-    protected SltFrameLocalsAndCatchTags(BigInteger frame, BigInteger threadId, String module, Callback callback) {
-        this.callback = callback;
+    public MacroexpandAll(String form, String module, Callback callback) {
+        this.form = form;
         this.module = module;
-        this.frame = frame;
-        this.threadId = threadId;
+        this.callback = callback;
     }
 
     public void processReply(LispContainer data) {
@@ -44,7 +38,7 @@ public class SltFrameLocalsAndCatchTags extends SlimeRequest {
 
     @Override
     public SwankPacket createPacket(BigInteger requestId) {
-        return SwankPacket.frameLocals(frame, threadId, module, requestId);
+        return SwankPacket.macroexpand(form, module, requestId);
     }
 
     public interface Callback {

@@ -5,7 +5,7 @@ import com.en_circle.slt.plugin.SltLispEnvironmentProvider;
 import com.en_circle.slt.plugin.lisp.lisp.LispContainer;
 import com.en_circle.slt.plugin.lisp.lisp.LispElement;
 import com.en_circle.slt.plugin.lisp.lisp.LispString;
-import com.en_circle.slt.plugin.swank.requests.SwankEvalAndGrab;
+import com.en_circle.slt.plugin.swank.requests.EvalAndGrab;
 import com.intellij.icons.AllIcons.Actions;
 import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.actionSystem.ex.CustomComponentAction;
@@ -54,7 +54,7 @@ public class PackageSelectorComponent {
 
     public void refresh() {
         try {
-            SltLispEnvironmentProvider.getInstance().sendToLisp(SwankEvalAndGrab.eval("(slt-core:list-package-names)", true, (result, stdout, parsed) -> {
+            SltLispEnvironmentProvider.getInstance().sendToLisp(EvalAndGrab.eval("(slt-core:list-package-names)", true, (result, stdout, parsed) -> {
                 resolvePackages(parsed);
             }), false);
         } catch (Exception e) {

@@ -7,10 +7,10 @@ import com.en_circle.slt.plugin.swank.SwankPacket;
 
 import java.math.BigInteger;
 
-public class SltInvokeNthRestart extends SlimeRequest {
+public class InvokeNthRestart extends SlimeRequest {
 
     public static SlimeRequest nthRestart(BigInteger threadId, BigInteger option, BigInteger nestLevel, String arg, String args, Callback callback) {
-        return new SltInvokeNthRestart(threadId, option, nestLevel, arg, args, callback);
+        return new InvokeNthRestart(threadId, option, nestLevel, arg, args, callback);
     }
 
     protected final Callback callback;
@@ -20,7 +20,7 @@ public class SltInvokeNthRestart extends SlimeRequest {
     protected final String arg;
     protected final String args;
 
-    protected SltInvokeNthRestart(BigInteger threadId, BigInteger option, BigInteger nestLevel, String arg, String args, Callback callback) {
+    protected InvokeNthRestart(BigInteger threadId, BigInteger option, BigInteger nestLevel, String arg, String args, Callback callback) {
         this.threadId = threadId;
         this.callback = callback;
         this.restart = option;

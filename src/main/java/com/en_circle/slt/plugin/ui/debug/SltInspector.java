@@ -7,10 +7,10 @@ import com.en_circle.slt.plugin.lisp.lisp.LispContainer;
 import com.en_circle.slt.plugin.lisp.lisp.LispElement;
 import com.en_circle.slt.plugin.swank.debug.SltInspectedObject;
 import com.en_circle.slt.plugin.swank.debug.SltInspectedObject.SltInspectionElement;
-import com.en_circle.slt.plugin.swank.requests.SltInspectFrameVar;
-import com.en_circle.slt.plugin.swank.requests.SltInspectNth;
-import com.en_circle.slt.plugin.swank.requests.SltInspectorAction;
-import com.en_circle.slt.plugin.swank.requests.SltInspectorAction.ActionType;
+import com.en_circle.slt.plugin.swank.requests.InspectFrameVar;
+import com.en_circle.slt.plugin.swank.requests.InspectNth;
+import com.en_circle.slt.plugin.swank.requests.InspectorAction;
+import com.en_circle.slt.plugin.swank.requests.InspectorAction.ActionType;
 import com.en_circle.slt.plugin.ui.debug.SltFrameInfo.Local;
 import com.intellij.icons.AllIcons.Actions;
 import com.intellij.openapi.actionSystem.*;
@@ -67,7 +67,7 @@ public class SltInspector {
     public void loadLocal(Local local, BigInteger frame) {
         try {
             SltLispEnvironmentProvider.getInstance()
-                    .sendToLisp(SltInspectFrameVar.inspectVariable(BigInteger.valueOf(local.ix), frame, threadId,
+                    .sendToLisp(InspectFrameVar.inspectVariable(BigInteger.valueOf(local.ix), frame, threadId,
                             result -> ApplicationManager.getApplication().invokeLater(() -> processResult(result))));
         } catch (Exception e) {
             log.warn(SltBundle.message("slt.error.sbclstart"), e);
@@ -133,7 +133,7 @@ public class SltInspector {
 
         try {
             SltLispEnvironmentProvider.getInstance()
-                    .sendToLisp(SltInspectNth.inspectVariable(ix, threadId, result ->
+                    .sendToLisp(InspectNth.inspectVariable(ix, threadId, result ->
                             ApplicationManager.getApplication().invokeLater(() -> processResult(result))));
         } catch (Exception e) {
             log.warn(SltBundle.message("slt.error.sbclstart"), e);
@@ -151,7 +151,7 @@ public class SltInspector {
         public void actionPerformed(@NotNull AnActionEvent event) {
             try {
                 SltLispEnvironmentProvider.getInstance()
-                        .sendToLisp(SltInspectorAction.action(ActionType.GO_BACK, threadId, result ->
+                        .sendToLisp(InspectorAction.action(ActionType.GO_BACK, threadId, result ->
                                 ApplicationManager.getApplication().invokeLater(() -> processResult(result))));
             } catch (Exception e) {
                 log.warn(SltBundle.message("slt.error.sbclstart"), e);
@@ -177,7 +177,7 @@ public class SltInspector {
         public void actionPerformed(@NotNull AnActionEvent event) {
             try {
                 SltLispEnvironmentProvider.getInstance()
-                        .sendToLisp(SltInspectorAction.action(ActionType.GO_FORWARD, threadId, result ->
+                        .sendToLisp(InspectorAction.action(ActionType.GO_FORWARD, threadId, result ->
                                 ApplicationManager.getApplication().invokeLater(() -> processResult(result))));
             } catch (Exception e) {
                 log.warn(SltBundle.message("slt.error.sbclstart"), e);
@@ -203,7 +203,7 @@ public class SltInspector {
         public void actionPerformed(@NotNull AnActionEvent event) {
             try {
                 SltLispEnvironmentProvider.getInstance()
-                        .sendToLisp(SltInspectorAction.action(ActionType.REFRESH, threadId, result ->
+                        .sendToLisp(InspectorAction.action(ActionType.REFRESH, threadId, result ->
                                 ApplicationManager.getApplication().invokeLater(() -> processResult(result))));
             } catch (Exception e) {
                 log.warn(SltBundle.message("slt.error.sbclstart"), e);

@@ -4,7 +4,7 @@ import com.en_circle.slt.plugin.SltBundle;
 import com.en_circle.slt.plugin.SltLispEnvironmentProvider;
 import com.en_circle.slt.plugin.SltUIConstants;
 import com.en_circle.slt.plugin.lisp.lisp.*;
-import com.en_circle.slt.plugin.swank.requests.SltFrameLocalsAndCatchTags;
+import com.en_circle.slt.plugin.swank.requests.FrameLocalsAndCatchTags;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
@@ -115,7 +115,7 @@ public class SltFrameInfo {
 
     private void reloadLocals() {
         try {
-            SltLispEnvironmentProvider.getInstance().sendToLisp(SltFrameLocalsAndCatchTags.getLocals(frameId, threadId, result -> {
+            SltLispEnvironmentProvider.getInstance().sendToLisp(FrameLocalsAndCatchTags.getLocals(frameId, threadId, result -> {
                 ApplicationManager.getApplication().invokeLater(() -> {
                     refreshFrameValues(result);
                 });

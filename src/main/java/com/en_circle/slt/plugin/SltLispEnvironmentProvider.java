@@ -4,6 +4,7 @@ import com.en_circle.slt.plugin.environment.SltLispEnvironment;
 import com.en_circle.slt.plugin.environment.SltLispEnvironment.SltLispOutputChangedListener;
 import com.en_circle.slt.plugin.environment.SltLispEnvironmentConfiguration;
 import com.en_circle.slt.plugin.environment.SltProcessException;
+import com.en_circle.slt.plugin.lisp.psi.LispList;
 import com.en_circle.slt.plugin.swank.SlimeListener;
 import com.en_circle.slt.plugin.swank.SlimeListener.DebugInterface;
 import com.en_circle.slt.plugin.swank.SlimeListener.RequestResponseLogger;
@@ -110,6 +111,7 @@ public class SltLispEnvironmentProvider implements Disposable {
         try {
             client.close();
         } finally {
+            SltLispEnvironmentMacroExpandCache.INSTANCE.clear();
             SltLispEnvironmentSymbolCache.INSTANCE.clear();
             if (environment != null) {
                 environment.stop();
@@ -163,6 +165,16 @@ public class SltLispEnvironmentProvider implements Disposable {
             log.error(e.getMessage());
             log.debug(e.getMessage(), e);
         }
+    }
+
+    public String macroexpand(LispList form, String packageName) {
+        try {
+            return SltLispEnvironmentMacroExpandCache.INSTANCE.macroexpand(form, packageName);
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            log.debug(e.getMessage(), e);
+        }
+        return null;
     }
 
     public interface SBCLServerListener extends SltLispOutputChangedListener {

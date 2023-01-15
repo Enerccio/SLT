@@ -7,8 +7,8 @@ import com.en_circle.slt.plugin.swank.debug.SltDebugAction;
 import com.en_circle.slt.plugin.swank.debug.SltDebugArgument;
 import com.en_circle.slt.plugin.swank.debug.SltDebugInfo;
 import com.en_circle.slt.plugin.swank.debug.SltDebugStackTraceElement;
-import com.en_circle.slt.plugin.swank.requests.SltFrameLocalsAndCatchTags;
-import com.en_circle.slt.plugin.swank.requests.SltInvokeNthRestart;
+import com.en_circle.slt.plugin.swank.requests.FrameLocalsAndCatchTags;
+import com.en_circle.slt.plugin.swank.requests.InvokeNthRestart;
 import com.en_circle.slt.plugin.swank.requests.ThrowToToplevel;
 import com.intellij.icons.AllIcons.Actions;
 import com.intellij.openapi.Disposable;
@@ -191,7 +191,7 @@ public class SltDebuggerImpl implements SltDebugger, Disposable {
         int ix = debugInfo.getActions().indexOf(action);
         if (action.getArguments().isEmpty()) {
             try {
-                SltLispEnvironmentProvider.getInstance().sendToLisp(SltInvokeNthRestart.nthRestart(debugInfo.getThreadId(),
+                SltLispEnvironmentProvider.getInstance().sendToLisp(InvokeNthRestart.nthRestart(debugInfo.getThreadId(),
                         BigInteger.valueOf(ix), debugInfo.getDebugLevel(), "NIL", "NIL", () -> {}));
             } catch (Exception e) {
                 log.warn(SltBundle.message("slt.error.sbclstart"), e);
@@ -215,7 +215,7 @@ public class SltDebuggerImpl implements SltDebugger, Disposable {
             }
             String args = arguments.size() == 0 ? "NIL" : "(" + String.join(" ", arguments) + ")";
             try {
-                SltLispEnvironmentProvider.getInstance().sendToLisp(SltInvokeNthRestart.nthRestart(debugInfo.getThreadId(),
+                SltLispEnvironmentProvider.getInstance().sendToLisp(InvokeNthRestart.nthRestart(debugInfo.getThreadId(),
                         BigInteger.valueOf(ix), debugInfo.getDebugLevel(), args, rest, () -> {}));
             } catch (Exception e) {
                 log.warn(SltBundle.message("slt.error.sbclstart"), e);
@@ -250,7 +250,7 @@ public class SltDebuggerImpl implements SltDebugger, Disposable {
             }
         }
         try {
-            SltLispEnvironmentProvider.getInstance().sendToLisp(SltFrameLocalsAndCatchTags.getLocals(BigInteger.valueOf(ix),
+            SltLispEnvironmentProvider.getInstance().sendToLisp(FrameLocalsAndCatchTags.getLocals(BigInteger.valueOf(ix),
                     debugInfo.getThreadId(), result -> {
                  ApplicationManager.getApplication().runWriteAction(() -> {
                     SltFrameInfo frameInfo = new SltFrameInfo(parent.getProject(), debugInfo.getThreadId(), BigInteger.valueOf(ix),

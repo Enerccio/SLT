@@ -8,22 +8,22 @@ import com.en_circle.slt.plugin.swank.SwankPacket;
 
 import java.math.BigInteger;
 
-public class SltInspectorAction extends SlimeRequest {
+public class InspectorAction extends SlimeRequest {
 
-    public static SlimeRequest action(ActionType actionType, BigInteger threadId, String module, SltInspectNth.Callback callback) {
-        return new SltInspectorAction(actionType, threadId, module, callback);
+    public static SlimeRequest action(ActionType actionType, BigInteger threadId, String module, Callback callback) {
+        return new InspectorAction(actionType, threadId, module, callback);
     }
 
-    public static SlimeRequest action(ActionType actionType, BigInteger threadId, SltInspectNth.Callback callback) {
-        return new SltInspectorAction(actionType, threadId, "CL-USER", callback);
+    public static SlimeRequest action(ActionType actionType, BigInteger threadId, Callback callback) {
+        return new InspectorAction(actionType, threadId, "CL-USER", callback);
     }
 
-    protected final SltInspectNth.Callback callback;
+    protected final Callback callback;
     protected final String module;
     protected final ActionType actionType;
     protected final BigInteger threadId;
 
-    protected SltInspectorAction(ActionType actionType, BigInteger threadId, String module, SltInspectNth.Callback callback) {
+    protected InspectorAction(ActionType actionType, BigInteger threadId, String module, Callback callback) {
         this.callback = callback;
         this.module = module;
         this.actionType = actionType;

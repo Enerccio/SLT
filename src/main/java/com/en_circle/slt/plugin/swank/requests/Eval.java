@@ -1,38 +1,37 @@
 package com.en_circle.slt.plugin.swank.requests;
 
 import com.en_circle.slt.plugin.lisp.lisp.LispContainer;
-import com.en_circle.slt.plugin.lisp.lisp.LispElement;
+import com.en_circle.slt.plugin.lisp.lisp.LispString;
 import com.en_circle.slt.plugin.lisp.lisp.LispSymbol;
 import com.en_circle.slt.plugin.swank.SlimeRequest;
 import com.en_circle.slt.plugin.swank.SwankPacket;
 
 import java.math.BigInteger;
 
-public class SltInspectNth extends SlimeRequest {
+public class Eval extends SlimeRequest {
 
-    public static SlimeRequest inspectVariable(BigInteger ix, BigInteger threadId, String module, Callback callback) {
-        return new SltInspectNth(ix, threadId, module, callback);
+    public static SlimeRequest eval(String code, String module, Callback callback) {
+        return new Eval(code, module, callback);
     }
 
-    public static SlimeRequest inspectVariable(BigInteger ix, BigInteger threadId, Callback callback) {
-        return new SltInspectNth(ix, threadId, "CL-USER", callback);
+    public static SlimeRequest eval(String code, Callback callback) {
+        return new Eval(code, "cl-user", callback);
     }
 
     protected final Callback callback;
     protected final String module;
-    protected final BigInteger ix;
-    protected final BigInteger threadId;
+    protected final String code;
 
-    protected SltInspectNth(BigInteger ix,BigInteger threadId, String module, Callback callback) {
+    protected Eval(String code, String module, Callback callback) {
         this.callback = callback;
         this.module = module;
-        this.ix = ix;
-        this.threadId = threadId;
+        this.code = code;
     }
 
     public void processReply(LispContainer data) {
         if (isOk(data)) {
-            callback.onResult(data.getItems().get(1));
+            String returnedText = ((LispString) data.getItems().get(1)).getValue();
+            callback.onResult(returnedText);
         }
     }
 
@@ -44,11 +43,11 @@ public class SltInspectNth extends SlimeRequest {
 
     @Override
     public SwankPacket createPacket(BigInteger requestId) {
-        return SwankPacket.frameInspectNth(ix, threadId, module, requestId);
+        return SwankPacket.sltEval(code, module, requestId);
     }
 
     public interface Callback {
-        void onResult(LispElement result);
+        void onResult(String result);
     }
 
 }

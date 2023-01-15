@@ -206,6 +206,20 @@ public class SwankPacket {
         return new SwankPacket(formatted);
     }
 
+    public static SwankPacket macroexpand(String form, String packageName, BigInteger continuation) {
+        return macroexpand(form, "T", packageName, continuation);
+    }
+
+    public static SwankPacket macroexpand(String form, String threadId, String packageName, BigInteger continuation) {
+        form = StringUtils.replace(form, "\\", "\\\\");
+        form = StringUtils.replace(form, "\"", "\\\"");
+        packageName = StringUtils.replace(packageName, "\\", "\\\\");
+        packageName = StringUtils.replace(packageName, "\"", "\\\"");
+        String formatted = String.format("(:emacs-rex (swank:swank-macroexpand-all \"%s\") :%s %s %s)",
+                form, packageName, threadId, continuation);
+        return new SwankPacket(formatted);
+    }
+
     private int length;
     private String expressionSource;
 

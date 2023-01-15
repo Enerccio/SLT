@@ -3,7 +3,7 @@ package com.en_circle.slt.plugin;
 import com.en_circle.slt.plugin.SymbolState.SymbolBinding;
 import com.en_circle.slt.plugin.lisp.lisp.*;
 import com.en_circle.slt.plugin.swank.components.SourceLocation;
-import com.en_circle.slt.plugin.swank.requests.SwankEvalAndGrab;
+import com.en_circle.slt.plugin.swank.requests.EvalAndGrab;
 import com.google.common.collect.Lists;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -129,7 +129,7 @@ public class SltLispEnvironmentSymbolCache extends Thread {
                 refreshStates.stream().map(x -> x.name.toUpperCase() + " ").collect(Collectors.joining()) + ")";
         request = StringUtils.replace(request, "\"", "\\\"");
 
-        SltLispEnvironmentProvider.getInstance().sendToLisp(SwankEvalAndGrab.eval(
+        SltLispEnvironmentProvider.getInstance().sendToLisp(EvalAndGrab.eval(
                 String.format(
                         "(slt-core:analyze-symbols (slt-core:read-fix-packages \"%s\"))",
                         request),

@@ -123,39 +123,44 @@ public class SlimeListener implements SwankClient.SwankReply {
         LispInteger replyId = (LispInteger) reply.getItems().get(2);
         try {
             SlimeRequest request = requests.get(replyId.getValue());
-            if (request instanceof SltEval) {
-                SltEval eval = (SltEval) request;
+            if (request instanceof Eval) {
+                Eval eval = (Eval) request;
                 eval.processReply((LispContainer) reply.getItems().get(1));
             }
 
-            if (request instanceof SwankEvalAndGrab) {
-                SwankEvalAndGrab evalAndGrab = (SwankEvalAndGrab) request;
+            if (request instanceof EvalAndGrab) {
+                EvalAndGrab evalAndGrab = (EvalAndGrab) request;
                 evalAndGrab.processReply((LispContainer) reply.getItems().get(1), this::parse);
             }
 
-            if (request instanceof SltInvokeNthRestart) {
-                SltInvokeNthRestart restart = (SltInvokeNthRestart) request;
+            if (request instanceof InvokeNthRestart) {
+                InvokeNthRestart restart = (InvokeNthRestart) request;
                 restart.processReply((LispContainer) reply.getItems().get(1));
             }
 
-            if (request instanceof SltFrameLocalsAndCatchTags) {
-                SltFrameLocalsAndCatchTags frames = (SltFrameLocalsAndCatchTags) request;
+            if (request instanceof FrameLocalsAndCatchTags) {
+                FrameLocalsAndCatchTags frames = (FrameLocalsAndCatchTags) request;
                 frames.processReply((LispContainer) reply.getItems().get(1));
             }
 
-            if (request instanceof SltInspectFrameVar) {
-                SltInspectFrameVar frameVar = (SltInspectFrameVar) request;
+            if (request instanceof InspectFrameVar) {
+                InspectFrameVar frameVar = (InspectFrameVar) request;
                 frameVar.processReply((LispContainer) reply.getItems().get(1));
             }
 
-            if (request instanceof SltInspectNth) {
-                SltInspectNth inspectNth = (SltInspectNth) request;
+            if (request instanceof InspectNth) {
+                InspectNth inspectNth = (InspectNth) request;
                 inspectNth.processReply((LispContainer) reply.getItems().get(1));
             }
 
-            if (request instanceof SltInspectorAction) {
-                SltInspectorAction action = (SltInspectorAction) request;
+            if (request instanceof InspectorAction) {
+                InspectorAction action = (InspectorAction) request;
                 action.processReply((LispContainer) reply.getItems().get(1));
+            }
+
+            if (request instanceof MacroexpandAll) {
+                MacroexpandAll macroexpandAll = (MacroexpandAll) request;
+                macroexpandAll.processReply((LispContainer) reply.getItems().get(1));
             }
         } finally {
             requests.remove(replyId.getValue());

@@ -81,7 +81,8 @@ You can also open this as a project in Intellij Idea.
 * [ ] Walkable debugger without actions 
 * [ ] Breakpoints
 * [x] Documentation 
-* [ ] Macro expand in documentation
+* [x] Macro expand in documentation
+  * Macro expand requires you to hover element twice for now
 * [x] Find function by symbol name
 * [ ] Search for symbols
 * [ ] Back references 

@@ -25,6 +25,9 @@ public class LispParserUtil extends GeneratedParserUtilBase {
     public static String getPackage(PsiElement element) {
         while (!(element instanceof LispToplevel)) {
             element = element.getParent();
+            if (element == null) {
+                return SltLispEnvironmentProvider.getInstance().getGlobalPackage();
+            }
         }
         PsiElement previous = element.getPrevSibling();
         while (previous != null) {
@@ -91,6 +94,23 @@ public class LispParserUtil extends GeneratedParserUtilBase {
             if (symbol != null) {
                 return symbol.getSymbol().getName();
             }
+        }
+        return null;
+    }
+
+    public static LispList getIfHead(PsiElement element) {
+        PsiElement original = element;
+        while (!(element instanceof LispList)) {
+            element = element.getParent();
+            if (element == null) {
+                return null;
+            }
+        }
+        LispList list = (LispList) element;
+        LispSexpr firstElement = list.getSexprList().get(0);
+        if (firstElement.getDatum() != null && firstElement.getDatum().getCompoundSymbol() != null &&
+                firstElement.getDatum().getCompoundSymbol().getSymbol().equals(original)) {
+            return list;
         }
         return null;
     }
