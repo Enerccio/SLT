@@ -28,7 +28,7 @@ enhancement ::= REFERENCE_SET | REFERENCE_LABEL | TEST_SUCCESS | COMMA | BACKQUO
 
 datum ::= tested | evaled | pathname | UNDEFINED_SEQUENCE | BIT_ARRAY | CHARACTER
             | number | real_pair
-            | symbol
+            | compound_symbol
             | string | vector | array | structure | list | pair
 
 tested ::= (TEST_SUCCESS | TEST_FALURE) sexpr
@@ -67,7 +67,9 @@ integer ::= INTEGER_NUMBER
 
 ratio ::= RATIO_NUMBER
 
-symbol ::= UNINTERN? SYMBOL_TOKEN {
+compound_symbol ::= UNINTERN? symbol
+
+symbol ::= SYMBOL_TOKEN {
     mixin="com.en_circle.slt.plugin.lisp.psi.impl.LispNamedElementImpl"
     implements="com.en_circle.slt.plugin.lisp.psi.LispNamedElement"
     methods=[getName setName getNameIdentifier]

@@ -11,6 +11,7 @@ public interface LispTypes {
   IElementType ARRAY = new LispElementType("ARRAY");
   IElementType BINARY_NUMBER = new LispElementType("BINARY_NUMBER");
   IElementType COMMENT = new LispElementType("COMMENT");
+  IElementType COMPOUND_SYMBOL = new LispElementType("COMPOUND_SYMBOL");
   IElementType DATUM = new LispElementType("DATUM");
   IElementType ENHANCEMENT = new LispElementType("ENHANCEMENT");
   IElementType EVALED = new LispElementType("EVALED");
@@ -77,6 +78,9 @@ public interface LispTypes {
       }
       else if (type == COMMENT) {
         return new LispCommentImpl(node);
+      }
+      else if (type == COMPOUND_SYMBOL) {
+        return new LispCompoundSymbolImpl(node);
       }
       else if (type == DATUM) {
         return new LispDatumImpl(node);

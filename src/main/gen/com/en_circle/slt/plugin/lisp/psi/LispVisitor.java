@@ -19,6 +19,10 @@ public class LispVisitor extends PsiElementVisitor {
     visitPsiElement(o);
   }
 
+  public void visitCompoundSymbol(@NotNull LispCompoundSymbol o) {
+    visitPsiElement(o);
+  }
+
   public void visitDatum(@NotNull LispDatum o) {
     visitPsiElement(o);
   }

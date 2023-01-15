@@ -74,9 +74,29 @@ public class LispParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
+  // UNINTERN? symbol
+  public static boolean compound_symbol(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "compound_symbol")) return false;
+    if (!nextTokenIs(b, "<compound symbol>", SYMBOL_TOKEN, UNINTERN)) return false;
+    boolean r;
+    Marker m = enter_section_(b, l, _NONE_, COMPOUND_SYMBOL, "<compound symbol>");
+    r = compound_symbol_0(b, l + 1);
+    r = r && symbol(b, l + 1);
+    exit_section_(b, l, m, r, false, null);
+    return r;
+  }
+
+  // UNINTERN?
+  private static boolean compound_symbol_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "compound_symbol_0")) return false;
+    consumeToken(b, UNINTERN);
+    return true;
+  }
+
+  /* ********************************************************** */
   // tested | evaled | pathname | UNDEFINED_SEQUENCE | BIT_ARRAY | CHARACTER
   //             | number | real_pair
-  //             | symbol
+  //             | compound_symbol
   //             | string | vector | array | structure | list | pair
   public static boolean datum(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "datum")) return false;
@@ -90,7 +110,7 @@ public class LispParser implements PsiParser, LightPsiParser {
     if (!r) r = consumeToken(b, CHARACTER);
     if (!r) r = number(b, l + 1);
     if (!r) r = real_pair(b, l + 1);
-    if (!r) r = symbol(b, l + 1);
+    if (!r) r = compound_symbol(b, l + 1);
     if (!r) r = string(b, l + 1);
     if (!r) r = vector(b, l + 1);
     if (!r) r = array(b, l + 1);
@@ -376,23 +396,15 @@ public class LispParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // UNINTERN? SYMBOL_TOKEN
+  // SYMBOL_TOKEN
   public static boolean symbol(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "symbol")) return false;
-    if (!nextTokenIs(b, "<symbol>", SYMBOL_TOKEN, UNINTERN)) return false;
+    if (!nextTokenIs(b, SYMBOL_TOKEN)) return false;
     boolean r;
-    Marker m = enter_section_(b, l, _NONE_, SYMBOL, "<symbol>");
-    r = symbol_0(b, l + 1);
-    r = r && consumeToken(b, SYMBOL_TOKEN);
-    exit_section_(b, l, m, r, false, null);
+    Marker m = enter_section_(b);
+    r = consumeToken(b, SYMBOL_TOKEN);
+    exit_section_(b, m, SYMBOL, r);
     return r;
-  }
-
-  // UNINTERN?
-  private static boolean symbol_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "symbol_0")) return false;
-    consumeToken(b, UNINTERN);
-    return true;
   }
 
   /* ********************************************************** */
