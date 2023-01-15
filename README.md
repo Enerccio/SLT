@@ -58,6 +58,13 @@ You can also open this as a project in Intellij Idea.
 * [ ] List of quicklisp installed packages / ASDF packages
 * [ ] List of modified top level forms that are yet to be evaluated
 
+### Far futures / possible goals 
+
+* [ ] Virtual Environment à la pycharm so you can specify which interpret instance you want
+* [ ] Automatic download of lisp interpret and quicklisp
+* [ ] Different lisp interpreter support 
+* [ ] Remote connections to interpreters
+
 ## License
 
 This project is licensed under [Apache License v2](LICENSE.txt).
