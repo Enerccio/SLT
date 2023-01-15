@@ -85,7 +85,8 @@ public class SltSBCL {
             listener.onPreStop();
         }
         try {
-            client.close();
+            if (client != null)
+                client.close();
         } finally {
             SltSBCLSymbolCache.INSTANCE.clear();
             SwankServer.stop();

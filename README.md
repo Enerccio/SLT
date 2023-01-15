@@ -15,12 +15,16 @@ IDE capabilities for Common Lisp.
 ## Requirements
 
 1) Intellij based IDE - tested on `Intellij Idea Community/Ultimate` but should workd on all major IDEs
+   1) Versions supported are from 2022.2 and upwards 
 2) [Steel Bank Common Lisp](https://www.sbcl.org/) installed
 3) [Quicklisp](https://www.quicklisp.org/beta/)
 
 ## Getting started
 
 Download plugin for your IDE from releases and install it via file.
+
+_ie_ File->Settings->Plugin, click on gear icon and then 'Install plugin from disk'
+
 To find out which release applies to you check this table:
 
 | Jetbrains IDE Variant |         Plugin name pattern |
@@ -35,6 +39,29 @@ To find out which release applies to you check this table:
 
 PhpStorm is coming when I read how to build it correctly since just swapping
 the type does not work. 
+
+For the first time use, I recommend installing swank and eclector dependencies manually 
+from sbcl because there is 10 seconds timeout to see if swank has initialized,and it might 
+terminate before quicklisp has initialized.
+
+Start sbcl and run this script:
+
+On linux and default quicklisp path: 
+
+```common lisp
+(load "~/quicklisp/setup.lisp")
+(ql:quickload :swank)
+(ql:quickload :eclector)
+```
+
+## Plugin options
+
+Plugin has 2 options right now.
+These are accessible in Settings>SLT Configuration
+
+- SBCL executable: Full path to sbcl or if sbcl is in path just `sbcl` is fine. 
+  - on windows, you might need .exe or even full path to .exe
+- Quicklisp path: path to the `setup.lisp` file of quicklisp. Defaults to `~/quicklisp/setup.lisp`
 
 ## Compiling source
 
@@ -57,6 +84,13 @@ You can also open this as a project in Intellij Idea.
 * [ ] Refactoring
 * [ ] List of quicklisp installed packages / ASDF packages
 * [ ] List of modified top level forms that are yet to be evaluated
+
+### Far futures / possible goals 
+
+* [ ] Virtual Environment à la pycharm so you can specify which interpret instance you want
+* [ ] Automatic download of lisp interpret and quicklisp
+* [ ] Different lisp interpreter support 
+* [ ] Remote connections to interpreters
 
 ## License
 

@@ -19,6 +19,8 @@ public class SltSettingsComponent {
         root = FormBuilder.createFormBuilder()
                 .addLabeledComponent(new JBLabel(SltBundle.message("slt.ui.settings.executable")),
                         sbclExecutable, 1, false)
+                .addLabeledComponent(new JBLabel(SltBundle.message("slt.ui.settings.port")),
+                        port, 1, false)
                 .addLabeledComponent(new JBLabel(SltBundle.message("slt.ui.settings.qlpath")),
                         quicklispStartScript, 1, false)
                 .addComponentFillVertically(new JPanel(), 0)

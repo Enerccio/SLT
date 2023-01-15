@@ -4,7 +4,7 @@ plugins {
 }
 
 group = "com.en_circle.slt"
-version = "0.1.0"
+version = "0.1.1"
 
 repositories {
     mavenCentral()
@@ -51,9 +51,13 @@ tasks {
     }
 
     signPlugin {
-        certificateChain.set(File("./signcerts/chain.crt").readText(Charsets.UTF_8))
-        privateKey.set(File("./signcerts/private.pem").readText(Charsets.UTF_8))
-        password.set(System.getenv("PRIVATE_KEY_PASSWORD"))
+        try {
+            certificateChain.set(File("./signcerts/chain.crt").readText(Charsets.UTF_8))
+            privateKey.set(File("./signcerts/private.pem").readText(Charsets.UTF_8))
+            password.set(System.getenv("PRIVATE_KEY_PASSWORD"))
+        } catch (_: Exception) {
+
+        }
     }
 
     publishPlugin {

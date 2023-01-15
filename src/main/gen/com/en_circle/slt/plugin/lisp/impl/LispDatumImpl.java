@@ -32,6 +32,12 @@ public class LispDatumImpl extends ASTWrapperPsiElement implements LispDatum {
 
   @Override
   @Nullable
+  public LispCompoundSymbol getCompoundSymbol() {
+    return findChildByClass(LispCompoundSymbol.class);
+  }
+
+  @Override
+  @Nullable
   public LispEvaled getEvaled() {
     return findChildByClass(LispEvaled.class);
   }
@@ -76,12 +82,6 @@ public class LispDatumImpl extends ASTWrapperPsiElement implements LispDatum {
   @Nullable
   public LispStructure getStructure() {
     return findChildByClass(LispStructure.class);
-  }
-
-  @Override
-  @Nullable
-  public LispSymbol getSymbol() {
-    return findChildByClass(LispSymbol.class);
   }
 
   @Override
