@@ -6,10 +6,7 @@ import com.en_circle.slt.plugin.SltCommonLispParserDefinition;
 import com.en_circle.slt.plugin.lisp.lisp.*;
 import com.en_circle.slt.plugin.lisp.psi.LispCoreProjectEnvironment;
 import com.en_circle.slt.plugin.swank.debug.SltDebugInfo;
-import com.en_circle.slt.plugin.swank.requests.SltEval;
-import com.en_circle.slt.plugin.swank.requests.SltFrameLocalsAndCatchTags;
-import com.en_circle.slt.plugin.swank.requests.SltInvokeNthRestart;
-import com.en_circle.slt.plugin.swank.requests.SwankEvalAndGrab;
+import com.en_circle.slt.plugin.swank.requests.*;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiFile;
@@ -23,7 +20,7 @@ import java.util.Map;
 
 public class SlimeListener implements SwankClient.SwankReply {
 
-    private static BigInteger rpcIdentifier = new BigInteger("0");
+    private static BigInteger rpcIdentifier = BigInteger.ZERO;
 
     public static synchronized BigInteger nextRpc() {
         BigInteger next = rpcIdentifier.add(BigInteger.ONE);
@@ -143,6 +140,11 @@ public class SlimeListener implements SwankClient.SwankReply {
 
             if (request instanceof SltFrameLocalsAndCatchTags) {
                 SltFrameLocalsAndCatchTags frames = (SltFrameLocalsAndCatchTags) request;
+                frames.processReply((LispContainer) reply.getItems().get(1));
+            }
+
+            if (request instanceof SltInspectFrameVar) {
+                SltInspectFrameVar frames = (SltInspectFrameVar) request;
                 frames.processReply((LispContainer) reply.getItems().get(1));
             }
         } finally {

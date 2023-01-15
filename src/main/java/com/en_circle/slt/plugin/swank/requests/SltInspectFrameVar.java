@@ -8,24 +8,26 @@ import com.en_circle.slt.plugin.swank.SwankPacket;
 
 import java.math.BigInteger;
 
-public class SltFrameLocalsAndCatchTags extends SlimeRequest {
+public class SltInspectFrameVar extends SlimeRequest {
 
-    public static SlimeRequest getLocals(BigInteger frame, BigInteger threadId, String module, Callback callback) {
-        return new SltFrameLocalsAndCatchTags(frame, threadId, module, callback);
+    public static SlimeRequest inspectVariable(BigInteger ix, BigInteger frame, BigInteger threadId, String module, Callback callback) {
+        return new SltInspectFrameVar(ix, frame, threadId, module, callback);
     }
 
-    public static SlimeRequest getLocals(BigInteger frame, BigInteger threadId, Callback callback) {
-        return new SltFrameLocalsAndCatchTags(frame, threadId, "CL-USER", callback);
+    public static SlimeRequest inspectVariable(BigInteger ix, BigInteger frame, BigInteger threadId, Callback callback) {
+        return new SltInspectFrameVar(ix, frame, threadId, "CL-USER", callback);
     }
 
     protected final Callback callback;
     protected final String module;
+    protected final BigInteger ix;
     protected final BigInteger frame;
     protected final BigInteger threadId;
 
-    protected SltFrameLocalsAndCatchTags(BigInteger frame, BigInteger threadId, String module, Callback callback) {
+    protected SltInspectFrameVar(BigInteger ix, BigInteger frame, BigInteger threadId, String module, Callback callback) {
         this.callback = callback;
         this.module = module;
+        this.ix = ix;
         this.frame = frame;
         this.threadId = threadId;
     }
@@ -44,7 +46,7 @@ public class SltFrameLocalsAndCatchTags extends SlimeRequest {
 
     @Override
     public SwankPacket createPacket(BigInteger requestId) {
-        return SwankPacket.frameLocals(frame, threadId, module, requestId);
+        return SwankPacket.inspectLocal(ix, frame, threadId, module, requestId);
     }
 
     public interface Callback {

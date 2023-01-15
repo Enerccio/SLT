@@ -33,6 +33,7 @@ public class SltColorSettingsPage implements ColorSettingsPage {
             new AttributesDescriptor(SltBundle.message("slt.ui.colorsettings.function"), CommonLispHighlighterColors.FUNCTION),
             new AttributesDescriptor(SltBundle.message("slt.ui.colorsettings.macro"), CommonLispHighlighterColors.MACRO),
             new AttributesDescriptor(SltBundle.message("slt.ui.colorsettings.reader"), CommonLispHighlighterColors.SUGAR),
+            new AttributesDescriptor(SltBundle.message("slt.ui.colorsettings.class"), CommonLispHighlighterColors.CLASS),
     };
 
     @Override

@@ -11,6 +11,7 @@ import com.en_circle.slt.plugin.swank.requests.SltFrameLocalsAndCatchTags;
 import com.en_circle.slt.plugin.swank.requests.SltInvokeNthRestart;
 import com.en_circle.slt.plugin.swank.requests.ThrowToToplevel;
 import com.intellij.icons.AllIcons.Actions;
+import com.intellij.openapi.Disposable;
 import com.intellij.openapi.actionSystem.ActionPlaces;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
@@ -47,7 +48,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class SltDebuggerImpl implements SltDebugger {
+public class SltDebuggerImpl implements SltDebugger, Disposable {
     private static final Logger log = LoggerFactory.getLogger(SltDebuggerImpl.class);
 
     private final JComponent content;
@@ -56,6 +57,7 @@ public class SltDebuggerImpl implements SltDebugger {
     private BigInteger lastDebugId;
     private JPanel singleFrameComponent;
     private final List<JPanel> stackframes = new ArrayList<>();
+    private BigInteger debugContext;
 
     public SltDebuggerImpl(SltDebuggers parent) {
         this.parent = parent;
@@ -223,10 +225,6 @@ public class SltDebuggerImpl implements SltDebugger {
 
     }
 
-    private void closeGui() {
-        parent.removeDebugger(this, lastDebugId);
-    }
-
     private void stackframeClicked(SltDebugStackTraceElement element, SltDebugInfo debugInfo) {
         int ix = debugInfo.getStacktrace().indexOf(element);
         for (int ix2=0; ix2<stackframes.size(); ix2++) {
@@ -282,4 +280,8 @@ public class SltDebuggerImpl implements SltDebugger {
         this.tabInfo.fireAlert();
     }
 
+    @Override
+    public void dispose() {
+
+    }
 }

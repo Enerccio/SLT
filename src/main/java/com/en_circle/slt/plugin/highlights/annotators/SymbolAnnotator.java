@@ -30,6 +30,10 @@ public class SymbolAnnotator implements Annotator {
         switch (state.binding) {
             case NONE:
                 break;
+            case CLASS:
+                CommonLispHighlighterColors.setHighlighting(element, holder,
+                        CommonLispHighlighterColors.CLASS);
+                break;
             case FUNCTION:
                 CommonLispHighlighterColors.setHighlighting(element, holder,
                         CommonLispHighlighterColors.FUNCTION);

@@ -152,6 +152,18 @@ public class SwankPacket {
         return new SwankPacket(formatted);
     }
 
+    public static SwankPacket inspectLocal(BigInteger ix, BigInteger frameId, BigInteger threadId, BigInteger continuation) {
+        return inspectLocal(ix, frameId, threadId, "CL-USER", continuation);
+    }
+
+    public static SwankPacket inspectLocal(BigInteger ix, BigInteger frameId, BigInteger threadId, String packageName, BigInteger continuation) {
+        packageName = StringUtils.replace(packageName, "\\", "\\\\");
+        packageName = StringUtils.replace(packageName, "\"", "\\\"");
+        String formatted = String.format("(:emacs-rex (swank:inspect-frame-var %s %s) :%s %s %s)",
+                frameId, ix, packageName, threadId, continuation);
+        return new SwankPacket(formatted);
+    }
+
     public static SwankPacket loadFile(String file, BigInteger continuation) {
         return loadFile(file, "CL-USER", continuation);
     }

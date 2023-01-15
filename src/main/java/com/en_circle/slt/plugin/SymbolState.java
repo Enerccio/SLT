@@ -28,7 +28,7 @@ public class SymbolState {
 
     public enum SymbolBinding {
         NONE, FUNCTION, MACRO, SPECIAL_FORM,
-        CONSTANT, KEYWORD, SPECIAL_VARIABLE
+        CONSTANT, KEYWORD, SPECIAL_VARIABLE, CLASS
     }
 
     @Override

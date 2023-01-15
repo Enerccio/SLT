@@ -33,6 +33,8 @@ public class SltDocumentationProvider extends AbstractDocumentationProvider {
                     return SltBundle.message("slt.documentation.types.specvariable") + " " + text;
                 case KEYWORD:
                     return SltBundle.message("slt.documentation.types.keyword") + " " + text;
+                case CLASS:
+                    return SltBundle.message("slt.documentation.types.class") + " " + text;
             }
         }
         return null;

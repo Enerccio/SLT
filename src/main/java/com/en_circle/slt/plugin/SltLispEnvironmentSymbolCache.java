@@ -153,6 +153,10 @@ public class SltLispEnvironmentSymbolCache extends Thread {
                                 boolean changed = false;
                                 state.timestamp = System.currentTimeMillis();
                                 switch (symValue) {
+                                    case ":CLASS":
+                                        changed |= state.binding != SymbolBinding.CLASS;
+                                        state.binding = SymbolBinding.CLASS;
+                                        break;
                                     case ":SPECIAL-FORM":
                                         changed |= state.binding != SymbolBinding.SPECIAL_FORM;
                                         state.binding = SymbolBinding.SPECIAL_FORM;
