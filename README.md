@@ -14,7 +14,7 @@ IDE capabilities for Common Lisp.
 
 ## Requirements
 
-1) Intellij based IDE - tested on `Intellij Idea Community/Ultimate` but should workd on all major IDEs
+1) Intellij based IDE - tested on `Intellij Idea Community/Ultimate` but should work on all major IDEs
    1) Versions supported are from 2022.2 and upwards 
 2) [Steel Bank Common Lisp](https://www.sbcl.org/) installed
 3) [Quicklisp](https://www.quicklisp.org/beta/)
