@@ -85,7 +85,6 @@ public class SltInspector {
         clear();
         if (parsedResult == null) {
             inspectorGeneratedContents.setText("Failed to parse result. Please report bug with this text: \n" + result.toString());
-            inspectorGeneratedContents.setEditorKit(new DefaultEditorKit());
         } else {
             inspectorGeneratedContents.setContentType("text/html");
             inspectorGeneratedContents.setEditorKit(new HTMLEditorKit());
@@ -97,7 +96,7 @@ public class SltInspector {
     private void loadInspectedObject(SltInspectedObject inspectedObject) {
         HtmlBuilder contentBuilder = new HtmlBuilder();
         contentBuilder.append(HtmlChunk.text(inspectedObject.getTitle())
-                .wrapWith("h2"));
+                .wrapWith("h3"));
         contentBuilder.append(HtmlChunk.hr());
         for (SltInspectionElement element : inspectedObject.getElements()) {
             String text = element.getText();
@@ -124,6 +123,7 @@ public class SltInspector {
 
     private void clear() {
         inspectorGeneratedContents.setContentType("text/plain");
+        inspectorGeneratedContents.setEditorKit(new DefaultEditorKit());
         inspectorGeneratedContents.setText("");
     }
 
