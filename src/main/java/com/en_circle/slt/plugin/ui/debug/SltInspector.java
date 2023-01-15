@@ -2,6 +2,7 @@ package com.en_circle.slt.plugin.ui.debug;
 
 import com.en_circle.slt.plugin.SltBundle;
 import com.en_circle.slt.plugin.SltLispEnvironmentProvider;
+import com.en_circle.slt.plugin.SltUIConstants;
 import com.en_circle.slt.plugin.lisp.lisp.LispContainer;
 import com.en_circle.slt.plugin.lisp.lisp.LispElement;
 import com.en_circle.slt.plugin.swank.debug.SltInspectedObject;
@@ -97,7 +98,7 @@ public class SltInspector {
         HtmlBuilder contentBuilder = new HtmlBuilder();
         contentBuilder.append(HtmlChunk.text(inspectedObject.getTitle())
                 .wrapWith("h2"));
-        contentBuilder.append(HtmlChunk.br());
+        contentBuilder.append(HtmlChunk.hr());
         for (SltInspectionElement element : inspectedObject.getElements()) {
             String text = element.getText();
             if (element.getId() == null) {
@@ -109,7 +110,8 @@ public class SltInspector {
                     }
                 }
             } else {
-                contentBuilder.append(HtmlChunk.link(mkLink(inspectedObject, element), text));
+                contentBuilder.append(HtmlChunk.link(mkLink(inspectedObject, element), text)
+                        .style("color:" + SltUIConstants.colorToHex(SltUIConstants.HYPERLINK_COLOR)));
             }
         }
 
