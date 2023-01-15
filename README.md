@@ -57,7 +57,12 @@ You can also open this as a project in Intellij Idea.
 * [ ] Refactoring
 * [ ] List of quicklisp installed packages / ASDF packages
 * [ ] List of modified top level forms that are yet to be evaluated
+* [ ] Actually make an IDE, ie just plugin with dependencies as one application, not a plugin
 
 ## License
 
 This project is licensed under [Apache License v2](LICENSE.txt).
+
+### What does SLT even mean?
+
+SLT - Speech Language Therapy. Only cure for LISP!
