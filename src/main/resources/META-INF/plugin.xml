@@ -57,6 +57,9 @@
 
         <lang.directNavigationProvider
                 implementation="com.en_circle.slt.plugin.references.SltDirectNavigationProvider"/>
+
+        <!-- SDK -->
+        <sdkType implementation="com.en_circle.slt.plugin.sdk.CommonLispSDKType"/>
     </extensions>
 
     <actions>
