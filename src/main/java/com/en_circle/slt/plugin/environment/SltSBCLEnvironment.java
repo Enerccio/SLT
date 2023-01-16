@@ -3,6 +3,7 @@ package com.en_circle.slt.plugin.environment;
 import com.en_circle.slt.plugin.environment.SltProcessStreamGobbler.ProcessInitializationWaiter;
 import com.en_circle.slt.plugin.environment.SltProcessStreamGobbler.WaitForOccurrence;
 import com.en_circle.slt.templates.SltScriptTemplate;
+import com.intellij.openapi.util.io.FileUtil;
 import org.apache.commons.io.FileUtils;
 import org.watertemplate.Template;
 
@@ -21,15 +22,19 @@ public class SltSBCLEnvironment extends SltLispEnvironmentProcess  {
         SltSBCLEnvironmentConfiguration c = getConfiguration(configuration);
         SBCLEnvironment e = new SBCLEnvironment();
         try {
-            e.sltCore = File.createTempFile("slt", ".cl");
+            File tempDir = FileUtil.createTempDirectory("SLTinit", "");
+
+            e.sltCore = new File(tempDir, "slt.cl");
             e.sltCore.deleteOnExit();
             String sltScriptTemplate = new SltScriptTemplate().render();
             FileUtils.write(e.sltCore, sltScriptTemplate, StandardCharsets.UTF_8);
 
-            e.serverStartSetup = File.createTempFile("startServer", ".cl");
+            e.serverStartSetup = new File(tempDir, "startServer.cl");
             e.serverStartSetup.deleteOnExit();
             String startScriptTemplate = new SBCLInitScriptTemplate(c, e.sltCore.getAbsolutePath()).render();
             FileUtils.write(e.serverStartSetup, startScriptTemplate, StandardCharsets.UTF_8);
+
+            tempDir.deleteOnExit();
         } catch (Exception ex) {
             throw new SltProcessException(ex);
         }
