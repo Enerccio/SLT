@@ -101,6 +101,12 @@ format suitable for Emacs."
                                            (describe test-sym)
                                            (list :class (get-output-stream-string *standard-output*)
                                                  (swank:find-source-location (find-class test-sym)))))
+                ((and (fboundp test-sym)
+                      (typep (symbol-function test-sym) 'generic-function))
+                                        (progn
+                                           (describe test-sym)
+                                           (list :method (get-output-stream-string *standard-output*)
+                                                 (swank:find-source-location (symbol-function test-sym)))))
                 ((special-operator-p test-sym) (list :special-form NIL NIL))
                 ((macro-function test-sym) (progn
                                              (describe test-sym)

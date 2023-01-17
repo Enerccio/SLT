@@ -34,6 +34,10 @@ public class SymbolAnnotator implements Annotator {
                 CommonLispHighlighterColors.setHighlighting(element, holder,
                         CommonLispHighlighterColors.CLASS);
                 break;
+            case METHOD:
+                CommonLispHighlighterColors.setHighlighting(element, holder,
+                        CommonLispHighlighterColors.METHOD);
+                break;
             case FUNCTION:
                 CommonLispHighlighterColors.setHighlighting(element, holder,
                         CommonLispHighlighterColors.FUNCTION);

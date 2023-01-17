@@ -61,7 +61,9 @@ public class SltLispEnvironmentSymbolCache extends Thread {
     public SymbolState refreshSymbolFromServer(String packageName, String symbolName, PsiElement element) {
         SymbolState state = getOrCreateBinding(packageName, symbolName);
         SymbolState undefinedSymbol = getOrCreateBinding(null, symbolName);
-        state.containerFiles.add(new WeakReference<>(element.getContainingFile().getVirtualFile()));
+        if (element != null) {
+            state.containerFiles.add(new WeakReference<>(element.getContainingFile().getVirtualFile()));
+        }
         SymbolBinding currentBinding = state.binding;
         if (currentBinding == SymbolBinding.NONE) {
             symbolRefreshQueue.add(state);

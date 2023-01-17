@@ -57,6 +57,8 @@
 
         <lang.directNavigationProvider
                 implementation="com.en_circle.slt.plugin.references.SltDirectNavigationProvider"/>
+
+        <completion.contributor language="Common Lisp" implementationClass="com.en_circle.slt.plugin.SltCompletionContributor"/>
     </extensions>
 
     <actions>

@@ -220,6 +220,18 @@ public class SwankPacket {
         return new SwankPacket(formatted);
     }
 
+    public static SwankPacket simpleCompletion(String prefix, String packageName, String requestPackageName, BigInteger continuation) {
+        return simpleCompletion(prefix, packageName, "T", requestPackageName, continuation);
+    }
+
+    public static SwankPacket simpleCompletion(String prefix, String packageName, String threadId, String requestPackageName, BigInteger continuation) {
+        requestPackageName = StringUtils.replace(requestPackageName, "\\", "\\\\");
+        requestPackageName = StringUtils.replace(requestPackageName, "\"", "\\\"");
+        String formatted = String.format("(:emacs-rex (swank:simple-completions \"%s\" \"%s\") :%s %s %s)",
+                prefix, packageName, requestPackageName, threadId, continuation);
+        return new SwankPacket(formatted);
+    }
+
     private int length;
     private String expressionSource;
 

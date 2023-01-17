@@ -22,6 +22,7 @@ public class CommonLispHighlighterColors {
     public static TextAttributesKey FUNCTION = TextAttributesKey.createTextAttributesKey("CL.FUNCTION", DefaultLanguageHighlighterColors.FUNCTION_CALL);
     public static TextAttributesKey MACRO = TextAttributesKey.createTextAttributesKey("CL.MACRO", DefaultLanguageHighlighterColors.KEYWORD);
     public static TextAttributesKey CLASS = TextAttributesKey.createTextAttributesKey("CL.CLASS", DefaultLanguageHighlighterColors.CLASS_NAME);
+    public static TextAttributesKey METHOD = TextAttributesKey.createTextAttributesKey("CL.METHOD", DefaultLanguageHighlighterColors.INSTANCE_METHOD);
 
     public static void setHighlighting(PsiElement element, AnnotationHolder holder, TextAttributesKey key) {
 //        Annotation a = holder.createInfoAnnotation(element, null);

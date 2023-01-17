@@ -123,44 +123,40 @@ public class SlimeListener implements SwankClient.SwankReply {
         LispInteger replyId = (LispInteger) reply.getItems().get(2);
         try {
             SlimeRequest request = requests.get(replyId.getValue());
-            if (request instanceof Eval) {
-                Eval eval = (Eval) request;
+            if (request instanceof Eval eval) {
                 eval.processReply((LispContainer) reply.getItems().get(1));
             }
 
-            if (request instanceof EvalAndGrab) {
-                EvalAndGrab evalAndGrab = (EvalAndGrab) request;
+            if (request instanceof EvalAndGrab evalAndGrab) {
                 evalAndGrab.processReply((LispContainer) reply.getItems().get(1), this::parse);
             }
 
-            if (request instanceof InvokeNthRestart) {
-                InvokeNthRestart restart = (InvokeNthRestart) request;
+            if (request instanceof InvokeNthRestart restart) {
                 restart.processReply((LispContainer) reply.getItems().get(1));
             }
 
-            if (request instanceof FrameLocalsAndCatchTags) {
-                FrameLocalsAndCatchTags frames = (FrameLocalsAndCatchTags) request;
+            if (request instanceof FrameLocalsAndCatchTags frames) {
                 frames.processReply((LispContainer) reply.getItems().get(1));
             }
 
-            if (request instanceof InspectFrameVar) {
-                InspectFrameVar frameVar = (InspectFrameVar) request;
+            if (request instanceof InspectFrameVar frameVar) {
                 frameVar.processReply((LispContainer) reply.getItems().get(1));
             }
 
-            if (request instanceof InspectNth) {
-                InspectNth inspectNth = (InspectNth) request;
+            if (request instanceof InspectNth inspectNth) {
                 inspectNth.processReply((LispContainer) reply.getItems().get(1));
             }
 
-            if (request instanceof InspectorAction) {
-                InspectorAction action = (InspectorAction) request;
+            if (request instanceof InspectorAction action) {
                 action.processReply((LispContainer) reply.getItems().get(1));
             }
 
-            if (request instanceof MacroexpandAll) {
-                MacroexpandAll macroexpandAll = (MacroexpandAll) request;
+            if (request instanceof MacroexpandAll macroexpandAll) {
                 macroexpandAll.processReply((LispContainer) reply.getItems().get(1));
+            }
+
+            if (request instanceof SimpleCompletion simpleCompletion) {
+                simpleCompletion.processReply((LispContainer) reply.getItems().get(1));
             }
         } finally {
             requests.remove(replyId.getValue());
