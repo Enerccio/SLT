@@ -70,6 +70,9 @@ public class SltDocumentationProvider extends AbstractDocumentationProvider {
                 builder.append(HtmlChunk.text(SltBundle.message("slt.documentation.macroexpand")));
                 builder.append(HtmlChunk.br());
                 builder.append(HtmlChunk.raw(macroExpand));
+            } else {
+                builder.append(HtmlChunk.hr());
+                builder.append(HtmlChunk.text(SltBundle.message("slt.documentation.macroexpand.generating")));
             }
         }
 
