@@ -4,6 +4,8 @@
 [![0.1.0](https://badgen.net/github/milestones/enerccio/SLT/1)](https://github.com/enerccio/SLT/milestone/1)
 [![0.2.0](https://badgen.net/github/milestones/enerccio/SLT/2)](https://github.com/enerccio/SLT/milestone/2)
 
+![Image](src/main/resources/logo/logo.svg)
+
 **THIS PLUGIN IS EXPERIMENTAL and can crash at any time! Please report all bugs!**
 
 This plugin is providing support for Common Lisp for JetBrains IDEs. 
@@ -23,7 +25,8 @@ IDE capabilities for Common Lisp.
 
 Download plugin for your IDE from releases and install it via file.
 
-_ie_ File->Settings->Plugin, click on gear icon and then 'Install plugin from disk'
+_ie_ File->Settings->Plugin, click on gear icon and then 'Install plugin from disk' 
+and then select the downloaded zip (do not unzip the zip)
 
 To find out which release applies to you check this table:
 
@@ -94,7 +97,7 @@ You can also open this as a project in Intellij Idea.
 
 ### Far futures / possible goals 
 
-* [ ] Virtual Environment à la pycharm so you can specify which interpret instance you want
+* [ ] SDK Support 
 * [ ] Automatic download of lisp interpret and quicklisp
 * [ ] Different lisp interpreter support 
 * [ ] Remote connections to interpreters
