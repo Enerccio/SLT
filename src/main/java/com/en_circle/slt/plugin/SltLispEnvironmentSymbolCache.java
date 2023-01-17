@@ -159,6 +159,10 @@ public class SltLispEnvironmentSymbolCache extends Thread {
                                         changed |= state.binding != SymbolBinding.CLASS;
                                         state.binding = SymbolBinding.CLASS;
                                         break;
+                                    case ":METHOD":
+                                        changed |= state.binding != SymbolBinding.METHOD;
+                                        state.binding = SymbolBinding.METHOD;
+                                        break;
                                     case ":SPECIAL-FORM":
                                         changed |= state.binding != SymbolBinding.SPECIAL_FORM;
                                         state.binding = SymbolBinding.SPECIAL_FORM;

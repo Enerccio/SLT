@@ -26,9 +26,11 @@ public class EvalFileFromEditor extends EvalActionBase {
         if (editor != null) {
             PsiDocumentManager psiMgr = PsiDocumentManager.getInstance(Objects.requireNonNull(editor.getProject()));
             psiMgr.commitDocument(editor.getDocument());
+            FileDocumentManager.getInstance().saveDocument(editor.getDocument());
 
             VirtualFile vf = FileDocumentManager.getInstance().getFile(editor.getDocument());
             if (vf != null) {
+
                 evaluateFile(editor.getProject(), vf.getPath(), vf);
             }
         }
