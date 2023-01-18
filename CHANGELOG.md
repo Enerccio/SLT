@@ -16,6 +16,7 @@ you need to hover again to see it.
 - Fixed code highlight for methods
 - Fixed bad package when package does not exist
 - Fixed lisp parser, `REFERENCE_LABEL` requiring `datum`, now it is stand alone
+- Fixed line comment highlight color
 
 ## 0.1.1 - 230115
 

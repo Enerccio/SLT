@@ -2,7 +2,7 @@
     (:use :cl)
     (:export foobar))
 
-(in-package :example)
+(in-package :example) ; my example comment
 
 (defun foobar (arg1 &rest bar)
     "Implements the foo bar!"
@@ -12,6 +12,9 @@
                 (loop for x from 10 to 20 collect
                     `(,@arg1 ,x)))
           #1#))
+
+#| long
+comment |#
 
 (defclass foo (T)
     ())
