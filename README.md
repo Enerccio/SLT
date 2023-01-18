@@ -101,6 +101,7 @@ You can also open this as a project in Intellij Idea.
 * [ ] Automatic download of lisp interpret and quicklisp
 * [ ] Different lisp interpreter support 
 * [ ] Remote connections to interpreters
+* [ ] Rewrite everything into ABCL just for purity sake lol
 
 ## License
 
