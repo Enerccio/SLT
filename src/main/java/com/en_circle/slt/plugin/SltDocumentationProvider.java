@@ -5,6 +5,7 @@ import com.en_circle.slt.plugin.lisp.LispParserUtil;
 import com.en_circle.slt.plugin.lisp.psi.LispList;
 import com.en_circle.slt.plugin.lisp.psi.LispSymbol;
 import com.en_circle.slt.plugin.lisp.psi.impl.LispPsiImplUtil;
+import com.en_circle.slt.plugin.services.lisp.LispEnvironmentService;
 import com.intellij.lang.documentation.AbstractDocumentationProvider;
 import com.intellij.openapi.util.text.HtmlBuilder;
 import com.intellij.openapi.util.text.HtmlChunk;
@@ -20,7 +21,7 @@ public class SltDocumentationProvider extends AbstractDocumentationProvider {
         String text = LispPsiImplUtil.getSExpressionHead(element);
         if (text != null) {
             String packageName = LispParserUtil.getPackage(element);
-            SymbolState state = SltLispEnvironmentProvider.getInstance().refreshSymbolFromServer(packageName, text, element);
+            SymbolState state = LispEnvironmentService.getInstance(element.getProject()).refreshSymbolFromServer(packageName, text, element);
             switch (state.binding) {
                 case NONE:
                     return SltBundle.message("slt.documentation.types.symbol") + " " + text;
@@ -50,7 +51,7 @@ public class SltDocumentationProvider extends AbstractDocumentationProvider {
         if (element instanceof LispSymbol) {
             String text = element.getText();
             String packageName = LispParserUtil.getPackage(element);
-            SymbolState state = SltLispEnvironmentProvider.getInstance().refreshSymbolFromServer(packageName, text, element);
+            SymbolState state = LispEnvironmentService.getInstance(element.getProject()).refreshSymbolFromServer(packageName, text, element);
             return asHtml(state, packageName, element, originalElement);
         }
         return null;
@@ -64,7 +65,7 @@ public class SltDocumentationProvider extends AbstractDocumentationProvider {
 
         LispList form = LispParserUtil.getIfHead(element);
         if (form != null && state.binding == SymbolBinding.MACRO) {
-            String macroExpand = SltLispEnvironmentProvider.getInstance().macroexpand(form, packageName);
+            String macroExpand = LispEnvironmentService.getInstance(element.getProject()).macroexpand(form, packageName);
             if (macroExpand != null) {
                 macroExpand = StringUtils.replace(StringUtils.replace(macroExpand, " ", "&nbsp;"),
                         "\n", HtmlChunk.br().toString());

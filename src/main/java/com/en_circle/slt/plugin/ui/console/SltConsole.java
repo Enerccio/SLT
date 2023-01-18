@@ -2,8 +2,9 @@ package com.en_circle.slt.plugin.ui.console;
 
 import com.en_circle.slt.plugin.SltBundle;
 import com.en_circle.slt.plugin.SltCommonLispLanguage;
-import com.en_circle.slt.plugin.SltLispEnvironmentProvider;
 import com.en_circle.slt.plugin.environment.SltLispEnvironment.SltOutput;
+import com.en_circle.slt.plugin.services.lisp.LispEnvironmentService;
+import com.en_circle.slt.plugin.services.lisp.LispEnvironmentService.LispEnvironmentState;
 import com.en_circle.slt.plugin.swank.requests.Eval;
 import com.en_circle.slt.plugin.ui.SltComponent;
 import com.intellij.execution.console.ConsoleExecuteAction;
@@ -60,7 +61,7 @@ public abstract class SltConsole implements SltComponent {
                 eval(code);
             }
 
-        }, languageConsoleView -> SltLispEnvironmentProvider.getInstance().isLispEnvironmentActive());
+        }, languageConsoleView -> LispEnvironmentService.getInstance(project).getState() == LispEnvironmentState.READY);
         action.registerCustomShortcutSet(action.getShortcutSet(), languageConsole.getConsoleEditor().getComponent());
         new ConsoleHistoryController(new MyConsoleRootType("cl"), null, languageConsole).install();
 
@@ -74,7 +75,7 @@ public abstract class SltConsole implements SltComponent {
     protected void eval(String data) {
         try {
             if (StringUtils.isNotBlank(data)) {
-                SltLispEnvironmentProvider.getInstance().sendToLisp(Eval.eval(data, currentModule,
+                LispEnvironmentService.getInstance(project).sendToLisp(Eval.eval(data, currentModule,
                         result -> languageConsole.print(result + "\n", ConsoleViewContentType.NORMAL_OUTPUT)));
             }
         } catch (Exception e) {

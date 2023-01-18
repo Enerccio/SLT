@@ -1,10 +1,11 @@
 package com.en_circle.slt.plugin.ui.debug;
 
 import com.en_circle.slt.plugin.SltBundle;
-import com.en_circle.slt.plugin.SltLispEnvironmentProvider;
 import com.en_circle.slt.plugin.SltUIConstants;
 import com.en_circle.slt.plugin.lisp.lisp.LispContainer;
 import com.en_circle.slt.plugin.lisp.lisp.LispElement;
+import com.en_circle.slt.plugin.services.lisp.LispEnvironmentService;
+import com.en_circle.slt.plugin.services.lisp.LispEnvironmentService.LispEnvironmentState;
 import com.en_circle.slt.plugin.swank.debug.SltInspectedObject;
 import com.en_circle.slt.plugin.swank.debug.SltInspectedObject.SltInspectionElement;
 import com.en_circle.slt.plugin.swank.requests.InspectFrameVar;
@@ -66,7 +67,7 @@ public class SltInspector {
 
     public void loadLocal(Local local, BigInteger frame) {
         try {
-            SltLispEnvironmentProvider.getInstance()
+            LispEnvironmentService.getInstance(project)
                     .sendToLisp(InspectFrameVar.inspectVariable(BigInteger.valueOf(local.ix), frame, threadId,
                             result -> ApplicationManager.getApplication().invokeLater(() -> processResult(result))));
         } catch (Exception e) {
@@ -132,7 +133,7 @@ public class SltInspector {
         BigInteger ix = new BigInteger(parts[1]);
 
         try {
-            SltLispEnvironmentProvider.getInstance()
+            LispEnvironmentService.getInstance(project)
                     .sendToLisp(InspectNth.inspectVariable(ix, threadId, result ->
                             ApplicationManager.getApplication().invokeLater(() -> processResult(result))));
         } catch (Exception e) {
@@ -150,7 +151,7 @@ public class SltInspector {
         @Override
         public void actionPerformed(@NotNull AnActionEvent event) {
             try {
-                SltLispEnvironmentProvider.getInstance()
+                LispEnvironmentService.getInstance(project)
                         .sendToLisp(InspectorAction.action(ActionType.GO_BACK, threadId, result ->
                                 ApplicationManager.getApplication().invokeLater(() -> processResult(result))));
             } catch (Exception e) {
@@ -163,7 +164,7 @@ public class SltInspector {
         public void update(@NotNull AnActionEvent e) {
             super.update(e);
 
-            e.getPresentation().setEnabled(SltLispEnvironmentProvider.getInstance().isLispEnvironmentActive());
+            e.getPresentation().setEnabled(LispEnvironmentService.getInstance(project).getState() == LispEnvironmentState.READY);
         }
     }
 
@@ -176,7 +177,7 @@ public class SltInspector {
         @Override
         public void actionPerformed(@NotNull AnActionEvent event) {
             try {
-                SltLispEnvironmentProvider.getInstance()
+                LispEnvironmentService.getInstance(project)
                         .sendToLisp(InspectorAction.action(ActionType.GO_FORWARD, threadId, result ->
                                 ApplicationManager.getApplication().invokeLater(() -> processResult(result))));
             } catch (Exception e) {
@@ -189,7 +190,7 @@ public class SltInspector {
         public void update(@NotNull AnActionEvent e) {
             super.update(e);
 
-            e.getPresentation().setEnabled(SltLispEnvironmentProvider.getInstance().isLispEnvironmentActive());
+            e.getPresentation().setEnabled(LispEnvironmentService.getInstance(project).getState() ==LispEnvironmentState.READY);
         }
     }
 
@@ -202,7 +203,7 @@ public class SltInspector {
         @Override
         public void actionPerformed(@NotNull AnActionEvent event) {
             try {
-                SltLispEnvironmentProvider.getInstance()
+                LispEnvironmentService.getInstance(project)
                         .sendToLisp(InspectorAction.action(ActionType.REFRESH, threadId, result ->
                                 ApplicationManager.getApplication().invokeLater(() -> processResult(result))));
             } catch (Exception e) {
@@ -215,7 +216,7 @@ public class SltInspector {
         public void update(@NotNull AnActionEvent e) {
             super.update(e);
 
-            e.getPresentation().setEnabled(SltLispEnvironmentProvider.getInstance().isLispEnvironmentActive());
+            e.getPresentation().setEnabled(LispEnvironmentService.getInstance(project).getState() == LispEnvironmentState.READY);
         }
     }
 

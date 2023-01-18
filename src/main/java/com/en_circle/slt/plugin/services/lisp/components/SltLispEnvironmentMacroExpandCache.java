@@ -1,12 +1,14 @@
-package com.en_circle.slt.plugin;
+package com.en_circle.slt.plugin.services.lisp.components;
 
 import com.en_circle.slt.plugin.lisp.lisp.LispString;
 import com.en_circle.slt.plugin.lisp.lisp.LispUtils;
 import com.en_circle.slt.plugin.lisp.psi.LispList;
+import com.en_circle.slt.plugin.services.lisp.LispEnvironmentService;
 import com.en_circle.slt.plugin.swank.requests.MacroexpandAll;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiFile;
 import org.jetbrains.annotations.NotNull;
@@ -15,15 +17,13 @@ import java.util.Objects;
 
 public class SltLispEnvironmentMacroExpandCache {
 
-    public static final SltLispEnvironmentMacroExpandCache INSTANCE = new SltLispEnvironmentMacroExpandCache();
-
     private final LoadingCache<MacroExpandEntry, MacroExpandEntry> expandedMacros;
 
     public SltLispEnvironmentMacroExpandCache() {
         CacheLoader<MacroExpandEntry, MacroExpandEntry> loader = new CacheLoader<>() {
             @Override
             public MacroExpandEntry load(@NotNull SltLispEnvironmentMacroExpandCache.MacroExpandEntry key) throws Exception {
-                SltLispEnvironmentProvider.getInstance().sendToLisp(
+                LispEnvironmentService.getInstance(key.project).sendToLisp(
                         MacroexpandAll.macroexpand(key.form, key.packageName, result -> {
                             key.evaluated = LispUtils.unescape(((LispString) result).getValue());
                         }));
@@ -44,6 +44,7 @@ public class SltLispEnvironmentMacroExpandCache {
             entry.virtualFile = file.getVirtualFile();
             entry.modification = file.getModificationStamp();
             entry.packageName = packageName;
+            entry.project = form.getProject();
             MacroExpandEntry cachedEntry = expandedMacros.get(entry);
             if (cachedEntry.modification < entry.modification) {
                 expandedMacros.refresh(cachedEntry);
@@ -59,6 +60,7 @@ public class SltLispEnvironmentMacroExpandCache {
 
     private static class MacroExpandEntry {
 
+        public Project project;
         private String form;
         private String packageName;
         private String evaluated;

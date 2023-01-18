@@ -1,8 +1,8 @@
 package com.en_circle.slt.plugin.ui.debug;
 
 import com.en_circle.slt.plugin.SltBundle;
-import com.en_circle.slt.plugin.SltLispEnvironmentProvider;
 import com.en_circle.slt.plugin.SltUIConstants;
+import com.en_circle.slt.plugin.services.lisp.LispEnvironmentService;
 import com.en_circle.slt.plugin.swank.debug.SltDebugAction;
 import com.en_circle.slt.plugin.swank.debug.SltDebugArgument;
 import com.en_circle.slt.plugin.swank.debug.SltDebugInfo;
@@ -191,7 +191,7 @@ public class SltDebuggerImpl implements SltDebugger, Disposable {
         int ix = debugInfo.getActions().indexOf(action);
         if (action.getArguments().isEmpty()) {
             try {
-                SltLispEnvironmentProvider.getInstance().sendToLisp(InvokeNthRestart.nthRestart(debugInfo.getThreadId(),
+                LispEnvironmentService.getInstance(parent.getProject()).sendToLisp(InvokeNthRestart.nthRestart(debugInfo.getThreadId(),
                         BigInteger.valueOf(ix), debugInfo.getDebugLevel(), "NIL", "NIL", () -> {}));
             } catch (Exception e) {
                 log.warn(SltBundle.message("slt.error.sbclstart"), e);
@@ -215,7 +215,7 @@ public class SltDebuggerImpl implements SltDebugger, Disposable {
             }
             String args = arguments.size() == 0 ? "NIL" : "(" + String.join(" ", arguments) + ")";
             try {
-                SltLispEnvironmentProvider.getInstance().sendToLisp(InvokeNthRestart.nthRestart(debugInfo.getThreadId(),
+                LispEnvironmentService.getInstance(parent.getProject()).sendToLisp(InvokeNthRestart.nthRestart(debugInfo.getThreadId(),
                         BigInteger.valueOf(ix), debugInfo.getDebugLevel(), args, rest, () -> {}));
             } catch (Exception e) {
                 log.warn(SltBundle.message("slt.error.sbclstart"), e);
@@ -250,7 +250,7 @@ public class SltDebuggerImpl implements SltDebugger, Disposable {
             }
         }
         try {
-            SltLispEnvironmentProvider.getInstance().sendToLisp(FrameLocalsAndCatchTags.getLocals(BigInteger.valueOf(ix),
+            LispEnvironmentService.getInstance(parent.getProject()).sendToLisp(FrameLocalsAndCatchTags.getLocals(BigInteger.valueOf(ix),
                     debugInfo.getThreadId(), result -> {
                  ApplicationManager.getApplication().runWriteAction(() -> {
                     SltFrameInfo frameInfo = new SltFrameInfo(parent.getProject(), debugInfo.getThreadId(), BigInteger.valueOf(ix),
@@ -268,7 +268,7 @@ public class SltDebuggerImpl implements SltDebugger, Disposable {
 
     private void close() {
         try {
-            SltLispEnvironmentProvider.getInstance().sendToLisp(new ThrowToToplevel(lastDebugId));
+            LispEnvironmentService.getInstance(parent.getProject()).sendToLisp(new ThrowToToplevel(lastDebugId));
         } catch (Exception e) {
             log.warn(SltBundle.message("slt.error.sbclstart"), e);
             Messages.showErrorDialog(parent.getProject(), e.getMessage(), SltBundle.message("slt.ui.errors.sbcl.start"));

@@ -1,9 +1,9 @@
 package com.en_circle.slt.plugin.references;
 
-import com.en_circle.slt.plugin.SltLispEnvironmentProvider;
 import com.en_circle.slt.plugin.SymbolState;
 import com.en_circle.slt.plugin.lisp.LispParserUtil;
 import com.en_circle.slt.plugin.lisp.psi.LispSymbol;
+import com.en_circle.slt.plugin.services.lisp.LispEnvironmentService;
 import com.en_circle.slt.plugin.swank.components.SourceLocation;
 import com.intellij.lang.ASTNode;
 import com.intellij.lang.FileASTNode;
@@ -26,7 +26,7 @@ public class SltReference extends PsiReferenceBase<LispSymbol> implements
     public ResolveResult @NotNull [] multiResolve(boolean incompleteCode) {
         String symbolName = myElement.getName();
         String packageName = LispParserUtil.getPackage(myElement);
-        SymbolState state = SltLispEnvironmentProvider.getInstance().refreshSymbolFromServer(packageName, symbolName, myElement);
+        SymbolState state = LispEnvironmentService.getInstance(myElement.getProject()).refreshSymbolFromServer(packageName, symbolName, myElement);
         SourceLocation location = state.location;
         if (location.isFile()) {
             VirtualFile vf = LocalFileSystem.getInstance().findFileByIoFile(new File(location.getLocation()));

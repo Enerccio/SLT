@@ -2,7 +2,7 @@ package com.en_circle.slt.plugin.actions;
 
 import com.en_circle.slt.plugin.SltBundle;
 import com.en_circle.slt.plugin.SltCommonLispFileType;
-import com.en_circle.slt.plugin.SltLispEnvironmentProvider;
+import com.en_circle.slt.plugin.services.lisp.LispEnvironmentService;
 import com.en_circle.slt.plugin.swank.requests.Eval;
 import com.en_circle.slt.plugin.swank.requests.EvalFromVirtualFile;
 import com.en_circle.slt.plugin.swank.requests.LoadFile;
@@ -33,14 +33,14 @@ public abstract class EvalActionBase extends AnAction {
         if (editor != null && event.getProject() != null) {
             PsiFile file = PsiDocumentManager.getInstance(Objects.requireNonNull(editor.getProject())).getPsiFile(editor.getDocument());
             if (file != null && SltCommonLispFileType.INSTANCE.equals(file.getFileType())) {
-                event.getPresentation().setEnabledAndVisible(SltLispEnvironmentProvider.getInstance().hasEventsSet());
+                event.getPresentation().setEnabledAndVisible(true);
             }
         }
     }
 
     protected void evaluate(Project project, String buffer, String packageName, Runnable callback) {
         try {
-            SltLispEnvironmentProvider.getInstance().sendToLisp(Eval.eval(buffer, packageName, result -> callback.run()), true);
+            LispEnvironmentService.getInstance(project).sendToLisp(Eval.eval(buffer, packageName, result -> callback.run()), true);
         } catch (Exception e) {
             log.warn(SltBundle.message("slt.error.sbclstart"), e);
             Messages.showErrorDialog(project, e.getMessage(), SltBundle.message("slt.ui.errors.sbcl.start"));
@@ -49,7 +49,7 @@ public abstract class EvalActionBase extends AnAction {
 
     protected void evaluateRegion(Project project, String buffer, String packageName, String filename, int bufferPosition, int lineno, int charno, Runnable callback) {
         try {
-            SltLispEnvironmentProvider.getInstance().sendToLisp(EvalFromVirtualFile
+            LispEnvironmentService.getInstance(project).sendToLisp(EvalFromVirtualFile
                     .eval(buffer, filename, bufferPosition, lineno, charno, packageName, result -> callback.run()), true);
         } catch (Exception e) {
             log.warn(SltBundle.message("slt.error.sbclstart"), e);
@@ -59,7 +59,7 @@ public abstract class EvalActionBase extends AnAction {
 
     protected void evaluateFile(Project project, String filename, VirtualFile virtualFile) {
         try {
-            SltLispEnvironmentProvider.getInstance().sendToLisp(LoadFile.loadFile(filename), true);
+            LispEnvironmentService.getInstance(project).sendToLisp(LoadFile.loadFile(filename), true);
             FileContentUtilCore.reparseFiles(virtualFile);
         } catch (Exception e) {
             log.warn(SltBundle.message("slt.error.sbclstart"), e);

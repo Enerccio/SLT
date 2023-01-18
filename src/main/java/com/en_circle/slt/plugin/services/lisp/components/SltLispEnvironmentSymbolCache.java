@@ -1,11 +1,15 @@
-package com.en_circle.slt.plugin;
+package com.en_circle.slt.plugin.services.lisp.components;
 
+import com.en_circle.slt.plugin.SymbolState;
 import com.en_circle.slt.plugin.SymbolState.SymbolBinding;
 import com.en_circle.slt.plugin.lisp.lisp.*;
+import com.en_circle.slt.plugin.services.lisp.LispEnvironmentService;
+import com.en_circle.slt.plugin.services.lisp.LispEnvironmentService.LispEnvironmentState;
 import com.en_circle.slt.plugin.swank.components.SourceLocation;
 import com.en_circle.slt.plugin.swank.requests.EvalAndGrab;
 import com.google.common.collect.Lists;
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiElement;
 import com.intellij.util.FileContentUtilCore;
@@ -18,24 +22,24 @@ import java.util.stream.Collectors;
 
 public class SltLispEnvironmentSymbolCache extends Thread {
 
-    public static final SltLispEnvironmentSymbolCache INSTANCE = new SltLispEnvironmentSymbolCache();
-    static {
-        INSTANCE.start();
-    }
-
     private final Map<String, SymbolState> symbolInformation = Collections.synchronizedMap(new HashMap<>());
     private final List<SymbolState> symbolRefreshQueue = Collections.synchronizedList(new ArrayList<>());
 
-    private SltLispEnvironmentSymbolCache() {
+    private final Project project;
+    private volatile boolean active = true;
+
+    public SltLispEnvironmentSymbolCache(Project project) {
+        this.project = project;
+
         setDaemon(true);
         setName("SBCL Symbol Cache Thread");
     }
 
     @Override
     public void run() {
-        while (true) {
+        while (active) {
             try {
-                if (SltLispEnvironmentProvider.getInstance().isLispEnvironmentActive()) {
+                if (LispEnvironmentService.getInstance(project).getState() == LispEnvironmentState.READY) {
                     while (symbolRefreshQueue.isEmpty()) {
                         Thread.sleep(1000);
                     }
@@ -56,6 +60,10 @@ public class SltLispEnvironmentSymbolCache extends Thread {
 
             }
         }
+    }
+
+    public void terminate() {
+        active = false;
     }
 
     public SymbolState refreshSymbolFromServer(String packageName, String symbolName, PsiElement element) {
@@ -131,11 +139,11 @@ public class SltLispEnvironmentSymbolCache extends Thread {
                 refreshStates.stream().map(x -> x.name.toUpperCase() + " ").collect(Collectors.joining()) + ")";
         request = StringUtils.replace(request, "\"", "\\\"");
 
-        SltLispEnvironmentProvider.getInstance().sendToLisp(EvalAndGrab.eval(
+        LispEnvironmentService.getInstance(project).sendToLisp(EvalAndGrab.eval(
                 String.format(
                         "(slt-core:analyze-symbols (slt-core:read-fix-packages \"%s\"))",
                         request),
-                SltLispEnvironmentProvider.getInstance().getGlobalPackage(), true, (result, stdout, parsed) -> {
+                LispEnvironmentService.getInstance(project).getGlobalPackage(), true, (result, stdout, parsed) -> {
                     Set<VirtualFile> toRefresh = new HashSet<>();
                     if (parsed.size() == 1 && parsed.get(0).getType() == LispElementType.CONTAINER) {
                         int ix = 0;
@@ -236,4 +244,5 @@ public class SltLispEnvironmentSymbolCache extends Thread {
         symbolInformation.clear();
         symbolRefreshQueue.clear();
     }
+
 }
