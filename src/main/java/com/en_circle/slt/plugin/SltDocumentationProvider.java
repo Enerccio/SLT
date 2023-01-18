@@ -38,6 +38,8 @@ public class SltDocumentationProvider extends AbstractDocumentationProvider {
                     return SltBundle.message("slt.documentation.types.keyword") + " " + text;
                 case CLASS:
                     return SltBundle.message("slt.documentation.types.class") + " " + text;
+                case METHOD:
+                    return SltBundle.message("slt.documentation.types.method") + " " + text;
             }
         }
         return null;
