@@ -16,7 +16,7 @@ public class CommonLispStaticHighlighter extends SyntaxHighlighterBase {
 
     static {
         SyntaxHighlighterBase.fillMap(colors, CommonLispHighlighterColors.COMMENT,
-                LispTypes.COMMENT, LispTypes.BLOCK_COMMENT);
+                LispTypes.LINE_COMMENT, LispTypes.BLOCK_COMMENT);
         SyntaxHighlighterBase.fillMap(colors, CommonLispHighlighterColors.PARENTS, LispTypes.LPAREN, LispTypes.RPAREN);
         SyntaxHighlighterBase.fillMap(colors, CommonLispHighlighterColors.NUMBER,
                 LispTypes.BIT_ARRAY, LispTypes.BINARY_NUMBER_TOKEN, LispTypes.HEX_NUMBER_TOKEN, LispTypes.RADIX_NUMBER_TOKEN,
