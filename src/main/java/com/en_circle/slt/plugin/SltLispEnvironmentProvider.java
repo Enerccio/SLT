@@ -4,6 +4,8 @@ import com.en_circle.slt.plugin.environment.SltLispEnvironment;
 import com.en_circle.slt.plugin.environment.SltLispEnvironment.SltLispOutputChangedListener;
 import com.en_circle.slt.plugin.environment.SltLispEnvironmentConfiguration;
 import com.en_circle.slt.plugin.environment.SltProcessException;
+import com.en_circle.slt.plugin.lisp.lisp.LispContainer;
+import com.en_circle.slt.plugin.lisp.lisp.LispElement;
 import com.en_circle.slt.plugin.lisp.psi.LispList;
 import com.en_circle.slt.plugin.swank.SlimeListener;
 import com.en_circle.slt.plugin.swank.SlimeListener.DebugInterface;
@@ -111,6 +113,7 @@ public class SltLispEnvironmentProvider implements Disposable {
         try {
             client.close();
         } finally {
+            SltIndentationContainer.INSTANCE.clear();
             SltLispEnvironmentMacroExpandCache.INSTANCE.clear();
             SltLispEnvironmentSymbolCache.INSTANCE.clear();
             if (environment != null) {
@@ -175,6 +178,10 @@ public class SltLispEnvironmentProvider implements Disposable {
             log.debug(e.getMessage(), e);
         }
         return null;
+    }
+
+    public void updateIndentation(LispElement element) {
+        SltIndentationContainer.INSTANCE.update((LispContainer) element);
     }
 
     public interface SBCLServerListener extends SltLispOutputChangedListener {
