@@ -3,6 +3,7 @@ package com.en_circle.slt.plugin.swank;
 import com.en_circle.slt.plugin.SltCommonLispFileType;
 import com.en_circle.slt.plugin.SltCommonLispLanguage;
 import com.en_circle.slt.plugin.SltCommonLispParserDefinition;
+import com.en_circle.slt.plugin.SltLispEnvironmentProvider;
 import com.en_circle.slt.plugin.lisp.lisp.*;
 import com.en_circle.slt.plugin.lisp.psi.LispCoreProjectEnvironment;
 import com.en_circle.slt.plugin.swank.debug.SltDebugInfo;
@@ -92,6 +93,8 @@ public class SlimeListener implements SwankClient.SwankReply {
                     processDebugReturn(reply);
                 } else if (isDebugActivate(reply)) {
                     processDebugActivate(reply);
+                } else if (isIndentation(reply)) {
+                    SltLispEnvironmentProvider.getInstance().updateIndentation(reply.getItems().get(1));
                 }
             }
         }
@@ -202,6 +205,12 @@ public class SlimeListener implements SwankClient.SwankReply {
         return reply.getItems().size() > 0 &&
                 reply.getItems().get(0) instanceof LispSymbol &&
                 ":debug-activate".equals(((LispSymbol) reply.getItems().get(0)).getValue());
+    }
+
+    private boolean isIndentation(LispContainer reply) {
+        return reply.getItems().size() > 0 &&
+                reply.getItems().get(0) instanceof LispSymbol &&
+                ":indentation-update".equals(((LispSymbol) reply.getItems().get(0)).getValue());
     }
 
     public interface RequestResponseLogger {
