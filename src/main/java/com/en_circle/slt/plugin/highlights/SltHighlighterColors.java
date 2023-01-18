@@ -7,7 +7,7 @@ import com.intellij.openapi.editor.colors.EditorColorsManager;
 import com.intellij.openapi.editor.colors.TextAttributesKey;
 import com.intellij.psi.PsiElement;
 
-public class CommonLispHighlighterColors {
+public class SltHighlighterColors {
 
     public static TextAttributesKey COMMENT = TextAttributesKey.createTextAttributesKey("CL.COMMENT", DefaultLanguageHighlighterColors.BLOCK_COMMENT);
     public static TextAttributesKey PARENTS = TextAttributesKey.createTextAttributesKey("CL.PARENTS", DefaultLanguageHighlighterColors.PARENTHESES);

@@ -38,15 +38,15 @@
                     anchor="bottom" icon="/icons/fileicon.svg"/>
 
         <lang.braceMatcher language="Common Lisp"
-                           implementationClass="com.en_circle.slt.plugin.highlights.CommonLispBraceMatcher"/>
+                           implementationClass="com.en_circle.slt.plugin.highlights.SltBraceMatcher"/>
 
         <lang.syntaxHighlighter language="Common Lisp"
-                                implementationClass="com.en_circle.slt.plugin.highlights.CommonLispStaticHighlighter"/>
+                                implementationClass="com.en_circle.slt.plugin.highlights.SltStaticHighlighter"/>
 
         <colorSettingsPage implementation="com.en_circle.slt.plugin.highlights.SltColorSettingsPage"/>
 
         <lang.syntaxHighlighterFactory language="Common Lisp"
-                implementationClass="com.en_circle.slt.plugin.highlights.CommonLispStaticHighlighterFactory"/>
+                implementationClass="com.en_circle.slt.plugin.highlights.SltStaticHighlighterFactory"/>
 
         <!-- Highlight annotators -->
         <annotator language="Common Lisp" implementationClass="com.en_circle.slt.plugin.highlights.annotators.SymbolAnnotator"/>
