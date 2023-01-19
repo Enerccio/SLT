@@ -3,11 +3,12 @@ package com.en_circle.slt.plugin.swank;
 import com.en_circle.slt.plugin.SltCommonLispFileType;
 import com.en_circle.slt.plugin.SltCommonLispLanguage;
 import com.en_circle.slt.plugin.SltCommonLispParserDefinition;
-import com.en_circle.slt.plugin.SltLispEnvironmentProvider;
 import com.en_circle.slt.plugin.lisp.lisp.*;
 import com.en_circle.slt.plugin.lisp.psi.LispCoreProjectEnvironment;
+import com.en_circle.slt.plugin.services.lisp.LispEnvironmentService;
 import com.en_circle.slt.plugin.swank.debug.SltDebugInfo;
 import com.en_circle.slt.plugin.swank.requests.*;
+import com.en_circle.slt.tools.ProjectUtils;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiFile;
@@ -68,23 +69,10 @@ public class SlimeListener implements SwankClient.SwankReply {
             logger.logResponse(data);
         }
 
-        PsiFile source;
-        if (project == null) {
-            LispCoreProjectEnvironment projectEnvironment = new LispCoreProjectEnvironment();
-            projectEnvironment.getEnvironment()
-                    .registerParserDefinition(SltCommonLispLanguage.INSTANCE, new SltCommonLispParserDefinition());
-            PsiFileFactory factory = PsiFileFactory.getInstance(projectEnvironment.getProject());
-            source = factory.createFileFromText("swank-reply.cl", SltCommonLispFileType.INSTANCE, data);
-        } else {
-            PsiFileFactory factory = PsiFileFactory.getInstance(project);
-            source = factory.createFileFromText("swank-reply.cl", SltCommonLispFileType.INSTANCE, data);
-        }
-
         List<LispElement> elements = parse(data);
         if (elements.size() == 1) {
             LispElement element = elements.get(0);
-            if (element instanceof LispContainer) {
-                LispContainer reply = (LispContainer) element;
+            if (element instanceof LispContainer reply) {
                 if (isReturn(reply)) {
                     processReturn(reply);
                 } else if (isDebug(reply)) {
@@ -94,7 +82,8 @@ public class SlimeListener implements SwankClient.SwankReply {
                 } else if (isDebugActivate(reply)) {
                     processDebugActivate(reply);
                 } else if (isIndentation(reply)) {
-                    SltLispEnvironmentProvider.getInstance().updateIndentation(reply.getItems().get(1));
+                    Project project = ProjectUtils.getCurrentProject();
+                    LispEnvironmentService.getInstance(project).updateIndentation(reply.getItems().get(1));
                 }
             }
         }

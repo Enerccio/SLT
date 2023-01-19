@@ -13,6 +13,9 @@
     <resource-bundle>messages.SltBundle</resource-bundle>
 
     <extensions defaultExtensionNs="com.intellij">
+        <projectService serviceImplementation="com.en_circle.slt.plugin.services.lisp.LispEnvironmentServiceImpl"
+                            serviceInterface="com.en_circle.slt.plugin.services.lisp.LispEnvironmentService" />
+
         <internalFileTemplate name="Common Lisp CL File.cl"/>
         <internalFileTemplate name="Common Lisp Lisp File.lisp"/>
         <internalFileTemplate name="Asdf System.asdf"/>
@@ -35,18 +38,18 @@
         <lang.documentationProvider language="Common Lisp" implementationClass="com.en_circle.slt.plugin.SltDocumentationProvider"/>
 
         <toolWindow factoryClass="com.en_circle.slt.plugin.SltWindowFactory" id="Common Lisp"
-                    anchor="bottom" icon="/icons/fileicon.svg"/>
+                    anchor="bottom" icon="/icons/fileicon.svg" />
 
         <lang.braceMatcher language="Common Lisp"
-                           implementationClass="com.en_circle.slt.plugin.highlights.CommonLispBraceMatcher"/>
+                           implementationClass="com.en_circle.slt.plugin.highlights.SltBraceMatcher"/>
 
         <lang.syntaxHighlighter language="Common Lisp"
-                                implementationClass="com.en_circle.slt.plugin.highlights.CommonLispStaticHighlighter"/>
+                                implementationClass="com.en_circle.slt.plugin.highlights.SltStaticHighlighter"/>
 
         <colorSettingsPage implementation="com.en_circle.slt.plugin.highlights.SltColorSettingsPage"/>
 
         <lang.syntaxHighlighterFactory language="Common Lisp"
-                implementationClass="com.en_circle.slt.plugin.highlights.CommonLispStaticHighlighterFactory"/>
+                implementationClass="com.en_circle.slt.plugin.highlights.SltStaticHighlighterFactory"/>
 
         <!-- Highlight annotators -->
         <annotator language="Common Lisp" implementationClass="com.en_circle.slt.plugin.highlights.annotators.SymbolAnnotator"/>

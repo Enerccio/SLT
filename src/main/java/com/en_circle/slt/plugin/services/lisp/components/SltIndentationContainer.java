@@ -1,4 +1,4 @@
-package com.en_circle.slt.plugin;
+package com.en_circle.slt.plugin.services.lisp.components;
 
 import com.en_circle.slt.plugin.lisp.lisp.LispContainer;
 import com.en_circle.slt.plugin.lisp.lisp.LispElement;
@@ -10,9 +10,7 @@ import java.util.*;
 
 public class SltIndentationContainer {
 
-    static final SltIndentationContainer INSTANCE = new SltIndentationContainer();
-
-    private Map<String, IndentationUpdate> indentations = new HashMap<>();
+    private final Map<String, IndentationUpdate> indentations = new HashMap<>();
 
     public synchronized void update(LispContainer updates) {
         for (LispElement element : updates.getItems()) {

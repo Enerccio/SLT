@@ -97,10 +97,6 @@ format suitable for Emacs."
         (let ((*standard-output* (make-string-output-stream)))
             (cond
                 ((not test-sym) (list NIL NIL NIL))
-                ((find-class test-sym NIL) (progn
-                                           (describe test-sym)
-                                           (list :class (get-output-stream-string *standard-output*)
-                                                 (swank:find-source-location (find-class test-sym)))))
                 ((and (fboundp test-sym)
                       (typep (symbol-function test-sym) 'generic-function))
                                         (progn
@@ -129,6 +125,10 @@ format suitable for Emacs."
                 ((constantp test-sym) (progn
                                         (describe test-sym)
                                         (list :constant (get-output-stream-string *standard-output*) NIL)))
+                ((find-class test-sym NIL) (progn
+                                           (describe test-sym)
+                                           (list :class (get-output-stream-string *standard-output*)
+                                                 (swank:find-source-location (find-class test-sym)))))
                 (T (list NIL NIL NIL))))))
 
 (defun analyze-symbols (symbols)

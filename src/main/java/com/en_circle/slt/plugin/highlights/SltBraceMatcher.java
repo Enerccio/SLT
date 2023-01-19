@@ -8,7 +8,7 @@ import com.intellij.psi.tree.IElementType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class CommonLispBraceMatcher implements PairedBraceMatcher {
+public class SltBraceMatcher implements PairedBraceMatcher {
 
     private static final BracePair[] PAIRS = new BracePair[] {
         new BracePair(LispTypes.LPAREN, LispTypes.RPAREN, true),

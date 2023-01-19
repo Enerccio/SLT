@@ -1,9 +1,9 @@
 package com.en_circle.slt.plugin.ui.debug;
 
 import com.en_circle.slt.plugin.SltBundle;
-import com.en_circle.slt.plugin.SltLispEnvironmentProvider;
 import com.en_circle.slt.plugin.SltUIConstants;
 import com.en_circle.slt.plugin.lisp.lisp.*;
+import com.en_circle.slt.plugin.services.lisp.LispEnvironmentService;
 import com.en_circle.slt.plugin.swank.requests.FrameLocalsAndCatchTags;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
@@ -115,7 +115,7 @@ public class SltFrameInfo {
 
     private void reloadLocals() {
         try {
-            SltLispEnvironmentProvider.getInstance().sendToLisp(FrameLocalsAndCatchTags.getLocals(frameId, threadId, result -> {
+            LispEnvironmentService.getInstance(project).sendToLisp(FrameLocalsAndCatchTags.getLocals(frameId, threadId, result -> {
                 ApplicationManager.getApplication().invokeLater(() -> {
                     refreshFrameValues(result);
                 });
@@ -132,8 +132,7 @@ public class SltFrameInfo {
 
     public void refreshFrameValues(LispElement localsAndTags) {
         LispElement locals = ((LispContainer) localsAndTags).getItems().get(0);
-        if (locals instanceof LispContainer) {
-            LispContainer locs = (LispContainer) locals;
+        if (locals instanceof LispContainer locs) {
             List<Local> parsedLocals = new ArrayList<>();
             int ix=0;
             for (LispElement e : locs.getItems()) {
@@ -179,11 +178,11 @@ public class SltFrameInfo {
 
         @Override
         public String getColumnName(int column) {
-            switch (column) {
-                case 0: return SltBundle.message("slt.ui.debugger.frame.arg");
-                case 1: return SltBundle.message("slt.ui.debugger.frame.value");
-            }
-            return null;
+            return switch (column) {
+                case 0 -> SltBundle.message("slt.ui.debugger.frame.arg");
+                case 1 -> SltBundle.message("slt.ui.debugger.frame.value");
+                default -> null;
+            };
         }
 
         @Override

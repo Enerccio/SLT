@@ -1,14 +1,17 @@
 package com.en_circle.slt.plugin.ui;
 
 import com.en_circle.slt.plugin.SltBundle;
-import com.en_circle.slt.plugin.SltLispEnvironmentProvider;
 import com.en_circle.slt.plugin.lisp.lisp.LispContainer;
 import com.en_circle.slt.plugin.lisp.lisp.LispElement;
 import com.en_circle.slt.plugin.lisp.lisp.LispString;
+import com.en_circle.slt.plugin.services.lisp.LispEnvironmentService;
+import com.en_circle.slt.plugin.services.lisp.LispEnvironmentService.LispEnvironmentState;
 import com.en_circle.slt.plugin.swank.requests.EvalAndGrab;
+import com.en_circle.slt.tools.ProjectUtils;
 import com.intellij.icons.AllIcons.Actions;
 import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.actionSystem.ex.CustomComponentAction;
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.ui.ComboBox;
 import com.intellij.openapi.ui.Messages;
@@ -30,8 +33,11 @@ public class PackageSelectorComponent {
     private final Supplier<String> currentPackage;
     private final ComboBox<String> packageComboBox;
     private PackageChangedListener listener;
+    private Project project;
 
     public PackageSelectorComponent(String id, Supplier<String> currentPackage) {
+        this.project = ProjectUtils.getCurrentProject();
+
         this.currentPackage = currentPackage;
         this.packageComboBox = new ComboBox<>();
         this.packageComboBox.addActionListener(e -> {
@@ -54,7 +60,7 @@ public class PackageSelectorComponent {
 
     public void refresh() {
         try {
-            SltLispEnvironmentProvider.getInstance().sendToLisp(EvalAndGrab.eval("(slt-core:list-package-names)", true, (result, stdout, parsed) -> {
+            LispEnvironmentService.getInstance(project).sendToLisp(EvalAndGrab.eval("(slt-core:list-package-names)", true, (result, stdout, parsed) -> {
                 resolvePackages(parsed);
             }), false);
         } catch (Exception e) {
@@ -102,6 +108,11 @@ public class PackageSelectorComponent {
         }
 
         @Override
+        public @NotNull ActionUpdateThread getActionUpdateThread() {
+            return ActionUpdateThread.EDT;
+        }
+
+        @Override
         public @NotNull JComponent createCustomComponent(@NotNull Presentation presentation, @NotNull String place) {
             JPanel panel = new JPanel(new BorderLayout());
             panel.add(packageComboBox, BorderLayout.CENTER);
@@ -113,7 +124,7 @@ public class PackageSelectorComponent {
         public void update(@NotNull AnActionEvent e) {
             super.update(e);
 
-            e.getPresentation().setEnabled(SltLispEnvironmentProvider.getInstance().isLispEnvironmentActive());
+            e.getPresentation().setEnabled(LispEnvironmentService.getInstance(project).getState() == LispEnvironmentState.READY);
         }
 
     }
@@ -125,6 +136,11 @@ public class PackageSelectorComponent {
         }
 
         @Override
+        public @NotNull ActionUpdateThread getActionUpdateThread() {
+            return ActionUpdateThread.EDT;
+        }
+
+        @Override
         public void actionPerformed(@NotNull AnActionEvent e) {
             refresh();
         }
@@ -133,7 +149,7 @@ public class PackageSelectorComponent {
         public void update(@NotNull AnActionEvent e) {
             super.update(e);
 
-            e.getPresentation().setEnabled(SltLispEnvironmentProvider.getInstance().isLispEnvironmentActive());
+            e.getPresentation().setEnabled(LispEnvironmentService.getInstance(project).getState() == LispEnvironmentState.READY);
         }
     }
 

@@ -2,12 +2,10 @@ package com.en_circle.slt.plugin.ui;
 
 import com.en_circle.slt.plugin.SltBundle;
 import com.en_circle.slt.plugin.SltCommonLispFileType;
-import com.en_circle.slt.plugin.SltLispEnvironmentProvider;
-import com.en_circle.slt.plugin.SltLispEnvironmentProvider.SBCLServerListener;
-import com.en_circle.slt.plugin.SltState;
 import com.en_circle.slt.plugin.environment.SltLispEnvironment.SltOutput;
-import com.en_circle.slt.plugin.environment.SltSBCLEnvironment;
-import com.en_circle.slt.plugin.environment.SltSBCLEnvironmentConfiguration;
+import com.en_circle.slt.plugin.services.lisp.LispEnvironmentService;
+import com.en_circle.slt.plugin.services.lisp.LispEnvironmentService.LispEnvironmentListener;
+import com.en_circle.slt.plugin.services.lisp.LispEnvironmentService.LispEnvironmentState;
 import com.en_circle.slt.plugin.ui.console.SltConsole;
 import com.en_circle.slt.plugin.ui.console.SltREPL;
 import com.intellij.icons.AllIcons;
@@ -15,10 +13,8 @@ import com.intellij.icons.AllIcons.Actions;
 import com.intellij.icons.AllIcons.General;
 import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.application.ApplicationManager;
-import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.psi.PsiFile;
@@ -33,8 +29,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class SltCoreWindow implements SBCLServerListener {
-    private static final Logger log = Logger.getInstance(SltCoreWindow.class);
+public class SltCoreWindow implements LispEnvironmentListener {
 
     private final Project project;
     private final JTextField process;
@@ -45,22 +40,14 @@ public class SltCoreWindow implements SBCLServerListener {
 
     public SltCoreWindow(ToolWindow toolWindow) {
         this.project = toolWindow.getProject();
-
-        SltLispEnvironmentProvider.getInstance().setEnvironmentProvider(SltSBCLEnvironment::new);
-        SltLispEnvironmentProvider.getInstance().setConfigurationBuilder(new SltSBCLEnvironmentConfiguration.Builder()
-                .setExecutable(SltState.getInstance().sbclExecutable)
-                .setPort(SltState.getInstance().port)
-                .setQuicklispStartScriptPath(SltState.getInstance().quicklispStartScript)
-                .setProjectDirectory(project.getBasePath()));
-        SltLispEnvironmentProvider.getInstance().addServerListener(this);
-        SltLispEnvironmentProvider.getInstance().setProject(toolWindow.getProject());
+        LispEnvironmentService.getInstance(project).addServerListener(this);
 
         content = new JPanel(new BorderLayout());
         components.add(new SltOutputHandlerComponent(this, SltOutput.STDOUT));
         components.add(new SltOutputHandlerComponent(this, SltOutput.STDERR));
         SltGeneralLog generalLog = new SltGeneralLog();
         components.add(generalLog);
-        SltLispEnvironmentProvider.getInstance().setRequestResponseLogger(generalLog);
+        LispEnvironmentService.getInstance(project).setRequestResponseLogger(generalLog);
 
         createSbclControls();
 
@@ -99,12 +86,7 @@ public class SltCoreWindow implements SBCLServerListener {
     }
 
     public void start() {
-        try {
-            SltLispEnvironmentProvider.getInstance().start();
-        } catch (Exception e) {
-            log.warn(SltBundle.message("slt.error.sbclstart"), e);
-            Messages.showErrorDialog(project, e.getMessage(), SltBundle.message("slt.ui.errors.sbcl.start"));
-        }
+        LispEnvironmentService.getInstance(project).start();
 
         PsiManager psiManager = PsiManager.getInstance(project);
         List<VirtualFile> toReparse = new ArrayList<>();
@@ -118,12 +100,7 @@ public class SltCoreWindow implements SBCLServerListener {
     }
 
     public void stop() {
-        try {
-            SltLispEnvironmentProvider.getInstance().stop();
-        } catch (Exception e) {
-            log.warn(SltBundle.message("slt.error.sbclstop"), e);
-            Messages.showErrorDialog(project, e.getMessage(), SltBundle.message("slt.ui.errors.sbcl.stop"));
-        }
+        LispEnvironmentService.getInstance(project).stop();
     }
 
     public JComponent getContent() {
@@ -164,7 +141,7 @@ public class SltCoreWindow implements SBCLServerListener {
             component.onPostStart();
         }
 
-        process.setText(SltLispEnvironmentProvider.getInstance().getEnvironment().getInformation().getPid());
+        process.setText(LispEnvironmentService.getInstance(project).getEnvironment().getInformation().getPid());
     }
 
     @Override
@@ -208,7 +185,7 @@ public class SltCoreWindow implements SBCLServerListener {
         public void update(@NotNull AnActionEvent e) {
             super.update(e);
 
-            e.getPresentation().setEnabled(!SltLispEnvironmentProvider.getInstance().isLispEnvironmentActive());
+            e.getPresentation().setEnabled(LispEnvironmentService.getInstance(project).getState() == LispEnvironmentState.STOPPED);
         }
     }
 
@@ -227,7 +204,7 @@ public class SltCoreWindow implements SBCLServerListener {
         public void update(@NotNull AnActionEvent e) {
             super.update(e);
 
-            e.getPresentation().setEnabled(SltLispEnvironmentProvider.getInstance().isLispEnvironmentActive());
+            e.getPresentation().setEnabled(LispEnvironmentService.getInstance(project).getState() != LispEnvironmentState.STOPPED);
         }
     }
 
@@ -246,7 +223,7 @@ public class SltCoreWindow implements SBCLServerListener {
         public void update(@NotNull AnActionEvent e) {
             super.update(e);
 
-            e.getPresentation().setEnabled(SltLispEnvironmentProvider.getInstance().isLispEnvironmentActive());
+            e.getPresentation().setEnabled(LispEnvironmentService.getInstance(project).getState() == LispEnvironmentState.READY);
         }
     }
 
