@@ -1,4 +1,10 @@
 
+## 0.2.1 - 230120
+
+### Fixes
+
+- Attempting to fix windows path error
+
 ## 0.2.0 - 230120
 
 ### Added
