@@ -5,6 +5,7 @@ import com.en_circle.slt.templates.InitScriptTemplate;
 import com.en_circle.slt.templates.SltScriptTemplate;
 import com.intellij.openapi.application.ApplicationManager;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -52,7 +53,11 @@ public class SwankServer {
 
             File serverStartSetup = File.createTempFile("startServer", ".cl");
             serverStartSetup.deleteOnExit();
-            String startScriptTemplate = new InitScriptTemplate(configuration, sltCore.getAbsolutePath()).render();
+            String sltCorePath = sltCore.getAbsolutePath();
+            if (sltCorePath.contains("\\")) {
+                sltCorePath = StringUtils.replace(sltCorePath, "\\", "\\\\");
+            }
+            String startScriptTemplate = new InitScriptTemplate(configuration, sltCorePath).render();
             FileUtils.write(serverStartSetup, startScriptTemplate, StandardCharsets.UTF_8);
 
             String[] commands = new String[]{
