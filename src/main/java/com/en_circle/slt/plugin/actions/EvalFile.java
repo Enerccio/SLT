@@ -1,6 +1,5 @@
 package com.en_circle.slt.plugin.actions;
 
-import com.en_circle.slt.plugin.SltBundle;
 import com.en_circle.slt.plugin.SltCommonLispFileType;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.CommonDataKeys;
@@ -27,8 +26,6 @@ public class EvalFile extends EvalActionBase {
 
     @Override
     public void update(@NotNull AnActionEvent event) {
-        event.getPresentation().setText(SltBundle.message("slt.actions.eval.file"));
-
         event.getPresentation().setEnabledAndVisible(false);
         if (event.getProject() != null) {
             VirtualFile vf = event.getData(CommonDataKeys.VIRTUAL_FILE);
