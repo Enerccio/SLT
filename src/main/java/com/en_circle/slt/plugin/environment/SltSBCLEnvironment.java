@@ -33,7 +33,7 @@ public class SltSBCLEnvironment extends SltLispEnvironmentProcess  {
             e.serverStartSetup = new File(tempDir, "startServer.cl");
             e.serverStartSetup.deleteOnExit();
             String sltCorePath = e.sltCore.getAbsolutePath();
-            if (sltCorePath.contains("//")) {
+            if (sltCorePath.contains("\\")) {
                 sltCorePath = StringUtils.replace(sltCorePath, "\\", "\\\\");
             }
             String startScriptTemplate = new SBCLInitScriptTemplate(c, sltCorePath).render();
