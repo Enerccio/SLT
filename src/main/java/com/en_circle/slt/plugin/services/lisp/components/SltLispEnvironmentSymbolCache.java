@@ -1,12 +1,15 @@
-package com.en_circle.slt.plugin;
+package com.en_circle.slt.plugin.services.lisp.components;
 
+import com.en_circle.slt.plugin.SymbolState;
 import com.en_circle.slt.plugin.SymbolState.SymbolBinding;
 import com.en_circle.slt.plugin.lisp.lisp.*;
-import com.en_circle.slt.plugin.swank.SwankServer;
+import com.en_circle.slt.plugin.services.lisp.LispEnvironmentService;
+import com.en_circle.slt.plugin.services.lisp.LispEnvironmentService.LispEnvironmentState;
 import com.en_circle.slt.plugin.swank.components.SourceLocation;
-import com.en_circle.slt.plugin.swank.requests.SwankEvalAndGrab;
+import com.en_circle.slt.plugin.swank.requests.EvalAndGrab;
 import com.google.common.collect.Lists;
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiElement;
 import com.intellij.util.FileContentUtilCore;
@@ -17,26 +20,26 @@ import java.util.*;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-public class SltSBCLSymbolCache extends Thread {
-
-    public static final SltSBCLSymbolCache INSTANCE = new SltSBCLSymbolCache();
-    static {
-        INSTANCE.start();
-    }
+public class SltLispEnvironmentSymbolCache extends Thread {
 
     private final Map<String, SymbolState> symbolInformation = Collections.synchronizedMap(new HashMap<>());
     private final List<SymbolState> symbolRefreshQueue = Collections.synchronizedList(new ArrayList<>());
 
-    private SltSBCLSymbolCache() {
+    private final Project project;
+    private volatile boolean active = true;
+
+    public SltLispEnvironmentSymbolCache(Project project) {
+        this.project = project;
+
         setDaemon(true);
         setName("SBCL Symbol Cache Thread");
     }
 
     @Override
     public void run() {
-        while (true) {
+        while (active) {
             try {
-                if (SwankServer.INSTANCE.isActive()) {
+                if (LispEnvironmentService.getInstance(project).getState() == LispEnvironmentState.READY) {
                     while (symbolRefreshQueue.isEmpty()) {
                         Thread.sleep(1000);
                     }
@@ -59,10 +62,16 @@ public class SltSBCLSymbolCache extends Thread {
         }
     }
 
+    public void terminate() {
+        active = false;
+    }
+
     public SymbolState refreshSymbolFromServer(String packageName, String symbolName, PsiElement element) {
         SymbolState state = getOrCreateBinding(packageName, symbolName);
         SymbolState undefinedSymbol = getOrCreateBinding(null, symbolName);
-        state.containerFiles.add(new WeakReference<>(element.getContainingFile().getVirtualFile()));
+        if (element != null) {
+            state.containerFiles.add(new WeakReference<>(element.getContainingFile().getVirtualFile()));
+        }
         SymbolBinding currentBinding = state.binding;
         if (currentBinding == SymbolBinding.NONE) {
             symbolRefreshQueue.add(state);
@@ -130,11 +139,11 @@ public class SltSBCLSymbolCache extends Thread {
                 refreshStates.stream().map(x -> x.name.toUpperCase() + " ").collect(Collectors.joining()) + ")";
         request = StringUtils.replace(request, "\"", "\\\"");
 
-        SltSBCL.getInstance().sendToSbcl(SwankEvalAndGrab.eval(
+        LispEnvironmentService.getInstance(project).sendToLisp(EvalAndGrab.eval(
                 String.format(
                         "(slt-core:analyze-symbols (slt-core:read-fix-packages \"%s\"))",
                         request),
-                SltSBCL.getInstance().getGlobalPackage(), true, (result, stdout, parsed) -> {
+                LispEnvironmentService.getInstance(project).getGlobalPackage(), true, (result, stdout, parsed) -> {
                     Set<VirtualFile> toRefresh = new HashSet<>();
                     if (parsed.size() == 1 && parsed.get(0).getType() == LispElementType.CONTAINER) {
                         int ix = 0;
@@ -154,6 +163,14 @@ public class SltSBCLSymbolCache extends Thread {
                                 boolean changed = false;
                                 state.timestamp = System.currentTimeMillis();
                                 switch (symValue) {
+                                    case ":CLASS":
+                                        changed |= state.binding != SymbolBinding.CLASS;
+                                        state.binding = SymbolBinding.CLASS;
+                                        break;
+                                    case ":METHOD":
+                                        changed |= state.binding != SymbolBinding.METHOD;
+                                        state.binding = SymbolBinding.METHOD;
+                                        break;
                                     case ":SPECIAL-FORM":
                                         changed |= state.binding != SymbolBinding.SPECIAL_FORM;
                                         state.binding = SymbolBinding.SPECIAL_FORM;
@@ -227,4 +244,5 @@ public class SltSBCLSymbolCache extends Thread {
         symbolInformation.clear();
         symbolRefreshQueue.clear();
     }
+
 }

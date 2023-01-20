@@ -1,7 +1,7 @@
 package com.en_circle.slt.plugin.ui;
 
 import com.en_circle.slt.plugin.SltBundle;
-import com.en_circle.slt.plugin.swank.SwankServer.SwankServerOutput;
+import com.en_circle.slt.plugin.environment.SltLispEnvironment.SltOutput;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.*;
 import com.intellij.ui.components.JBScrollPane;
@@ -15,17 +15,17 @@ import java.awt.*;
 
 public class SltOutputHandlerComponent implements SltComponent {
 
-    private final SwankServerOutput output;
+    private final SltOutput output;
     private final JPanel dataContainer;
     private JTextArea area;
     private TabInfo tabInfo;
 
-    public SltOutputHandlerComponent(SltCoreWindow coreWindow, SwankServerOutput output) {
+    public SltOutputHandlerComponent(SltCoreWindow coreWindow, SltOutput output) {
         this.output = output;
         this.dataContainer = new JPanel(new BorderLayout());
     }
 
-    public SwankServerOutput getOutput() {
+    public SltOutput getOutput() {
         return output;
     }
 
@@ -106,7 +106,7 @@ public class SltOutputHandlerComponent implements SltComponent {
     }
 
     @Override
-    public void handleOutput(SwankServerOutput output, String data) {
+    public void handleOutput(SltOutput output, String data) {
         if (output == this.output) {
             area.setText(area.getText() + data);
             DefaultCaret caret = (DefaultCaret) area.getCaret();
@@ -127,7 +127,7 @@ public class SltOutputHandlerComponent implements SltComponent {
 
     @Override
     public String getTitle() {
-        return getOutput() == SwankServerOutput.STDERR ? SltBundle.message("slt.ui.process.log.error.title") :
+        return getOutput() == SltOutput.STDERR ? SltBundle.message("slt.ui.process.log.error.title") :
                 SltBundle.message("slt.ui.process.log.output.title");
     }
 

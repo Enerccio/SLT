@@ -1,8 +1,8 @@
 package com.en_circle.slt.plugin.actions;
 
 import com.en_circle.slt.plugin.SltBundle;
-import com.en_circle.slt.plugin.SltSBCL;
 import com.en_circle.slt.plugin.lisp.LispParserUtil;
+import com.en_circle.slt.plugin.services.lisp.LispEnvironmentService;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.CommonDataKeys;
 import com.intellij.openapi.editor.Caret;
@@ -59,7 +59,7 @@ public class EvalRegionAction extends EvalActionBase {
                     int offset = editor.getSelectionModel().getSelectionStart();
                     evaluate(editor.getProject(), selectedText, LispParserUtil.getPackage(psiFile, offset), () -> { });
                 } else {
-                    evaluate(editor.getProject(), selectedText, SltSBCL.getInstance().getGlobalPackage(), () -> { });
+                    evaluate(editor.getProject(), selectedText, LispEnvironmentService.getInstance(editor.getProject()).getGlobalPackage(), () -> { });
                 }
             }
         }
@@ -84,7 +84,7 @@ public class EvalRegionAction extends EvalActionBase {
                 PsiDocumentManager psiMgr = PsiDocumentManager.getInstance(Objects.requireNonNull(editor.getProject()));
                 psiMgr.commitDocument(editor.getDocument());
                 PsiFile psiFile = psiMgr.getPsiFile(editor.getDocument());
-                String packageName = SltSBCL.getInstance().getGlobalPackage();
+                String packageName = LispEnvironmentService.getInstance(editor.getProject()).getGlobalPackage();
                 if (psiFile != null) {
                     packageName = LispParserUtil.getPackage(psiFile, offset);
                 }

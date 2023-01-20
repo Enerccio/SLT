@@ -2,7 +2,6 @@ package com.en_circle.slt.plugin.actions;
 
 import com.en_circle.slt.plugin.SltBundle;
 import com.en_circle.slt.plugin.SltCommonLispFileType;
-import com.en_circle.slt.plugin.SltSBCL;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.CommonDataKeys;
 import com.intellij.openapi.fileEditor.FileEditorManager;
@@ -18,7 +17,7 @@ public class EvalFile extends EvalActionBase {
     public void actionPerformed(@NotNull AnActionEvent event) {
         VirtualFile vf = event.getData(CommonDataKeys.VIRTUAL_FILE);
         if (vf != null) {
-            evaluateFile(event.getProject(), vf.getPath());
+            evaluateFile(event.getProject(), vf.getPath(), vf);
             for (VirtualFile openedFiles : FileEditorManager.getInstance(Objects.requireNonNull(event.getProject()))
                     .getOpenFiles()) {
                 FileContentUtilCore.reparseFiles(openedFiles);
@@ -35,7 +34,7 @@ public class EvalFile extends EvalActionBase {
             VirtualFile vf = event.getData(CommonDataKeys.VIRTUAL_FILE);
             if (vf != null) {
                 if (vf.getFileType().equals(SltCommonLispFileType.INSTANCE)) {
-                    event.getPresentation().setEnabledAndVisible(SltSBCL.getInstance().hasEventsSet());
+                    event.getPresentation().setEnabledAndVisible(true);
                 }
             }
         }

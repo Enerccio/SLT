@@ -7,11 +7,11 @@ import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class CommonLispStaticHighlighterFactory extends SyntaxHighlighterFactory {
+public class SltStaticHighlighterFactory extends SyntaxHighlighterFactory {
 
     @Override
     public @NotNull SyntaxHighlighter getSyntaxHighlighter(@Nullable Project project, @Nullable VirtualFile virtualFile) {
-        return new CommonLispStaticHighlighter();
+        return new SltStaticHighlighter();
     }
 
 }

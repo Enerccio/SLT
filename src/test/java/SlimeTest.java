@@ -1,5 +1,10 @@
-import com.en_circle.slt.plugin.swank.*;
+import com.en_circle.slt.plugin.environment.SltLispEnvironment;
+import com.en_circle.slt.plugin.environment.SltSBCLEnvironment;
+import com.en_circle.slt.plugin.environment.SltSBCLEnvironmentConfiguration;
+import com.en_circle.slt.plugin.swank.SlimeListener;
 import com.en_circle.slt.plugin.swank.SlimeListener.DebugInterface;
+import com.en_circle.slt.plugin.swank.SwankClient;
+import com.en_circle.slt.plugin.swank.SwankPacket;
 import com.en_circle.slt.plugin.swank.debug.SltDebugInfo;
 import org.awaitility.Awaitility;
 
@@ -13,7 +18,8 @@ public class SlimeTest {
         try {
             AtomicLong sent = new AtomicLong();
             AtomicLong expected = new AtomicLong();
-            SwankServer.startSbcl(new SwankServerConfiguration.Builder().build());
+            SltLispEnvironment environment = new SltSBCLEnvironment();
+            environment.start(new SltSBCLEnvironmentConfiguration.Builder().build());
             SlimeListener listener = new SlimeListener(null, false, null, new DebugInterface() {
                 @Override
                 public void onDebugCreate(SltDebugInfo info) {
@@ -42,7 +48,7 @@ public class SlimeTest {
                         .atMost(10, TimeUnit.SECONDS)
                         .until(() -> expected.get() > sent.get() && sent.get() > 0);
             }
-            SwankServer.stop();
+            environment.stop();
         } catch (Exception e) {
 
         }

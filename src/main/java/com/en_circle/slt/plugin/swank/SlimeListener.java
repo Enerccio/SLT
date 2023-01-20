@@ -5,11 +5,10 @@ import com.en_circle.slt.plugin.SltCommonLispLanguage;
 import com.en_circle.slt.plugin.SltCommonLispParserDefinition;
 import com.en_circle.slt.plugin.lisp.lisp.*;
 import com.en_circle.slt.plugin.lisp.psi.LispCoreProjectEnvironment;
+import com.en_circle.slt.plugin.services.lisp.LispEnvironmentService;
 import com.en_circle.slt.plugin.swank.debug.SltDebugInfo;
-import com.en_circle.slt.plugin.swank.requests.SltEval;
-import com.en_circle.slt.plugin.swank.requests.SltFrameLocalsAndCatchTags;
-import com.en_circle.slt.plugin.swank.requests.SltInvokeNthRestart;
-import com.en_circle.slt.plugin.swank.requests.SwankEvalAndGrab;
+import com.en_circle.slt.plugin.swank.requests.*;
+import com.en_circle.slt.tools.ProjectUtils;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiFile;
@@ -23,7 +22,7 @@ import java.util.Map;
 
 public class SlimeListener implements SwankClient.SwankReply {
 
-    private static BigInteger rpcIdentifier = new BigInteger("0");
+    private static BigInteger rpcIdentifier = BigInteger.ZERO;
 
     public static synchronized BigInteger nextRpc() {
         BigInteger next = rpcIdentifier.add(BigInteger.ONE);
@@ -70,23 +69,10 @@ public class SlimeListener implements SwankClient.SwankReply {
             logger.logResponse(data);
         }
 
-        PsiFile source;
-        if (project == null) {
-            LispCoreProjectEnvironment projectEnvironment = new LispCoreProjectEnvironment();
-            projectEnvironment.getEnvironment()
-                    .registerParserDefinition(SltCommonLispLanguage.INSTANCE, new SltCommonLispParserDefinition());
-            PsiFileFactory factory = PsiFileFactory.getInstance(projectEnvironment.getProject());
-            source = factory.createFileFromText("swank-reply.cl", SltCommonLispFileType.INSTANCE, data);
-        } else {
-            PsiFileFactory factory = PsiFileFactory.getInstance(project);
-            source = factory.createFileFromText("swank-reply.cl", SltCommonLispFileType.INSTANCE, data);
-        }
-
         List<LispElement> elements = parse(data);
         if (elements.size() == 1) {
             LispElement element = elements.get(0);
-            if (element instanceof LispContainer) {
-                LispContainer reply = (LispContainer) element;
+            if (element instanceof LispContainer reply) {
                 if (isReturn(reply)) {
                     processReturn(reply);
                 } else if (isDebug(reply)) {
@@ -95,6 +81,9 @@ public class SlimeListener implements SwankClient.SwankReply {
                     processDebugReturn(reply);
                 } else if (isDebugActivate(reply)) {
                     processDebugActivate(reply);
+                } else if (isIndentation(reply)) {
+                    Project project = ProjectUtils.getCurrentProject();
+                    LispEnvironmentService.getInstance(project).updateIndentation(reply.getItems().get(1));
                 }
             }
         }
@@ -126,24 +115,40 @@ public class SlimeListener implements SwankClient.SwankReply {
         LispInteger replyId = (LispInteger) reply.getItems().get(2);
         try {
             SlimeRequest request = requests.get(replyId.getValue());
-            if (request instanceof SltEval) {
-                SltEval eval = (SltEval) request;
+            if (request instanceof Eval eval) {
                 eval.processReply((LispContainer) reply.getItems().get(1));
             }
 
-            if (request instanceof SwankEvalAndGrab) {
-                SwankEvalAndGrab evalAndGrab = (SwankEvalAndGrab) request;
+            if (request instanceof EvalAndGrab evalAndGrab) {
                 evalAndGrab.processReply((LispContainer) reply.getItems().get(1), this::parse);
             }
 
-            if (request instanceof SltInvokeNthRestart) {
-                SltInvokeNthRestart restart = (SltInvokeNthRestart) request;
+            if (request instanceof InvokeNthRestart restart) {
                 restart.processReply((LispContainer) reply.getItems().get(1));
             }
 
-            if (request instanceof SltFrameLocalsAndCatchTags) {
-                SltFrameLocalsAndCatchTags frames = (SltFrameLocalsAndCatchTags) request;
+            if (request instanceof FrameLocalsAndCatchTags frames) {
                 frames.processReply((LispContainer) reply.getItems().get(1));
+            }
+
+            if (request instanceof InspectFrameVar frameVar) {
+                frameVar.processReply((LispContainer) reply.getItems().get(1));
+            }
+
+            if (request instanceof InspectNth inspectNth) {
+                inspectNth.processReply((LispContainer) reply.getItems().get(1));
+            }
+
+            if (request instanceof InspectorAction action) {
+                action.processReply((LispContainer) reply.getItems().get(1));
+            }
+
+            if (request instanceof MacroexpandAll macroexpandAll) {
+                macroexpandAll.processReply((LispContainer) reply.getItems().get(1));
+            }
+
+            if (request instanceof SimpleCompletion simpleCompletion) {
+                simpleCompletion.processReply((LispContainer) reply.getItems().get(1));
             }
         } finally {
             requests.remove(replyId.getValue());
@@ -189,6 +194,12 @@ public class SlimeListener implements SwankClient.SwankReply {
         return reply.getItems().size() > 0 &&
                 reply.getItems().get(0) instanceof LispSymbol &&
                 ":debug-activate".equals(((LispSymbol) reply.getItems().get(0)).getValue());
+    }
+
+    private boolean isIndentation(LispContainer reply) {
+        return reply.getItems().size() > 0 &&
+                reply.getItems().get(0) instanceof LispSymbol &&
+                ":indentation-update".equals(((LispSymbol) reply.getItems().get(0)).getValue());
     }
 
     public interface RequestResponseLogger {

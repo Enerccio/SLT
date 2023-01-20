@@ -94,7 +94,7 @@ public class LispParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // tested | evaled | pathname | UNDEFINED_SEQUENCE | BIT_ARRAY | CHARACTER
+  // tested | evaled | pathname | UNDEFINED_SEQUENCE | BIT_ARRAY | CHARACTER | REFERENCE_LABEL
   //             | number | real_pair
   //             | compound_symbol
   //             | string | vector | array | structure | list | pair
@@ -108,6 +108,7 @@ public class LispParser implements PsiParser, LightPsiParser {
     if (!r) r = consumeToken(b, UNDEFINED_SEQUENCE);
     if (!r) r = consumeToken(b, BIT_ARRAY);
     if (!r) r = consumeToken(b, CHARACTER);
+    if (!r) r = consumeToken(b, REFERENCE_LABEL);
     if (!r) r = number(b, l + 1);
     if (!r) r = real_pair(b, l + 1);
     if (!r) r = compound_symbol(b, l + 1);
@@ -122,13 +123,12 @@ public class LispParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // REFERENCE_SET | REFERENCE_LABEL | TEST_SUCCESS | COMMA | BACKQUOTE | QUOTE | FUNCTION
+  // REFERENCE_SET | TEST_SUCCESS | COMMA | BACKQUOTE | QUOTE | FUNCTION
   public static boolean enhancement(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "enhancement")) return false;
     boolean r;
     Marker m = enter_section_(b, l, _NONE_, ENHANCEMENT, "<enhancement>");
     r = consumeToken(b, REFERENCE_SET);
-    if (!r) r = consumeToken(b, REFERENCE_LABEL);
     if (!r) r = consumeToken(b, TEST_SUCCESS);
     if (!r) r = consumeToken(b, COMMA);
     if (!r) r = consumeToken(b, BACKQUOTE);

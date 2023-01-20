@@ -2,7 +2,9 @@
 
 (defpackage :slt-core
     (:use :cl :swank)
-    (:export analyze-symbol analyze-symbols read-fix-packages list-package-names))
+    (:export analyze-symbol analyze-symbols read-fix-packages list-package-names
+             initialize-or-get-debug-context debug-context debug-frame-variable register-variable
+             ))
 
 ; swank/slime overrides
 
@@ -95,6 +97,12 @@ format suitable for Emacs."
         (let ((*standard-output* (make-string-output-stream)))
             (cond
                 ((not test-sym) (list NIL NIL NIL))
+                ((and (fboundp test-sym)
+                      (typep (symbol-function test-sym) 'generic-function))
+                                        (progn
+                                           (describe test-sym)
+                                           (list :method (get-output-stream-string *standard-output*)
+                                                 (swank:find-source-location (symbol-function test-sym)))))
                 ((special-operator-p test-sym) (list :special-form NIL NIL))
                 ((macro-function test-sym) (progn
                                              (describe test-sym)
@@ -107,7 +115,7 @@ format suitable for Emacs."
                                       (list
                                         :function
                                         (get-output-stream-string *standard-output*)
-                                        (swank:find-source-location (symbol-function test-sym)))))
+                                            (swank:find-source-location (symbol-function test-sym)))))
                 ((specialp test-sym) (progn
                                        (describe test-sym)
                                        (list :special (get-output-stream-string *standard-output*) NIL)))
@@ -117,6 +125,10 @@ format suitable for Emacs."
                 ((constantp test-sym) (progn
                                         (describe test-sym)
                                         (list :constant (get-output-stream-string *standard-output*) NIL)))
+                ((find-class test-sym NIL) (progn
+                                           (describe test-sym)
+                                           (list :class (get-output-stream-string *standard-output*)
+                                                 (swank:find-source-location (find-class test-sym)))))
                 (T (list NIL NIL NIL))))))
 
 (defun analyze-symbols (symbols)

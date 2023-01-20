@@ -1,9 +1,9 @@
 package com.en_circle.slt.plugin.references;
 
-import com.en_circle.slt.plugin.SltSBCL;
 import com.en_circle.slt.plugin.SymbolState;
 import com.en_circle.slt.plugin.lisp.LispParserUtil;
 import com.en_circle.slt.plugin.lisp.psi.LispSymbol;
+import com.en_circle.slt.plugin.services.lisp.LispEnvironmentService;
 import com.en_circle.slt.plugin.swank.components.SourceLocation;
 import com.intellij.lang.ASTNode;
 import com.intellij.lang.FileASTNode;
@@ -27,7 +27,7 @@ public class SltDirectNavigationProvider implements DirectNavigationProvider {
             String packageName = LispParserUtil.getPackage(element);
             Project project = element.getProject();
             String symbolName = ((LispSymbol) element).getName();
-            SymbolState state = SltSBCL.getInstance().refreshSymbolFromServer(packageName, symbolName, element);
+            SymbolState state = LispEnvironmentService.getInstance(element.getProject()).refreshSymbolFromServer(packageName, symbolName, element);
             SourceLocation location = state.location;
             if (location.isFile()) {
                 VirtualFile vf = LocalFileSystem.getInstance().findFileByIoFile(new File(location.getLocation()));

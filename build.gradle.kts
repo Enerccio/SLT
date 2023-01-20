@@ -4,7 +4,7 @@ plugins {
 }
 
 group = "com.en_circle.slt"
-version = "0.1.1"
+version = "0.2.0"
 
 repositories {
     mavenCentral()
@@ -13,6 +13,7 @@ repositories {
 dependencies {
     implementation("org.awaitility:awaitility:4.2.0")
     implementation("org.watertemplate:watertemplate-engine:1.2.2")
+    implementation("com.google.guava:guava:30.0-jre")
 }
 
 sourceSets {
@@ -26,7 +27,7 @@ sourceSets {
 // Configure Gradle IntelliJ Plugin
 // Read more: https://plugins.jetbrains.com/docs/intellij/tools-gradle-intellij-plugin.html
 intellij {
-    version.set("2022.1")
+    version.set("2022.2")
     pluginName.set("slt")
     var ide = System.getenv("TARGET_IDE")
     if (ide == null || "" == ide)
@@ -41,12 +42,12 @@ intellij {
 tasks {
     // Set the JVM compatibility versions
     withType<JavaCompile> {
-        sourceCompatibility = "11"
-        targetCompatibility = "11"
+        sourceCompatibility = "17"
+        targetCompatibility = "17"
     }
 
     patchPluginXml {
-        sinceBuild.set("221")
+        sinceBuild.set("222")
         untilBuild.set("231.*")
     }
 

@@ -1,11 +1,12 @@
 package com.en_circle.slt.plugin.lisp;
 
-import com.en_circle.slt.plugin.SltSBCL;
 import com.en_circle.slt.plugin.lisp.lisp.LispUtils;
 import com.en_circle.slt.plugin.lisp.psi.*;
+import com.en_circle.slt.plugin.services.lisp.LispEnvironmentService;
 import com.intellij.lang.ASTNode;
 import com.intellij.lang.FileASTNode;
 import com.intellij.lang.parser.GeneratedParserUtilBase;
+import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 
@@ -19,12 +20,16 @@ public class LispParserUtil extends GeneratedParserUtilBase {
         if (locationNode != null)
             return getPackage(locationNode.getPsi());
         else
-            return SltSBCL.getInstance().getGlobalPackage();
+            return LispEnvironmentService.getInstance(psiFile.getProject()).getGlobalPackage();
     }
 
     public static String getPackage(PsiElement element) {
+        Project project = element.getProject();
         while (!(element instanceof LispToplevel)) {
             element = element.getParent();
+            if (element == null) {
+                return LispEnvironmentService.getInstance(project).getGlobalPackage();
+            }
         }
         PsiElement previous = element.getPrevSibling();
         while (previous != null) {
@@ -38,15 +43,14 @@ public class LispParserUtil extends GeneratedParserUtilBase {
             previous = previous.getPrevSibling();
         }
 
-        return SltSBCL.getInstance().getGlobalPackage();
+        return LispEnvironmentService.getInstance(element.getProject()).getGlobalPackage();
     }
 
     private static LispList isLispList(PsiElement form) {
         if (form instanceof LispList) {
             return (LispList) form;
         }
-        if (form instanceof LispToplevel) {
-            LispToplevel toplevel = (LispToplevel) form;
+        if (form instanceof LispToplevel toplevel) {
             LispSexpr sexpr = toplevel.getSexpr();
             if (sexpr.getDatum() != null && sexpr.getDatum().getList() != null) {
                 return sexpr.getDatum().getList();
@@ -91,6 +95,22 @@ public class LispParserUtil extends GeneratedParserUtilBase {
             if (symbol != null) {
                 return symbol.getSymbol().getName();
             }
+        }
+        return null;
+    }
+
+    public static LispList getIfHead(PsiElement element) {
+        PsiElement original = element;
+        while (!(element instanceof LispList list)) {
+            element = element.getParent();
+            if (element == null) {
+                return null;
+            }
+        }
+        LispSexpr firstElement = list.getSexprList().get(0);
+        if (firstElement.getDatum() != null && firstElement.getDatum().getCompoundSymbol() != null &&
+                firstElement.getDatum().getCompoundSymbol().getSymbol().equals(original)) {
+            return list;
         }
         return null;
     }

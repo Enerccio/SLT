@@ -3,6 +3,9 @@
 [![License: APACHE](https://badgen.net/github/license/enerccio/SLT?color=green)](LICENSE)
 [![0.1.0](https://badgen.net/github/milestones/enerccio/SLT/1)](https://github.com/enerccio/SLT/milestone/1)
 [![0.2.0](https://badgen.net/github/milestones/enerccio/SLT/2)](https://github.com/enerccio/SLT/milestone/2)
+[![0.3.0](https://badgen.net/github/milestones/enerccio/SLT/4)](https://github.com/enerccio/SLT/milestone/4)
+
+![Image](src/main/resources/logo/logo.svg)
 
 **THIS PLUGIN IS EXPERIMENTAL and can crash at any time! Please report all bugs!**
 
@@ -14,7 +17,7 @@ IDE capabilities for Common Lisp.
 
 ## Requirements
 
-1) Intellij based IDE - tested on `Intellij Idea Community/Ultimate` but should workd on all major IDEs
+1) Intellij based IDE - tested on `Intellij Idea Community/Ultimate` but should work on all major IDEs
    1) Versions supported are from 2022.2 and upwards 
 2) [Steel Bank Common Lisp](https://www.sbcl.org/) installed
 3) [Quicklisp](https://www.quicklisp.org/beta/)
@@ -23,7 +26,8 @@ IDE capabilities for Common Lisp.
 
 Download plugin for your IDE from releases and install it via file.
 
-_ie_ File->Settings->Plugin, click on gear icon and then 'Install plugin from disk'
+_ie_ File->Settings->Plugin, click on gear icon and then 'Install plugin from disk' 
+and then select the downloaded zip (do not unzip the zip)
 
 To find out which release applies to you check this table:
 
@@ -72,26 +76,38 @@ You can also open this as a project in Intellij Idea.
 ## Planned features / goals
 
 * [ ] Upload to marketplace when it has enough features
+* [ ] Automatic indentation
 * [x] REPL
 * [x] Interactive debugging
+* [ ] Inspection
+  * [x] Basic inspection
+  * [ ] Actions
+  * [ ] Inspection eval
 * [ ] Walkable debugger without actions 
 * [ ] Breakpoints
 * [x] Documentation 
-* [ ] Macro expand in documentation
+* [x] Macro expand in documentation
+  * Macro expand requires you to hover element twice for now
 * [x] Find function by symbol name
 * [ ] Search for symbols
 * [ ] Back references 
 * [ ] Refactoring
 * [ ] List of quicklisp installed packages / ASDF packages
 * [ ] List of modified top level forms that are yet to be evaluated
+* [ ] Actually make an IDE, ie just plugin with dependencies as one application, not a plugin
 
 ### Far futures / possible goals 
 
-* [ ] Virtual Environment à la pycharm so you can specify which interpret instance you want
+* [ ] SDK Support 
 * [ ] Automatic download of lisp interpret and quicklisp
 * [ ] Different lisp interpreter support 
 * [ ] Remote connections to interpreters
+* [ ] Rewrite everything into ABCL just for purity sake lol
 
 ## License
 
 This project is licensed under [Apache License v2](LICENSE.txt).
+
+### What does SLT even mean?
+
+SLT - Speech Language Therapy. Only cure for LISP!

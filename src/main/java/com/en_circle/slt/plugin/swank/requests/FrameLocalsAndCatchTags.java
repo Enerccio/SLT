@@ -8,14 +8,14 @@ import com.en_circle.slt.plugin.swank.SwankPacket;
 
 import java.math.BigInteger;
 
-public class SltFrameLocalsAndCatchTags extends SlimeRequest {
+public class FrameLocalsAndCatchTags extends SlimeRequest {
 
     public static SlimeRequest getLocals(BigInteger frame, BigInteger threadId, String module, Callback callback) {
-        return new SltFrameLocalsAndCatchTags(frame, threadId, module, callback);
+        return new FrameLocalsAndCatchTags(frame, threadId, module, callback);
     }
 
     public static SlimeRequest getLocals(BigInteger frame, BigInteger threadId, Callback callback) {
-        return new SltFrameLocalsAndCatchTags(frame, threadId, "cl-user", callback);
+        return new FrameLocalsAndCatchTags(frame, threadId, "CL-USER", callback);
     }
 
     protected final Callback callback;
@@ -23,15 +23,14 @@ public class SltFrameLocalsAndCatchTags extends SlimeRequest {
     protected final BigInteger frame;
     protected final BigInteger threadId;
 
-    protected SltFrameLocalsAndCatchTags(BigInteger frame, BigInteger threadId, String module, Callback callback) {
+    protected FrameLocalsAndCatchTags(BigInteger frame, BigInteger threadId, String module, Callback callback) {
         this.callback = callback;
         this.module = module;
         this.frame = frame;
         this.threadId = threadId;
     }
 
-    public void processReply(LispContainer data
-    ) {
+    public void processReply(LispContainer data) {
         if (isOk(data)) {
             callback.onResult(data.getItems().get(1));
         }

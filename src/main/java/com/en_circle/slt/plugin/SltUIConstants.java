@@ -10,4 +10,8 @@ public class SltUIConstants {
     public static final JBColor DEBUG_FRAMES_COLOR = new JBColor(new Color(230, 245, 95), new Color(5, 51, 12));
     public static final JBColor DEBUG_FRAMES_SELECTED_COLOR = new JBColor(new Color(230, 145, 95), new Color(5, 51, 72));
 
+    public static String colorToHex(JBColor color) {
+        int rgba = (color.getRGB() << 8) | color.getAlpha();
+        return String.format("#%08X", rgba);
+    }
 }

@@ -1,4 +1,4 @@
-package com.en_circle.slt.plugin.swank;
+package com.en_circle.slt.plugin.environment;
 
 import org.awaitility.Awaitility;
 import org.awaitility.pollinterval.FixedPollInterval;
@@ -11,18 +11,18 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public class SwankStreamController extends Thread {
+public class SltProcessStreamGobbler extends Thread {
 
     private final InputStream inputStream;
-    private final List<SwankStreamControllerUpdateListener> updateListeners = Collections.synchronizedList(new ArrayList<>());
+    private final List<SltProcessStreamControllerUpdateListener> updateListeners = Collections.synchronizedList(new ArrayList<>());
 
-    public SwankStreamController(InputStream inputStream) {
+    public SltProcessStreamGobbler(InputStream inputStream) {
         this.inputStream = inputStream;
-        setName("SwanStreamController reader " + inputStream);
+        setName("SltProcessStreamGobbler " + inputStream);
         setDaemon(true);
     }
 
-    public void addUpdateListener(SwankStreamControllerUpdateListener listener) {
+    public void addUpdateListener(SltProcessStreamControllerUpdateListener listener) {
         updateListeners.add(listener);
     }
 
@@ -43,7 +43,7 @@ public class SwankStreamController extends Thread {
 
                 if (readSize > 0) {
                     String data = new String(buffer, 0, readSize, StandardCharsets.UTF_8);
-                    for (SwankStreamControllerUpdateListener listener : updateListeners) {
+                    for (SltProcessStreamControllerUpdateListener listener : updateListeners) {
                         listener.onDataRead(data);
                     }
                 }
@@ -53,13 +53,18 @@ public class SwankStreamController extends Thread {
         }
     }
 
-    public interface SwankStreamControllerUpdateListener {
+    public interface SltProcessStreamControllerUpdateListener {
 
         void onDataRead(String data);
 
     }
 
-    public static class WaitForOccurrence implements SwankStreamControllerUpdateListener {
+    public interface ProcessInitializationWaiter {
+        boolean awaitFor(Process process);
+
+    }
+
+    public static class WaitForOccurrence implements ProcessInitializationWaiter, SltProcessStreamControllerUpdateListener {
 
         private final String occurrence;
         private final String[] occurrenceStrings;

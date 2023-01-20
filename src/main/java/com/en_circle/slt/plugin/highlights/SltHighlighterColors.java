@@ -7,7 +7,7 @@ import com.intellij.openapi.editor.colors.EditorColorsManager;
 import com.intellij.openapi.editor.colors.TextAttributesKey;
 import com.intellij.psi.PsiElement;
 
-public class CommonLispHighlighterColors {
+public class SltHighlighterColors {
 
     public static TextAttributesKey COMMENT = TextAttributesKey.createTextAttributesKey("CL.COMMENT", DefaultLanguageHighlighterColors.BLOCK_COMMENT);
     public static TextAttributesKey PARENTS = TextAttributesKey.createTextAttributesKey("CL.PARENTS", DefaultLanguageHighlighterColors.PARENTHESES);
@@ -21,6 +21,8 @@ public class CommonLispHighlighterColors {
     public static TextAttributesKey SPECIAL_FORM = TextAttributesKey.createTextAttributesKey("CL.SPECIAL_FORM", DefaultLanguageHighlighterColors.KEYWORD);
     public static TextAttributesKey FUNCTION = TextAttributesKey.createTextAttributesKey("CL.FUNCTION", DefaultLanguageHighlighterColors.FUNCTION_CALL);
     public static TextAttributesKey MACRO = TextAttributesKey.createTextAttributesKey("CL.MACRO", DefaultLanguageHighlighterColors.KEYWORD);
+    public static TextAttributesKey CLASS = TextAttributesKey.createTextAttributesKey("CL.CLASS", DefaultLanguageHighlighterColors.CLASS_NAME);
+    public static TextAttributesKey METHOD = TextAttributesKey.createTextAttributesKey("CL.METHOD", DefaultLanguageHighlighterColors.INSTANCE_METHOD);
 
     public static void setHighlighting(PsiElement element, AnnotationHolder holder, TextAttributesKey key) {
 //        Annotation a = holder.createInfoAnnotation(element, null);

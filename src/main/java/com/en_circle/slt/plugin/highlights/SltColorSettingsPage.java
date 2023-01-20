@@ -21,18 +21,20 @@ public class SltColorSettingsPage implements ColorSettingsPage {
     public static final String DEMO_CODE = new CodeHighlightTemplate().render();
 
     private static final AttributesDescriptor[] DESCRIPTORS = new AttributesDescriptor[] {
-            new AttributesDescriptor(SltBundle.message("slt.ui.colorsettings.parenthesis"), CommonLispHighlighterColors.PARENTS),
-            new AttributesDescriptor(SltBundle.message("slt.ui.colorsettings.number"), CommonLispHighlighterColors.NUMBER),
-            new AttributesDescriptor(SltBundle.message("slt.ui.colorsettings.stringliteral"), CommonLispHighlighterColors.STRING),
-            new AttributesDescriptor(SltBundle.message("slt.ui.colorsettings.comment"), CommonLispHighlighterColors.COMMENT),
-            new AttributesDescriptor(SltBundle.message("slt.ui.colorsettings.keyword"), CommonLispHighlighterColors.KEYWORD),
-            new AttributesDescriptor(SltBundle.message("slt.ui.colorsettings.helper"), CommonLispHighlighterColors.DEFUN_FORM),
-            new AttributesDescriptor(SltBundle.message("slt.ui.colorsettings.specvariable"), CommonLispHighlighterColors.SPECIAL_VARIABLE),
-            new AttributesDescriptor(SltBundle.message("slt.ui.colorsettings.constant"), CommonLispHighlighterColors.CONSTANT),
-            new AttributesDescriptor(SltBundle.message("slt.ui.colorsettings.specialform"), CommonLispHighlighterColors.SPECIAL_FORM),
-            new AttributesDescriptor(SltBundle.message("slt.ui.colorsettings.function"), CommonLispHighlighterColors.FUNCTION),
-            new AttributesDescriptor(SltBundle.message("slt.ui.colorsettings.macro"), CommonLispHighlighterColors.MACRO),
-            new AttributesDescriptor(SltBundle.message("slt.ui.colorsettings.reader"), CommonLispHighlighterColors.SUGAR),
+            new AttributesDescriptor(SltBundle.message("slt.ui.colorsettings.parenthesis"), SltHighlighterColors.PARENTS),
+            new AttributesDescriptor(SltBundle.message("slt.ui.colorsettings.number"), SltHighlighterColors.NUMBER),
+            new AttributesDescriptor(SltBundle.message("slt.ui.colorsettings.stringliteral"), SltHighlighterColors.STRING),
+            new AttributesDescriptor(SltBundle.message("slt.ui.colorsettings.comment"), SltHighlighterColors.COMMENT),
+            new AttributesDescriptor(SltBundle.message("slt.ui.colorsettings.keyword"), SltHighlighterColors.KEYWORD),
+            new AttributesDescriptor(SltBundle.message("slt.ui.colorsettings.helper"), SltHighlighterColors.DEFUN_FORM),
+            new AttributesDescriptor(SltBundle.message("slt.ui.colorsettings.specvariable"), SltHighlighterColors.SPECIAL_VARIABLE),
+            new AttributesDescriptor(SltBundle.message("slt.ui.colorsettings.constant"), SltHighlighterColors.CONSTANT),
+            new AttributesDescriptor(SltBundle.message("slt.ui.colorsettings.specialform"), SltHighlighterColors.SPECIAL_FORM),
+            new AttributesDescriptor(SltBundle.message("slt.ui.colorsettings.function"), SltHighlighterColors.FUNCTION),
+            new AttributesDescriptor(SltBundle.message("slt.ui.colorsettings.macro"), SltHighlighterColors.MACRO),
+            new AttributesDescriptor(SltBundle.message("slt.ui.colorsettings.reader"), SltHighlighterColors.SUGAR),
+            new AttributesDescriptor(SltBundle.message("slt.ui.colorsettings.class"), SltHighlighterColors.CLASS),
+            new AttributesDescriptor(SltBundle.message("slt.ui.colorsettings.method"), SltHighlighterColors.METHOD),
     };
 
     @Override
@@ -42,7 +44,7 @@ public class SltColorSettingsPage implements ColorSettingsPage {
 
     @Override
     public @NotNull SyntaxHighlighter getHighlighter() {
-        return new CommonLispStaticHighlighter();
+        return new SltStaticHighlighter();
     }
 
     @Override

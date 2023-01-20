@@ -1,10 +1,10 @@
 package com.en_circle.slt.plugin.highlights.annotators;
 
-import com.en_circle.slt.plugin.SltSBCL;
 import com.en_circle.slt.plugin.SymbolState;
-import com.en_circle.slt.plugin.highlights.CommonLispHighlighterColors;
+import com.en_circle.slt.plugin.highlights.SltHighlighterColors;
 import com.en_circle.slt.plugin.lisp.LispParserUtil;
 import com.en_circle.slt.plugin.lisp.psi.LispSymbol;
+import com.en_circle.slt.plugin.services.lisp.LispEnvironmentService;
 import com.intellij.lang.annotation.AnnotationHolder;
 import com.intellij.lang.annotation.Annotator;
 import com.intellij.psi.PsiElement;
@@ -17,42 +17,50 @@ public class SymbolAnnotator implements Annotator {
         if (element instanceof LispSymbol) {
             String text = element.getText();
             String packageName = LispParserUtil.getPackage(element);
-            SymbolState state = SltSBCL.getInstance().refreshSymbolFromServer(packageName, text, element);
+            SymbolState state = LispEnvironmentService.getInstance(element.getProject()).refreshSymbolFromServer(packageName, text, element);
             setHighlight(element, text, holder, state);
         }
     }
 
     private void setHighlight(PsiElement element, String name, AnnotationHolder holder, SymbolState state) {
         if (name.startsWith("&"))
-            CommonLispHighlighterColors.setHighlighting(element, holder,
-                    CommonLispHighlighterColors.DEFUN_FORM);
+            SltHighlighterColors.setHighlighting(element, holder,
+                    SltHighlighterColors.DEFUN_FORM);
 
         switch (state.binding) {
             case NONE:
                 break;
+            case CLASS:
+                SltHighlighterColors.setHighlighting(element, holder,
+                        SltHighlighterColors.CLASS);
+                break;
+            case METHOD:
+                SltHighlighterColors.setHighlighting(element, holder,
+                        SltHighlighterColors.METHOD);
+                break;
             case FUNCTION:
-                CommonLispHighlighterColors.setHighlighting(element, holder,
-                        CommonLispHighlighterColors.FUNCTION);
+                SltHighlighterColors.setHighlighting(element, holder,
+                        SltHighlighterColors.FUNCTION);
                 break;
             case MACRO:
-                CommonLispHighlighterColors.setHighlighting(element, holder,
-                        CommonLispHighlighterColors.MACRO);
+                SltHighlighterColors.setHighlighting(element, holder,
+                        SltHighlighterColors.MACRO);
                 break;
             case SPECIAL_FORM:
-                CommonLispHighlighterColors.setHighlighting(element, holder,
-                        CommonLispHighlighterColors.SPECIAL_FORM);
+                SltHighlighterColors.setHighlighting(element, holder,
+                        SltHighlighterColors.SPECIAL_FORM);
                 break;
             case CONSTANT:
-                CommonLispHighlighterColors.setHighlighting(element, holder,
-                        CommonLispHighlighterColors.CONSTANT);
+                SltHighlighterColors.setHighlighting(element, holder,
+                        SltHighlighterColors.CONSTANT);
                 break;
             case SPECIAL_VARIABLE:
-                CommonLispHighlighterColors.setHighlighting(element, holder,
-                        CommonLispHighlighterColors.SPECIAL_VARIABLE);
+                SltHighlighterColors.setHighlighting(element, holder,
+                        SltHighlighterColors.SPECIAL_VARIABLE);
                 break;
             case KEYWORD:
-                CommonLispHighlighterColors.setHighlighting(element, holder,
-                        CommonLispHighlighterColors.KEYWORD);
+                SltHighlighterColors.setHighlighting(element, holder,
+                        SltHighlighterColors.KEYWORD);
                 break;
         }
     }

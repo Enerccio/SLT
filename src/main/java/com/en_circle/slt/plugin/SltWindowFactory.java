@@ -15,7 +15,7 @@ public class SltWindowFactory implements ToolWindowFactory {
     public void createToolWindowContent(@NotNull Project project, @NotNull ToolWindow toolWindow) {
         {
             SltCoreWindow sltCoreWindow = new SltCoreWindow(toolWindow);
-            ContentFactory contentFactory = ContentFactory.SERVICE.getInstance();
+            ContentFactory contentFactory = ContentFactory.getInstance();
             Content content = contentFactory.createContent(sltCoreWindow.getContent(),
                     SltBundle.message("slt.ui.process.title"), false);
             toolWindow.getContentManager().addContent(content);
@@ -23,7 +23,7 @@ public class SltWindowFactory implements ToolWindowFactory {
 
         {
             SltDebuggers debugger = new SltDebuggers(toolWindow);
-            ContentFactory contentFactory = ContentFactory.SERVICE.getInstance();
+            ContentFactory contentFactory = ContentFactory.getInstance();
             Content content = contentFactory.createContent(debugger.getContent(),
                     SltBundle.message("slt.ui.debuggers.title"), false);
             debugger.setSelf(content);

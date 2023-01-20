@@ -1,12 +1,13 @@
 package com.en_circle.slt.plugin.settings;
 
 import com.en_circle.slt.plugin.SltBundle;
-import com.en_circle.slt.plugin.SltSBCL;
 import com.en_circle.slt.plugin.SltState;
-import com.en_circle.slt.plugin.swank.SwankServer;
+import com.en_circle.slt.plugin.services.lisp.LispEnvironmentService;
+import com.en_circle.slt.plugin.services.lisp.LispEnvironmentService.LispEnvironmentState;
+import com.en_circle.slt.tools.ProjectUtils;
 import com.intellij.openapi.options.Configurable;
 import com.intellij.openapi.options.ConfigurationException;
-import com.intellij.openapi.project.ProjectManager;
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.util.NlsContexts.ConfigurableName;
 import org.jetbrains.annotations.Nullable;
@@ -63,21 +64,18 @@ public class SltSettingsConfigurable implements Configurable {
         settings.port = component.getPort();
         settings.quicklispStartScript = component.getQuicklispStartScript();
 
-        if (restartServer && SwankServer.INSTANCE.isActive()) {
+        Project project = ProjectUtils.getCurrentProject();
+
+        if (restartServer && LispEnvironmentService.getInstance(project).getState() != LispEnvironmentState.STOPPED) {
             if (Messages.YES == Messages.showYesNoDialog(
                     SltBundle.message("slt.ui.settings.restart.prompt"),
                     SltBundle.message("slt.ui.settings.restart.title"),
                     SltBundle.message("slt.ui.settings.restart.yes"),
                     SltBundle.message("slt.ui.settings.restart.no"),
                     Messages.getQuestionIcon())) {
-                try {
-                    SltSBCL.getInstance().stop();
-                    SltSBCL.getInstance().start();
-                } catch (Exception e) {
-                    log.warn(SltBundle.message("slt.error.sbclstart"), e);
-                    Messages.showErrorDialog(ProjectManager.getInstance().getDefaultProject(),
-                            e.getMessage(), SltBundle.message("slt.ui.errors.sbcl.start"));
-                }
+                LispEnvironmentService.getInstance(project).resetConfiguration();
+                LispEnvironmentService.getInstance(project).stop();
+                LispEnvironmentService.getInstance(project).start();
             }
         }
     }

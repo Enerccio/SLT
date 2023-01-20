@@ -12,14 +12,14 @@ import java.math.BigInteger;
 import java.util.List;
 import java.util.function.Function;
 
-public class SwankEvalAndGrab extends SlimeRequest {
+public class EvalAndGrab extends SlimeRequest {
 
     public static SlimeRequest eval(String code, String module, boolean parse, Callback callback) {
-        return new SwankEvalAndGrab(code, module, parse, callback);
+        return new EvalAndGrab(code, module, parse, callback);
     }
 
     public static SlimeRequest eval(String code, boolean parse, Callback callback) {
-        return new SwankEvalAndGrab(code, "cl-user", parse, callback);
+        return new EvalAndGrab(code, "cl-user", parse, callback);
     }
 
     protected final Callback callback;
@@ -27,7 +27,7 @@ public class SwankEvalAndGrab extends SlimeRequest {
     protected final String code;
     protected final boolean parse;
 
-    protected SwankEvalAndGrab(String code, String module, boolean parse, Callback callback) {
+    protected EvalAndGrab(String code, String module, boolean parse, Callback callback) {
         this.callback = callback;
         this.module = module;
         this.code = code;

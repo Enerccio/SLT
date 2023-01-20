@@ -1,14 +1,15 @@
 import com.en_circle.slt.plugin.SltCommonLispFileType;
 import com.en_circle.slt.plugin.SltCommonLispLanguage;
 import com.en_circle.slt.plugin.SltCommonLispParserDefinition;
+import com.en_circle.slt.plugin.environment.SltLispEnvironment;
+import com.en_circle.slt.plugin.environment.SltLispEnvironment.SltOutput;
+import com.en_circle.slt.plugin.environment.SltSBCLEnvironment;
+import com.en_circle.slt.plugin.environment.SltSBCLEnvironmentConfiguration;
 import com.en_circle.slt.plugin.lisp.lisp.LispElement;
 import com.en_circle.slt.plugin.lisp.lisp.LispUtils;
 import com.en_circle.slt.plugin.lisp.psi.LispCoreProjectEnvironment;
 import com.en_circle.slt.plugin.swank.SwankClient;
 import com.en_circle.slt.plugin.swank.SwankPacket;
-import com.en_circle.slt.plugin.swank.SwankServer;
-import com.en_circle.slt.plugin.swank.SwankServer.SwankServerOutput;
-import com.en_circle.slt.plugin.swank.SwankServerConfiguration;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiFileFactory;
 
@@ -18,14 +19,15 @@ public class SwankTest {
 
     public static void main(String[] args) throws Exception {
         try {
-            SwankServerConfiguration c = new SwankServerConfiguration.Builder()
+            SltSBCLEnvironmentConfiguration c = new SltSBCLEnvironmentConfiguration.Builder()
                     .setListener((output, newData) -> {
-                        if (output == SwankServerOutput.STDERR) {
+                        if (output == SltOutput.STDERR) {
                             System.err.print(newData);
                         }
                     })
                     .build();
-            SwankServer.startSbcl(c);
+            SltLispEnvironment environment = new SltSBCLEnvironment();
+            environment.start(c);
             try (SwankClient client = new SwankClient("127.0.0.1", 4005, packet -> {
                 LispCoreProjectEnvironment projectEnvironment = new LispCoreProjectEnvironment();
                 projectEnvironment.getEnvironment()
@@ -50,7 +52,7 @@ public class SwankTest {
 
                 Thread.sleep(10000);
             }
-            SwankServer.stop();
+            environment.stop();
         } catch (Exception e) {
             e.printStackTrace();
         }

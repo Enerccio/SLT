@@ -5,7 +5,7 @@ import com.en_circle.slt.plugin.swank.SwankPacket;
 
 import java.math.BigInteger;
 
-public class EvalStringInFrameEval extends SltEval {
+public class EvalStringInFrameEval extends Eval {
 
     public static SlimeRequest evalInFrame(String code, BigInteger frame, BigInteger thread, String module, Callback callback) {
         return new EvalStringInFrameEval(code, frame, thread, module, callback);

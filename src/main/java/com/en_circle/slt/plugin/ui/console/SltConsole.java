@@ -2,10 +2,10 @@ package com.en_circle.slt.plugin.ui.console;
 
 import com.en_circle.slt.plugin.SltBundle;
 import com.en_circle.slt.plugin.SltCommonLispLanguage;
-import com.en_circle.slt.plugin.SltSBCL;
-import com.en_circle.slt.plugin.swank.SwankServer;
-import com.en_circle.slt.plugin.swank.SwankServer.SwankServerOutput;
-import com.en_circle.slt.plugin.swank.requests.SltEval;
+import com.en_circle.slt.plugin.environment.SltLispEnvironment.SltOutput;
+import com.en_circle.slt.plugin.services.lisp.LispEnvironmentService;
+import com.en_circle.slt.plugin.services.lisp.LispEnvironmentService.LispEnvironmentState;
+import com.en_circle.slt.plugin.swank.requests.Eval;
 import com.en_circle.slt.plugin.ui.SltComponent;
 import com.intellij.execution.console.ConsoleExecuteAction;
 import com.intellij.execution.console.ConsoleHistoryController;
@@ -15,6 +15,7 @@ import com.intellij.execution.console.LanguageConsoleView;
 import com.intellij.execution.ui.ConsoleViewContentType;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
+import com.intellij.openapi.util.Disposer;
 import com.intellij.ui.tabs.TabInfo;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -50,6 +51,7 @@ public abstract class SltConsole implements SltComponent {
     public TabInfo create() {
         languageConsole = new LanguageConsoleBuilder()
                 .build(project, SltCommonLispLanguage.INSTANCE);
+        Disposer.register(project, languageConsole);
         languageConsole.setPrompt(currentModule + "> ");
 
         ConsoleExecuteAction action = new ConsoleExecuteAction(languageConsole, new SltConsoleExecuteActionHandler(languageConsole) {
@@ -59,7 +61,7 @@ public abstract class SltConsole implements SltComponent {
                 eval(code);
             }
 
-        }, languageConsoleView -> SwankServer.INSTANCE.isActive());
+        }, languageConsoleView -> LispEnvironmentService.getInstance(project).getState() == LispEnvironmentState.READY);
         action.registerCustomShortcutSet(action.getShortcutSet(), languageConsole.getConsoleEditor().getComponent());
         new ConsoleHistoryController(new MyConsoleRootType("cl"), null, languageConsole).install();
 
@@ -73,7 +75,7 @@ public abstract class SltConsole implements SltComponent {
     protected void eval(String data) {
         try {
             if (StringUtils.isNotBlank(data)) {
-                SltSBCL.getInstance().sendToSbcl(SltEval.eval(data, currentModule,
+                LispEnvironmentService.getInstance(project).sendToLisp(Eval.eval(data, currentModule,
                         result -> languageConsole.print(result + "\n", ConsoleViewContentType.NORMAL_OUTPUT)));
             }
         } catch (Exception e) {
@@ -98,7 +100,7 @@ public abstract class SltConsole implements SltComponent {
     }
 
     @Override
-    public void handleOutput(SwankServerOutput output, String data) {
+    public void handleOutput(SltOutput output, String data) {
 
     }
 

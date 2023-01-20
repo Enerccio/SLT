@@ -26,11 +26,6 @@ public class SymbolState {
         this.symbolName = symbolName;
     }
 
-    public enum SymbolBinding {
-        NONE, FUNCTION, MACRO, SPECIAL_FORM,
-        CONSTANT, KEYWORD, SPECIAL_VARIABLE
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -49,5 +44,17 @@ public class SymbolState {
         result = 31 * result + (packageName != null ? packageName.hashCode() : 0);
         result = 31 * result + (symbolName != null ? symbolName.hashCode() : 0);
         return result;
+    }
+
+    public enum SymbolBinding {
+        NONE,
+        FUNCTION,
+        MACRO,
+        SPECIAL_FORM,
+        CONSTANT,
+        KEYWORD,
+        SPECIAL_VARIABLE,
+        CLASS,
+        METHOD
     }
 }

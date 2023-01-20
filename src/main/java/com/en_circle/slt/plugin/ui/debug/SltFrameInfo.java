@@ -1,9 +1,10 @@
 package com.en_circle.slt.plugin.ui.debug;
 
 import com.en_circle.slt.plugin.SltBundle;
-import com.en_circle.slt.plugin.SltSBCL;
+import com.en_circle.slt.plugin.SltUIConstants;
 import com.en_circle.slt.plugin.lisp.lisp.*;
-import com.en_circle.slt.plugin.swank.requests.SltFrameLocalsAndCatchTags;
+import com.en_circle.slt.plugin.services.lisp.LispEnvironmentService;
+import com.en_circle.slt.plugin.swank.requests.FrameLocalsAndCatchTags;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
@@ -17,10 +18,16 @@ import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import javax.swing.table.AbstractTableModel;
+import javax.swing.table.DefaultTableCellRenderer;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.font.TextAttribute;
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class SltFrameInfo {
     private static final Logger log = LoggerFactory.getLogger(SltFrameInfo.class);
@@ -30,7 +37,10 @@ public class SltFrameInfo {
     private final BigInteger frameId;
     private final String module;
     private final JComponent content;
+    private SltInspector inspector;
     private JBTable localsTable;
+    private JBTabs tabs;
+    private TabInfo inspectorTab;
 
     public SltFrameInfo(Project project, BigInteger threadId, BigInteger frameId, String module) {
         this.project = project;
@@ -44,10 +54,26 @@ public class SltFrameInfo {
     }
 
     private void create() {
-        JBTabs tabs = new JBTabsImpl(project);
+        tabs = new JBTabsImpl(project);
 
         localsTable = new JBTable(new FrameTableModel(new ArrayList<>()));
         localsTable.setFillsViewportHeight(true);
+        localsTable.setFocusable(false);
+        localsTable.setRowSelectionAllowed(false);
+        localsTable.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                int row = localsTable.rowAtPoint(e.getPoint());
+                if (row >= 0) {
+                    int column = localsTable.columnAtPoint(e.getPoint());
+                    if (column == 0) {
+                        FrameTableModel model = (FrameTableModel) localsTable.getModel();
+                        openInspector(model.locals.get(row));
+                    }
+                }
+            }
+        });
+        resetRenderer();
 
         TabInfo locals = new TabInfo(new JBScrollPane(localsTable));
         locals.setText(SltBundle.message("slt.ui.debugger.frame.locals"));
@@ -56,12 +82,40 @@ public class SltFrameInfo {
         SltFrameConsole frameConsole = new SltFrameConsole(project, threadId, frameId, this::reloadLocals, module);
         TabInfo consoleTab = frameConsole.create();
         tabs.addTab(consoleTab);
+
+        inspector = new SltInspector(project, threadId);
+        inspectorTab = new TabInfo(new JBScrollPane(inspector.getContent()));
+        inspectorTab.setText(SltBundle.message("slt.ui.debugger.frame.inspector"));
+        tabs.addTab(inspectorTab);
+
         content.add(tabs.getComponent(), BorderLayout.CENTER);
+    }
+
+    private void resetRenderer() {
+        localsTable.getColumn(SltBundle.message("slt.ui.debugger.frame.arg")).setCellRenderer(new DefaultTableCellRenderer() {
+            @Override
+            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+                super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+
+                Map<TextAttribute, Object> attributes = new HashMap<>(getFont().getAttributes());
+                attributes.put(TextAttribute.UNDERLINE, TextAttribute.UNDERLINE_ON);
+                setFont(getFont().deriveFont(attributes));
+                setForeground(SltUIConstants.HYPERLINK_COLOR);
+                setCursor(new Cursor(Cursor.HAND_CURSOR));
+
+                return this;
+            }
+        });
+    }
+
+    private void openInspector(Local local) {
+        inspector.loadLocal(local, frameId);
+        tabs.select(inspectorTab, true);
     }
 
     private void reloadLocals() {
         try {
-            SltSBCL.getInstance().sendToSbcl(SltFrameLocalsAndCatchTags.getLocals(frameId, threadId, result -> {
+            LispEnvironmentService.getInstance(project).sendToLisp(FrameLocalsAndCatchTags.getLocals(frameId, threadId, result -> {
                 ApplicationManager.getApplication().invokeLater(() -> {
                     refreshFrameValues(result);
                 });
@@ -78,15 +132,16 @@ public class SltFrameInfo {
 
     public void refreshFrameValues(LispElement localsAndTags) {
         LispElement locals = ((LispContainer) localsAndTags).getItems().get(0);
-        if (locals instanceof LispContainer) {
-            LispContainer locs = (LispContainer) locals;
+        if (locals instanceof LispContainer locs) {
             List<Local> parsedLocals = new ArrayList<>();
+            int ix=0;
             for (LispElement e : locs.getItems()) {
                 try {
                     LispContainer ec = (LispContainer) e;
                     String name = ((LispString) LispUtils.pvalue(ec, new LispSymbol(":NAME"))).getValue();
                     String value = ((LispString) LispUtils.pvalue(ec, new LispSymbol(":VALUE"))).getValue();
                     Local l = new Local();
+                    l.ix = ix++;
                     l.name = name;
                     l.value = value;
                     parsedLocals.add(l);
@@ -98,13 +153,16 @@ public class SltFrameInfo {
                 }
             }
             localsTable.setModel(new FrameTableModel(parsedLocals));
+            resetRenderer();
         } else {
             localsTable.setModel(new FrameTableModel(new ArrayList<>()));
+            resetRenderer();
         }
     }
 
-    private static class Local {
+    public static class Local {
 
+        int ix;
         private String name;
         private String value;
 
@@ -120,11 +178,11 @@ public class SltFrameInfo {
 
         @Override
         public String getColumnName(int column) {
-            switch (column) {
-                case 0: return SltBundle.message("slt.ui.debugger.frame.arg");
-                case 1: return SltBundle.message("slt.ui.debugger.frame.value");
-            }
-            return null;
+            return switch (column) {
+                case 0 -> SltBundle.message("slt.ui.debugger.frame.arg");
+                case 1 -> SltBundle.message("slt.ui.debugger.frame.value");
+                default -> null;
+            };
         }
 
         @Override
@@ -144,6 +202,11 @@ public class SltFrameInfo {
             } else {
                 return locals.get(rowIndex).value;
             }
+        }
+
+        @Override
+        public Class<?> getColumnClass(int columnIndex) {
+            return String.class;
         }
     }
 }

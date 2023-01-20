@@ -13,6 +13,9 @@
     <resource-bundle>messages.SltBundle</resource-bundle>
 
     <extensions defaultExtensionNs="com.intellij">
+        <projectService serviceImplementation="com.en_circle.slt.plugin.services.lisp.LispEnvironmentServiceImpl"
+                            serviceInterface="com.en_circle.slt.plugin.services.lisp.LispEnvironmentService" />
+
         <internalFileTemplate name="Common Lisp CL File.cl"/>
         <internalFileTemplate name="Common Lisp Lisp File.lisp"/>
         <internalFileTemplate name="Asdf System.asdf"/>
@@ -35,18 +38,15 @@
         <lang.documentationProvider language="Common Lisp" implementationClass="com.en_circle.slt.plugin.SltDocumentationProvider"/>
 
         <toolWindow factoryClass="com.en_circle.slt.plugin.SltWindowFactory" id="Common Lisp"
-                    anchor="bottom" icon="/icons/fileicon.svg"/>
-
-        <lang.braceMatcher language="Common Lisp"
-                           implementationClass="com.en_circle.slt.plugin.highlights.CommonLispBraceMatcher"/>
+                    anchor="bottom" icon="/icons/fileicon.svg" />
 
         <lang.syntaxHighlighter language="Common Lisp"
-                                implementationClass="com.en_circle.slt.plugin.highlights.CommonLispStaticHighlighter"/>
+                                implementationClass="com.en_circle.slt.plugin.highlights.SltStaticHighlighter"/>
 
         <colorSettingsPage implementation="com.en_circle.slt.plugin.highlights.SltColorSettingsPage"/>
 
         <lang.syntaxHighlighterFactory language="Common Lisp"
-                implementationClass="com.en_circle.slt.plugin.highlights.CommonLispStaticHighlighterFactory"/>
+                implementationClass="com.en_circle.slt.plugin.highlights.SltStaticHighlighterFactory"/>
 
         <!-- Highlight annotators -->
         <annotator language="Common Lisp" implementationClass="com.en_circle.slt.plugin.highlights.annotators.SymbolAnnotator"/>
@@ -57,6 +57,11 @@
 
         <lang.directNavigationProvider
                 implementation="com.en_circle.slt.plugin.references.SltDirectNavigationProvider"/>
+
+        <completion.contributor language="Common Lisp" implementationClass="com.en_circle.slt.plugin.SltCompletionContributor"/>
+
+        <postStartupActivity implementation="com.en_circle.slt.plugin.highlights.SltBraceHighlighter"
+            id="SLT_BRACE_MATCHER" />
     </extensions>
 
     <actions>
@@ -107,5 +112,21 @@
 <!--            <add-to-group group-id="MainToolBar" anchor="first"/>-->
 <!--        </action>-->
     </actions>
+
+    <change-notes>
+        ## 0.2.0
+
+        ### Added
+
+        - Added first version of inspector - so far only read-only.
+        To access, start interactive debugging and then click on any local variable.
+        - Macro expand. When you hover over a symbol that is a macro call in a form,
+        it will macro expand it in the documentation. Due to async notion,
+        you need to hover again to see it.
+
+        ### Fixes
+
+        - Changed internal environment to be more decoupled
+    </change-notes>
 
 </idea-plugin>

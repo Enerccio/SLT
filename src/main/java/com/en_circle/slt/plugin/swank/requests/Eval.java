@@ -8,21 +8,21 @@ import com.en_circle.slt.plugin.swank.SwankPacket;
 
 import java.math.BigInteger;
 
-public class SltEval extends SlimeRequest {
+public class Eval extends SlimeRequest {
 
     public static SlimeRequest eval(String code, String module, Callback callback) {
-        return new SltEval(code, module, callback);
+        return new Eval(code, module, callback);
     }
 
     public static SlimeRequest eval(String code, Callback callback) {
-        return new SltEval(code, "cl-user", callback);
+        return new Eval(code, "cl-user", callback);
     }
 
     protected final Callback callback;
     protected final String module;
     protected final String code;
 
-    protected SltEval(String code, String module, Callback callback) {
+    protected Eval(String code, String module, Callback callback) {
         this.callback = callback;
         this.module = module;
         this.code = code;

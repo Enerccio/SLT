@@ -1,9 +1,9 @@
 package com.en_circle.slt.plugin.ui.debug;
 
-import com.en_circle.slt.plugin.SltSBCL;
-import com.en_circle.slt.plugin.SltSBCL.SBCLServerListener;
+import com.en_circle.slt.plugin.environment.SltLispEnvironment.SltOutput;
+import com.en_circle.slt.plugin.services.lisp.LispEnvironmentService;
+import com.en_circle.slt.plugin.services.lisp.LispEnvironmentService.LispEnvironmentListener;
 import com.en_circle.slt.plugin.swank.SlimeListener.DebugInterface;
-import com.en_circle.slt.plugin.swank.SwankServer.SwankServerOutput;
 import com.en_circle.slt.plugin.swank.debug.SltDebugInfo;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
@@ -17,7 +17,7 @@ import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.Map;
 
-public class SltDebuggers implements DebugInterface, SBCLServerListener {
+public class SltDebuggers implements DebugInterface, LispEnvironmentListener {
 
     private final ToolWindow toolWindow;
     private final JPanel content;
@@ -32,8 +32,8 @@ public class SltDebuggers implements DebugInterface, SBCLServerListener {
         this.tabs = new JBTabsImpl(toolWindow.getProject());
         this.content.add(this.tabs.getComponent());
 
-        SltSBCL.getInstance().addServerListener(this);
-        SltSBCL.getInstance().setDebugInterface(this);
+        LispEnvironmentService.getInstance(toolWindow.getProject()).addServerListener(this);
+        LispEnvironmentService.getInstance(toolWindow.getProject()).setDebugInterface(this);
     }
 
     public JPanel getContent() {
@@ -106,7 +106,7 @@ public class SltDebuggers implements DebugInterface, SBCLServerListener {
     }
 
     @Override
-    public void onOutputChanged(SwankServerOutput output, String newData) {
+    public void onOutputChanged(SltOutput output, String newData) {
 
     }
 

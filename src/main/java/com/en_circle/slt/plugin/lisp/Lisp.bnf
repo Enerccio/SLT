@@ -24,9 +24,9 @@ sexpr ::= (enhancement* datum) | comment
 
 comment ::= LINE_COMMENT | BLOCK_COMMENT
 
-enhancement ::= REFERENCE_SET | REFERENCE_LABEL | TEST_SUCCESS | COMMA | BACKQUOTE | QUOTE | FUNCTION
+enhancement ::= REFERENCE_SET | TEST_SUCCESS | COMMA | BACKQUOTE | QUOTE | FUNCTION
 
-datum ::= tested | evaled | pathname | UNDEFINED_SEQUENCE | BIT_ARRAY | CHARACTER
+datum ::= tested | evaled | pathname | UNDEFINED_SEQUENCE | BIT_ARRAY | CHARACTER | REFERENCE_LABEL
             | number | real_pair
             | compound_symbol
             | string | vector | array | structure | list | pair

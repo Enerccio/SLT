@@ -1,16 +1,18 @@
-package com.en_circle.slt.plugin.swank;
+package com.en_circle.slt.plugin.environment;
 
-import com.en_circle.slt.plugin.swank.SwankServer.SwankServerListener;
 
-public class SwankServerConfiguration {
+import com.en_circle.slt.plugin.environment.SltLispEnvironment.SltLispOutputChangedListener;
+import com.en_circle.slt.plugin.environment.SltLispEnvironmentProcess.SltLispEnvironmentProcessConfiguration;
+
+public class SltSBCLEnvironmentConfiguration implements SltLispEnvironmentProcessConfiguration {
 
     private String executablePath = "sbcl";
     private String quicklispStartScript = "~/quicklisp/setup.lisp";
     private int port = 4005;
     private String projectDirectory = "/tmp";
-    private SwankServerListener listener = null;
+    private SltLispOutputChangedListener listener = null;
 
-    private SwankServerConfiguration() {
+    private SltSBCLEnvironmentConfiguration() {
 
     }
 
@@ -30,13 +32,14 @@ public class SwankServerConfiguration {
         return projectDirectory;
     }
 
-    public SwankServerListener getListener() {
+    @Override
+    public SltLispOutputChangedListener getListener() {
         return listener;
     }
 
-    public static class Builder {
+    public static class Builder implements SltLispEnvironmentConfiguration.Builder<Builder, SltSBCLEnvironmentConfiguration> {
 
-        private final SwankServerConfiguration c = new SwankServerConfiguration();
+        private final SltSBCLEnvironmentConfiguration c = new SltSBCLEnvironmentConfiguration();
         private boolean built = false;
 
         public Builder setExecutable(String executable) {
@@ -68,14 +71,16 @@ public class SwankServerConfiguration {
             return this;
         }
 
-        public Builder setListener(SwankServerListener listener) {
+        @Override
+        public Builder setListener(SltLispOutputChangedListener listener) {
             checkNotBuilt();
 
             c.listener = listener;
             return this;
         }
 
-        public SwankServerConfiguration build() {
+        @Override
+        public SltSBCLEnvironmentConfiguration build() {
             checkNotBuilt();
             built = true;
             return c;
