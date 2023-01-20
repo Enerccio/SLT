@@ -9,26 +9,51 @@ import com.intellij.lang.parser.GeneratedParserUtilBase;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
+import com.intellij.psi.PsiWhiteSpace;
 
 import java.util.List;
+import java.util.function.Function;
 
 public class LispParserUtil extends GeneratedParserUtilBase {
 
+    public static final Function<Project, String> NULL_RETURN = (project) -> null;
+    public static final Function<Project, String> GLOBAL_PACKAGE_RETURN = (project) ->
+            LispEnvironmentService.getInstance(project).getGlobalPackage();
+
     public static String getPackage(PsiFile psiFile, int offset) {
+        return getPackage(psiFile, offset, GLOBAL_PACKAGE_RETURN);
+    }
+
+    public static String getPackage(PsiFile psiFile, int offset, Function<Project, String> notFoundSupplier) {
         FileASTNode node = psiFile.getNode();
         ASTNode locationNode = node.findLeafElementAt(offset);
+        if (locationNode == null && offset == psiFile.getTextLength()) {
+            // can be the end of file, check character before
+            locationNode = node.findLeafElementAt(offset - 1);
+        }
+
         if (locationNode != null)
-            return getPackage(locationNode.getPsi());
+            return getPackage(locationNode.getPsi(), notFoundSupplier);
         else
-            return LispEnvironmentService.getInstance(psiFile.getProject()).getGlobalPackage();
+            return notFoundSupplier.apply(psiFile.getProject());
     }
 
     public static String getPackage(PsiElement element) {
+        return getPackage(element,  GLOBAL_PACKAGE_RETURN);
+    }
+
+    public static String getPackage(PsiElement element, Function<Project, String> notFoundSupplier) {
         Project project = element.getProject();
+        while (element instanceof PsiWhiteSpace) {
+            element = element.getPrevSibling();
+            if (element == null) {
+                return notFoundSupplier.apply(project);
+            }
+        }
         while (!(element instanceof LispToplevel)) {
             element = element.getParent();
             if (element == null) {
-                return LispEnvironmentService.getInstance(project).getGlobalPackage();
+                return notFoundSupplier.apply(project);
             }
         }
         PsiElement previous = element.getPrevSibling();
@@ -43,7 +68,7 @@ public class LispParserUtil extends GeneratedParserUtilBase {
             previous = previous.getPrevSibling();
         }
 
-        return LispEnvironmentService.getInstance(element.getProject()).getGlobalPackage();
+        return notFoundSupplier.apply(project);
     }
 
     private static LispList isLispList(PsiElement form) {

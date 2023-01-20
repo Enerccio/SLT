@@ -62,45 +62,47 @@
 
         <postStartupActivity implementation="com.en_circle.slt.plugin.highlights.SltBraceHighlighter"
             id="SLT_BRACE_MATCHER" />
+
+        <statusBarWidgetFactory id="Common Lisp" implementation="com.en_circle.slt.plugin.SltStatusBarWidgetFactory"/>
     </extensions>
 
-    <actions>
-        <action id="com.en_circle.slt.plugin.actions.EvalRegionAction"
+    <actions resource-bundle="messages.SltBundle">
+        <action id="slt.actions.eval.region"
                 icon="/icons/fileicon.svg"
                 class="com.en_circle.slt.plugin.actions.EvalRegionAction">
             <add-to-group group-id="EditorPopupMenu" anchor="last"/>
             <keyboard-shortcut keymap="$default" first-keystroke="ctrl alt R"/>
         </action>
 
-        <action id="com.en_circle.slt.plugin.actions.EvalCurrentFormAction"
+        <action id="slt.actions.eval.current"
                 icon="/icons/fileicon.svg"
                 class="com.en_circle.slt.plugin.actions.EvalCurrentFormAction">
-            <add-to-group group-id="EditorPopupMenu" anchor="after" relative-to-action="com.en_circle.slt.plugin.actions.EvalRegionAction" />
+            <add-to-group group-id="EditorPopupMenu" anchor="after" relative-to-action="slt.actions.eval.region" />
             <keyboard-shortcut keymap="$default" first-keystroke="ctrl alt F"/>
         </action>
 
-        <action id="com.en_circle.slt.plugin.actions.EvalPreviousFormAction"
+        <action id="slt.actions.eval.previous"
                 icon="/icons/fileicon.svg"
                 class="com.en_circle.slt.plugin.actions.EvalPreviousFormAction">
-            <add-to-group group-id="EditorPopupMenu" anchor="after" relative-to-action="com.en_circle.slt.plugin.actions.EvalCurrentFormAction" />
+            <add-to-group group-id="EditorPopupMenu" anchor="after" relative-to-action="slt.actions.eval.current" />
             <keyboard-shortcut keymap="$default" first-keystroke="ctrl alt E"/>
         </action>
 
-        <action id="com.en_circle.slt.plugin.actions.EvalNextFormAction"
+        <action id="slt.actions.eval.next"
                 icon="/icons/fileicon.svg"
                 class="com.en_circle.slt.plugin.actions.EvalNextFormAction">
-            <add-to-group group-id="EditorPopupMenu" anchor="after" relative-to-action="com.en_circle.slt.plugin.actions.EvalPreviousFormAction" />
+            <add-to-group group-id="EditorPopupMenu" anchor="after" relative-to-action="slt.actions.eval.previous" />
             <keyboard-shortcut keymap="$default" first-keystroke="ctrl alt Q"/>
         </action>
 
-        <action id="com.en_circle.slt.plugin.actions.EvalFileFromEditor"
+        <action id="slt.actions.eval.file.editor"
                 icon="/icons/evalFile.svg"
                 class="com.en_circle.slt.plugin.actions.EvalFileFromEditor">
-            <add-to-group group-id="EditorPopupMenu" anchor="after" relative-to-action="com.en_circle.slt.plugin.actions.EvalNextFormAction" />
+            <add-to-group group-id="EditorPopupMenu" anchor="after" relative-to-action="slt.actions.eval.next" />
             <keyboard-shortcut keymap="$default" first-keystroke="ctrl alt T"/>
         </action>
 
-        <action id="com.en_circle.slt.plugin.actions.EvalFile"
+        <action id="slt.actions.eval.file"
                 icon="/icons/evalFile.svg"
                 class="com.en_circle.slt.plugin.actions.EvalFile">
             <add-to-group group-id="ProjectViewPopupMenuRunGroup" anchor="last"/>

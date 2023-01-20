@@ -2,6 +2,8 @@
 
 ### Added
 
+- Current package at editor cursor widget
+
 ### Fixes
 
 - Fixed action threading

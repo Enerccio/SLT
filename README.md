@@ -3,7 +3,7 @@
 ![GitHub release (latest by date)](https://img.shields.io/github/v/release/Enerccio/SLT)
 [![License: APACHE](https://badgen.net/github/license/enerccio/SLT?color=green)](LICENSE)
 ![GitHub lisp counter](https://img.shields.io/github/search/Enerccio/SLT/lisp)
-![OSS Lifecycle](https://img.shields.io/osslifecycle/Enerccio/SLT)
+![GitHub](https://img.shields.io/github/license/Enerccio/SLT)
 [![0.1.0](https://badgen.net/github/milestones/enerccio/SLT/1)](https://github.com/enerccio/SLT/milestone/1)
 [![0.2.0](https://badgen.net/github/milestones/enerccio/SLT/2)](https://github.com/enerccio/SLT/milestone/2)
 [![0.3.0](https://badgen.net/github/milestones/enerccio/SLT/4)](https://github.com/enerccio/SLT/milestone/4)
@@ -12,7 +12,7 @@
 ![GitHub last commit](https://img.shields.io/github/last-commit/Enerccio/SLT)
 ![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/Enerccio/SLT)
 
-[![(want-to-support-me? T NIL)](https://img.shields.io/liberapay/receives/Enerccio.svg?logo=liberapay)]((https://liberapay.com/kozec))
+[![(want-to-support-me? T NIL)](https://img.shields.io/liberapay/receives/Enerccio.svg?logo=liberapay)](https://liberapay.com/Enerccio)
 
 ![Image](src/main/resources/logo/logo.svg)
 
