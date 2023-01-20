@@ -58,7 +58,7 @@ public abstract class EvalActionBase extends AnAction {
         }
     }
 
-    protected void evaluateFile(Project project, String filename, VirtualFile virtualFile) {
+    public static void evaluateFile(Project project, String filename, VirtualFile virtualFile) {
         try {
             LispEnvironmentService.getInstance(project).sendToLisp(LoadFile.loadFile(filename), true);
             FileContentUtilCore.reparseFiles(virtualFile);
@@ -70,6 +70,6 @@ public abstract class EvalActionBase extends AnAction {
 
     @Override
     public @NotNull ActionUpdateThread getActionUpdateThread() {
-        return ActionUpdateThread.EDT;
+        return ActionUpdateThread.BGT;
     }
 }

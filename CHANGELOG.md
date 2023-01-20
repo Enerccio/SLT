@@ -4,6 +4,7 @@
 
 ### Fixes
 
+- Fixed action threading
 
 ## 0.2.1 - 230120
 
