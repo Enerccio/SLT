@@ -27,10 +27,8 @@ public abstract class SltLispEnvironmentProcess extends SltLispEnvironmentBase {
     public void start(SltLispEnvironmentConfiguration configuration) throws SltProcessException {
         if (process != null)
             return;
-        if (!(configuration instanceof SltLispEnvironmentProcessConfiguration))
+        if (!(configuration instanceof SltLispEnvironmentProcessConfiguration processConfiguration))
             throw new SltProcessException("Configuration incorrect");
-        SltLispEnvironmentProcessConfiguration processConfiguration = (SltLispEnvironmentProcessConfiguration)
-                configuration;
 
         try {
             Object environment = prepareProcessEnvironment(processConfiguration);

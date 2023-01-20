@@ -40,9 +40,6 @@
         <toolWindow factoryClass="com.en_circle.slt.plugin.SltWindowFactory" id="Common Lisp"
                     anchor="bottom" icon="/icons/fileicon.svg" />
 
-        <lang.braceMatcher language="Common Lisp"
-                           implementationClass="com.en_circle.slt.plugin.highlights.SltBraceMatcher"/>
-
         <lang.syntaxHighlighter language="Common Lisp"
                                 implementationClass="com.en_circle.slt.plugin.highlights.SltStaticHighlighter"/>
 
@@ -63,6 +60,8 @@
 
         <completion.contributor language="Common Lisp" implementationClass="com.en_circle.slt.plugin.SltCompletionContributor"/>
 
+        <postStartupActivity implementation="com.en_circle.slt.plugin.highlights.SltBraceHighlighter"
+                             id="SLT_BRACE_MATCHER" />
         <!-- SDK -->
         <sdkType implementation="com.en_circle.slt.plugin.sdk.CommonLispSDKType"/>
     </extensions>

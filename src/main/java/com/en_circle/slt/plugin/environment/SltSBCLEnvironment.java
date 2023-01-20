@@ -5,6 +5,7 @@ import com.en_circle.slt.plugin.environment.SltProcessStreamGobbler.WaitForOccur
 import com.en_circle.slt.templates.SltScriptTemplate;
 import com.intellij.openapi.util.io.FileUtil;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.watertemplate.Template;
 
 import java.io.File;
@@ -31,7 +32,11 @@ public class SltSBCLEnvironment extends SltLispEnvironmentProcess  {
 
             e.serverStartSetup = new File(tempDir, "startServer.cl");
             e.serverStartSetup.deleteOnExit();
-            String startScriptTemplate = new SBCLInitScriptTemplate(c, e.sltCore.getAbsolutePath()).render();
+            String sltCorePath = e.sltCore.getAbsolutePath();
+            if (sltCorePath.contains("//")) {
+                sltCorePath = StringUtils.replace(sltCorePath, "\\", "\\\\");
+            }
+            String startScriptTemplate = new SBCLInitScriptTemplate(c, sltCorePath).render();
             FileUtils.write(e.serverStartSetup, startScriptTemplate, StandardCharsets.UTF_8);
 
             tempDir.deleteOnExit();
