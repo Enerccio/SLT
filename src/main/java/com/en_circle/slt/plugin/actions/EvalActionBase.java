@@ -6,6 +6,7 @@ import com.en_circle.slt.plugin.services.lisp.LispEnvironmentService;
 import com.en_circle.slt.plugin.swank.requests.Eval;
 import com.en_circle.slt.plugin.swank.requests.EvalFromVirtualFile;
 import com.en_circle.slt.plugin.swank.requests.LoadFile;
+import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.CommonDataKeys;
@@ -67,4 +68,8 @@ public abstract class EvalActionBase extends AnAction {
         }
     }
 
+    @Override
+    public @NotNull ActionUpdateThread getActionUpdateThread() {
+        return ActionUpdateThread.EDT;
+    }
 }
