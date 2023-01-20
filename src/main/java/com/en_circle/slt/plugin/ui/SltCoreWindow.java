@@ -113,7 +113,7 @@ public class SltCoreWindow implements LispEnvironmentListener {
     }
 
     private void addRepl() {
-        SltConsole console = new SltREPL(this.project);
+        SltConsole console = new SltREPL(this.project, this);
         components.add(console);
         tabs.addTab(console.create());
         console.getTabInfo().setTabLabelActions(new DefaultActionGroup(

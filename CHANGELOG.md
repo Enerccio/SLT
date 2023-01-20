@@ -2,7 +2,8 @@
 
 ### Fixes
 
-- Fixed action threading 
+- Fixed action threading
+- Fixed repl not closing
 
 ## 0.2.1 - 230120
 
