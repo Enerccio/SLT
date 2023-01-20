@@ -3,6 +3,7 @@
 [![License: APACHE](https://badgen.net/github/license/enerccio/SLT?color=green)](LICENSE)
 [![0.1.0](https://badgen.net/github/milestones/enerccio/SLT/1)](https://github.com/enerccio/SLT/milestone/1)
 [![0.2.0](https://badgen.net/github/milestones/enerccio/SLT/2)](https://github.com/enerccio/SLT/milestone/2)
+[![0.3.0](https://badgen.net/github/milestones/enerccio/SLT/4)](https://github.com/enerccio/SLT/milestone/4)
 
 ![Image](src/main/resources/logo/logo.svg)
 

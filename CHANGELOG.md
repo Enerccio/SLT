@@ -1,5 +1,5 @@
 
-## 0.2.0
+## 0.2.0 - 230120
 
 ### Added
 
@@ -17,6 +17,8 @@ you need to hover again to see it.
 - Fixed bad package when package does not exist
 - Fixed lisp parser, `REFERENCE_LABEL` requiring `datum`, now it is stand alone
 - Fixed line comment highlight color
+- Fixed highlight on braces 
+  - no longer using standard BracePair but instead use internal brace matcher to prevent auto brace inserting
 
 ## 0.1.1 - 230115
 
