@@ -4,6 +4,7 @@
 
 - Fixed action threading
 - Fixed repl not closing
+- Fixed templates
 
 ## 0.2.1 - 230120
 
