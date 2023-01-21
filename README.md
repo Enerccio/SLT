@@ -1,9 +1,8 @@
 # SLT - A Common Lisp Language Plugin for Jetbrains IDE lineup
 
 ![GitHub release (latest by date)](https://img.shields.io/github/v/release/Enerccio/SLT)
-[![License: APACHE](https://badgen.net/github/license/enerccio/SLT?color=green)](LICENSE)
-![GitHub lisp counter](https://img.shields.io/github/search/Enerccio/SLT/lisp)
 ![GitHub](https://img.shields.io/github/license/Enerccio/SLT)
+![GitHub lisp counter](https://img.shields.io/github/search/Enerccio/SLT/lisp)
 [![0.1.0](https://badgen.net/github/milestones/enerccio/SLT/1)](https://github.com/enerccio/SLT/milestone/1)
 [![0.2.0](https://badgen.net/github/milestones/enerccio/SLT/2)](https://github.com/enerccio/SLT/milestone/2)
 [![0.3.0](https://badgen.net/github/milestones/enerccio/SLT/4)](https://github.com/enerccio/SLT/milestone/4)
