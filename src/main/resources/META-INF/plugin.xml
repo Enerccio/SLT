@@ -13,15 +13,19 @@
     <resource-bundle>messages.SltBundle</resource-bundle>
 
     <extensions defaultExtensionNs="com.intellij">
+
+        <applicationService
+                serviceImplementation="com.en_circle.slt.plugin.sdk.SdkList" />
+
+        <projectService
+                serviceImplementation="com.en_circle.slt.plugin.sdk.LispProjectSdk" />
+
         <projectService serviceImplementation="com.en_circle.slt.plugin.services.lisp.LispEnvironmentServiceImpl"
                             serviceInterface="com.en_circle.slt.plugin.services.lisp.LispEnvironmentService" />
 
         <internalFileTemplate name="Common Lisp CL File.cl"/>
         <internalFileTemplate name="Common Lisp Lisp File.lisp"/>
         <internalFileTemplate name="Asdf System.asdf"/>
-
-        <applicationService
-            serviceImplementation="com.en_circle.slt.plugin.SltState" />
 
         <fileType
                 name="Common Lisp" language="Common Lisp" extensions="cl;lisp;asdf"
@@ -64,9 +68,6 @@
                              id="SLT_BRACE_MATCHER" />
 
         <statusBarWidgetFactory id="Common Lisp" implementation="com.en_circle.slt.plugin.SltStatusBarWidgetFactory"/>
-
-        <!-- SDK -->
-        <sdkType implementation="com.en_circle.slt.plugin.sdk.CommonLispSDKType"/>
     </extensions>
 
     <actions resource-bundle="messages.SltBundle">

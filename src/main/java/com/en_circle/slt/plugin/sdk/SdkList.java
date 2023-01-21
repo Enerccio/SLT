@@ -1,4 +1,4 @@
-package com.en_circle.slt.plugin;
+package com.en_circle.slt.plugin.sdk;
 
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.PersistentStateComponent;
@@ -8,27 +8,29 @@ import com.intellij.util.xmlb.XmlSerializerUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @State(
-        name = "org.intellij.sdk.settings.AppSettingsState",
+        name = "SltSdkList",
         storages = @Storage("SdkSettingsPlugin.xml")
 )
-public class SltState implements PersistentStateComponent<SltState> {
+public class SdkList implements PersistentStateComponent<SdkList> {
 
-    public String sbclExecutable = "sbcl";
-    public String quicklispStartScript = "~/quicklisp/setup.lisp";
-    public int port = 4005;
-
-    public static SltState getInstance() {
-        return ApplicationManager.getApplication().getService(SltState.class);
+    public static SdkList getInstance() {
+        return ApplicationManager.getApplication().getService(SdkList.class);
     }
 
+    public List<LispSdk> sdks = new ArrayList<>();
+
     @Override
-    public @Nullable SltState getState() {
+    public @Nullable SdkList getState() {
         return this;
     }
 
     @Override
-    public void loadState(@NotNull SltState state) {
+    public void loadState(@NotNull SdkList state) {
         XmlSerializerUtil.copyBean(state, this);
     }
+
 }
