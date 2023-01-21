@@ -1,6 +1,5 @@
 package com.en_circle.slt.plugin.actions;
 
-import com.en_circle.slt.plugin.SltBundle;
 import com.en_circle.slt.plugin.lisp.LispParserUtil;
 import com.en_circle.slt.plugin.services.lisp.LispEnvironmentService;
 import com.intellij.openapi.actionSystem.AnActionEvent;
@@ -21,13 +20,6 @@ import java.util.List;
 import java.util.Objects;
 
 public class EvalRegionAction extends EvalActionBase {
-
-    @Override
-    public void update(@NotNull AnActionEvent event) {
-        super.update(event);
-
-        event.getPresentation().setText(SltBundle.message("slt.actions.eval.region"));
-    }
 
     @Override
     public void actionPerformed(@NotNull AnActionEvent event) {
