@@ -5,6 +5,7 @@
 - Fixed action threading
 - Fixed repl not closing
 - Fixed templates
+- Fixed lexer issue with comments
 
 ## 0.2.1 - 230120
 
