@@ -152,6 +152,8 @@ TERMINATING_MACRO_CHAR=[\"'\(\),;`]
 
 <BLOCK_COMMENT_TEST> {
     ["#"] { yybegin(YYINITIAL); return LispTypes.BLOCK_COMMENT; }
+
+    <<EOF>> { yybegin(YYINITIAL); return TokenType.ERROR_ELEMENT; }
     [^] { yybegin(BLOCK_COMMENT); }
 }
 
