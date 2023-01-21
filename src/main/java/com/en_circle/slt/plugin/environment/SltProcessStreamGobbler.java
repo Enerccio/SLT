@@ -15,6 +15,7 @@ public class SltProcessStreamGobbler extends Thread {
 
     private final InputStream inputStream;
     private final List<SltProcessStreamControllerUpdateListener> updateListeners = Collections.synchronizedList(new ArrayList<>());
+    private volatile boolean alive = true;
 
     public SltProcessStreamGobbler(InputStream inputStream) {
         this.inputStream = inputStream;
@@ -51,6 +52,11 @@ public class SltProcessStreamGobbler extends Thread {
         } catch (Exception ignored) {
             // pass
         }
+        alive = false;
+    }
+
+    private boolean isFinished() {
+        return !alive;
     }
 
     public interface SltProcessStreamControllerUpdateListener {
@@ -83,12 +89,19 @@ public class SltProcessStreamGobbler extends Thread {
         }
 
         public boolean awaitFor(Process process) {
+            return awaitFor(process, null, 10L, TimeUnit.SECONDS);
+        }
+
+        public boolean awaitFor(Process process, SltProcessStreamGobbler gobbler, long time, TimeUnit unit) {
             AtomicBoolean started = new AtomicBoolean(false);
             Awaitility.await()
                     .pollInterval(new FixedPollInterval(250, TimeUnit.MILLISECONDS))
-                    .atMost(10L, TimeUnit.SECONDS)
+                    .atMost(time, unit)
                     .until(() -> {
-                        if (!process.isAlive()) {
+                        if (process != null && !process.isAlive()) {
+                            return true;
+                        }
+                        if (gobbler != null && gobbler.isFinished()) {
                             return true;
                         }
                         if (status) {
@@ -134,4 +147,5 @@ public class SltProcessStreamGobbler extends Thread {
             }
         }
     }
+
 }

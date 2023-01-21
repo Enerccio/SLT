@@ -8,6 +8,8 @@ import com.en_circle.slt.plugin.lisp.lisp.LispContainer;
 import com.en_circle.slt.plugin.lisp.lisp.LispElement;
 import com.en_circle.slt.plugin.lisp.psi.LispList;
 import com.en_circle.slt.plugin.sdk.LispProjectSdk;
+import com.en_circle.slt.plugin.sdk.LispSdk;
+import com.en_circle.slt.plugin.sdk.SdkList;
 import com.en_circle.slt.plugin.services.lisp.components.SltIndentationContainer;
 import com.en_circle.slt.plugin.services.lisp.components.SltLispEnvironmentMacroExpandCache;
 import com.en_circle.slt.plugin.services.lisp.components.SltLispEnvironmentSymbolCache;
@@ -75,12 +77,17 @@ public class LispEnvironmentServiceImpl implements LispEnvironmentService {
         if (projectSdk.currentSDK == null) {
             return false;
         }
+        SdkList list = SdkList.getInstance();
+        LispSdk sdk = list.getSdkByUuid(projectSdk.currentSDK);
+        if (sdk == null) {
+            return false;
+        }
 
         environmentProvider = SltSBCLEnvironment::new;
         configurationBuilder = new SltSBCLEnvironmentConfiguration.Builder()
-                .setExecutable(projectSdk.currentSDK.sbclExecutable)
-                .setCore(projectSdk.currentSDK.sbclCorePath)
-                .setQuicklispStartScriptPath(projectSdk.currentSDK.quickLispPath)
+                .setExecutable(sdk.sbclExecutable)
+                .setCore(sdk.sbclCorePath)
+                .setQuicklispStartScriptPath(sdk.quickLispPath)
                 .setProjectDirectory(ProjectUtils.getCurrentProject().getBasePath());
 
         return true;

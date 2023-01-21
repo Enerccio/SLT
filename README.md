@@ -28,7 +28,7 @@ IDE capabilities for Common Lisp.
 1) Intellij based IDE - tested on `Intellij Idea Community/Ultimate` but should work on all major IDEs
    1) Versions supported are from 2022.2 and upwards 
 2) [Steel Bank Common Lisp](https://www.sbcl.org/) installed
-3) [Quicklisp](https://www.quicklisp.org/beta/)
+3) [Quicklisp](https://www.quicklisp.org/beta/) installed
 
 ## Getting started
 
@@ -52,19 +52,9 @@ To find out which release applies to you check this table:
 PhpStorm is coming when I read how to build it correctly since just swapping
 the type does not work. 
 
-For the first time use, I recommend installing swank and eclector dependencies manually 
-from sbcl because there is 10 seconds timeout to see if swank has initialized,and it might 
-terminate before quicklisp has initialized.
-
-Start sbcl and run this script:
-
-On linux and default quicklisp path: 
-
-```common lisp
-(load "~/quicklisp/setup.lisp")
-(ql:quickload :swank)
-(ql:quickload :eclector)
-```
+For each project you need to have Lisp SDK selected. In Settings select an SDK. It's either in root of settings
+or in Project: <name> setting section (for pycharm based IDEs). To select an SDK you need to define application wide SDK 
+in Settings > Language > Common Lisp IDEs. This will also download all quicklisp dependencies needed.
 
 ## Plugin options
 
@@ -106,7 +96,10 @@ You can also open this as a project in Intellij Idea.
 
 ### Far futures / possible goals 
 
-* [ ] SDK Support 
+* [x] SDK Support 
+  * not a true SDK because that is only available in Intellij and not in  (for instance) PyCharm, thus
+this is implemented manually.
+  * [ ] Download SBCL and quicklisp for user
 * [ ] Automatic download of lisp interpret and quicklisp
 * [ ] Different lisp interpreter support 
 * [ ] Remote connections to interpreters

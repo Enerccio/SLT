@@ -14,7 +14,7 @@ public class LispProjectSdk implements PersistentStateComponent<LispProjectSdk> 
         return project.getService(LispProjectSdk.class);
     }
 
-    public LispSdk currentSDK;
+    public String currentSDK;
 
     @Override
     public @Nullable LispProjectSdk getState() {

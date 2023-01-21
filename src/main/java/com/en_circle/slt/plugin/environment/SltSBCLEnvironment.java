@@ -3,6 +3,7 @@ package com.en_circle.slt.plugin.environment;
 import com.en_circle.slt.plugin.environment.SltProcessStreamGobbler.ProcessInitializationWaiter;
 import com.en_circle.slt.plugin.environment.SltProcessStreamGobbler.WaitForOccurrence;
 import com.en_circle.slt.templates.SltScriptTemplate;
+import com.en_circle.slt.tools.PluginPath;
 import com.intellij.openapi.util.io.FileUtil;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -39,7 +40,8 @@ public class SltSBCLEnvironment extends SltLispEnvironmentProcess  {
                 throw new IOException("no free port available");
             }
 
-            File tempDir = FileUtil.createTempDirectory("SLTinit", "");
+            File tempDir = FileUtil.createTempDirectory(PluginPath.getPluginFolder(),
+                    "SLTinit", "");
 
             e.sltCore = new File(tempDir, "slt.cl");
             e.sltCore.deleteOnExit();

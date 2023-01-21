@@ -33,4 +33,19 @@ public class SdkList implements PersistentStateComponent<SdkList> {
         XmlSerializerUtil.copyBean(state, this);
     }
 
+    public LispSdk getSdkByUuid(String currentSDK) {
+        if (sdks == null)
+            return null;
+
+        for (LispSdk sdk : sdks) {
+            if (sdk.uuid.equals(currentSDK))
+                return sdk;
+        }
+
+        return null;
+    }
+
+    public boolean hasSdks() {
+        return sdks != null && !sdks.isEmpty();
+    }
 }

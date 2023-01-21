@@ -17,11 +17,17 @@
         <applicationService
                 serviceImplementation="com.en_circle.slt.plugin.sdk.SdkList" />
 
+        <applicationConfigurable groupId="language"
+                                 instance="com.en_circle.slt.plugin.ui.sdk.SdkConfigurer"/>
+
         <projectService
                 serviceImplementation="com.en_circle.slt.plugin.sdk.LispProjectSdk" />
 
         <projectService serviceImplementation="com.en_circle.slt.plugin.services.lisp.LispEnvironmentServiceImpl"
                             serviceInterface="com.en_circle.slt.plugin.services.lisp.LispEnvironmentService" />
+
+        <projectConfigurable groupId="project"
+                             instance="com.en_circle.slt.plugin.ui.sdk.SdkSelector"/>
 
         <internalFileTemplate name="Common Lisp CL File.cl"/>
         <internalFileTemplate name="Common Lisp Lisp File.lisp"/>
@@ -36,8 +42,6 @@
 
         <lang.parserDefinition language="Common Lisp"
                                implementationClass="com.en_circle.slt.plugin.SltCommonLispParserDefinition"/>
-
-        <applicationConfigurable instance="com.en_circle.slt.plugin.settings.SltSettingsConfigurable"/>
 
         <lang.documentationProvider language="Common Lisp" implementationClass="com.en_circle.slt.plugin.SltDocumentationProvider"/>
 
