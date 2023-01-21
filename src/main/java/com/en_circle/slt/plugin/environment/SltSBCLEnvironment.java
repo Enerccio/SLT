@@ -3,15 +3,27 @@ package com.en_circle.slt.plugin.environment;
 import com.en_circle.slt.plugin.environment.SltProcessStreamGobbler.ProcessInitializationWaiter;
 import com.en_circle.slt.plugin.environment.SltProcessStreamGobbler.WaitForOccurrence;
 import com.en_circle.slt.templates.SltScriptTemplate;
+import com.en_circle.slt.tools.PluginPath;
 import com.intellij.openapi.util.io.FileUtil;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.watertemplate.Template;
 
 import java.io.File;
+import java.io.IOException;
+import java.net.ServerSocket;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
 
 public class SltSBCLEnvironment extends SltLispEnvironmentProcess  {
+
+    private int port;
+
+    @Override
+    public int getSwankPort() {
+        return port;
+    }
 
     @Override
     public SltLispProcessInformation getInformation() {
@@ -23,7 +35,13 @@ public class SltSBCLEnvironment extends SltLispEnvironmentProcess  {
         SltSBCLEnvironmentConfiguration c = getConfiguration(configuration);
         SBCLEnvironment e = new SBCLEnvironment();
         try {
-            File tempDir = FileUtil.createTempDirectory("SLTinit", "");
+            e.port = getFreePort();
+            if (e.port == 0) {
+                throw new IOException("no free port available");
+            }
+
+            File tempDir = FileUtil.createTempDirectory(PluginPath.getPluginFolder(),
+                    "SLTinit", "");
 
             e.sltCore = new File(tempDir, "slt.cl");
             e.sltCore.deleteOnExit();
@@ -36,7 +54,7 @@ public class SltSBCLEnvironment extends SltLispEnvironmentProcess  {
             if (sltCorePath.contains("\\")) {
                 sltCorePath = StringUtils.replace(sltCorePath, "\\", "\\\\");
             }
-            String startScriptTemplate = new SBCLInitScriptTemplate(c, sltCorePath).render();
+            String startScriptTemplate = new SBCLInitScriptTemplate(c, sltCorePath, e.port).render();
             FileUtils.write(e.serverStartSetup, startScriptTemplate, StandardCharsets.UTF_8);
 
             tempDir.deleteOnExit();
@@ -58,12 +76,18 @@ public class SltSBCLEnvironment extends SltLispEnvironmentProcess  {
     protected String[] getProcessCommand(SltLispEnvironmentProcessConfiguration configuration, Object environment) throws SltProcessException {
         SltSBCLEnvironmentConfiguration c = getConfiguration(configuration);
         SBCLEnvironment e = getEnvironment(environment);
+        this.port = e.port;
 
-        return new String[]{
-                c.getExecutablePath(),
-                "--load",
-                e.serverStartSetup.getName()
-        };
+        List<String> parameters = new ArrayList<>();
+        parameters.add(c.getExecutablePath());
+        if (StringUtils.isNotBlank(c.getCorePath())) {
+            parameters.add("--core");
+            parameters.add(c.getCorePath());
+        }
+        parameters.add("--load");
+        parameters.add(e.serverStartSetup.getName());
+
+        return parameters.toArray(new String[0]);
     }
 
     @Override
@@ -89,6 +113,18 @@ public class SltSBCLEnvironment extends SltLispEnvironmentProcess  {
         return (SBCLEnvironment) environment;
     }
 
+    private int getFreePort() {
+        var freePort = 0;
+        try (ServerSocket s = new ServerSocket(0)) {
+            freePort = s.getLocalPort();
+        } catch (Exception ignored) {
+
+        }
+
+        return freePort;
+    }
+
+
     private class SltSBCLLispProcessInformation implements SltLispProcessInformation {
 
         @Override
@@ -101,14 +137,15 @@ public class SltSBCLEnvironment extends SltLispEnvironmentProcess  {
 
         File sltCore;
         File serverStartSetup;
+        int port;
 
     }
 
     private static class SBCLInitScriptTemplate extends Template {
 
-        public SBCLInitScriptTemplate(SltSBCLEnvironmentConfiguration configuration, String sltCoreScript) {
+        public SBCLInitScriptTemplate(SltSBCLEnvironmentConfiguration configuration, String sltCoreScript, int port) {
             add("qlpath", configuration.getQuicklispStartScript());
-            add("port", "" + configuration.getPort());
+            add("port", "" + port);
             add("cwd", configuration.getProjectDirectory());
             add("sbclcorefile", sltCoreScript);
         }

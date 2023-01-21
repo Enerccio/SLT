@@ -7,8 +7,8 @@ import com.en_circle.slt.plugin.environment.SltLispEnvironmentProcess.SltLispEnv
 public class SltSBCLEnvironmentConfiguration implements SltLispEnvironmentProcessConfiguration {
 
     private String executablePath = "sbcl";
+    private String corePath = "";
     private String quicklispStartScript = "~/quicklisp/setup.lisp";
-    private int port = 4005;
     private String projectDirectory = "/tmp";
     private SltLispOutputChangedListener listener = null;
 
@@ -24,10 +24,6 @@ public class SltSBCLEnvironmentConfiguration implements SltLispEnvironmentProces
         return quicklispStartScript;
     }
 
-    public int getPort() {
-        return port;
-    }
-
     public String getProjectDirectory() {
         return projectDirectory;
     }
@@ -35,6 +31,10 @@ public class SltSBCLEnvironmentConfiguration implements SltLispEnvironmentProces
     @Override
     public SltLispOutputChangedListener getListener() {
         return listener;
+    }
+
+    public String getCorePath() {
+        return corePath;
     }
 
     public static class Builder implements SltLispEnvironmentConfiguration.Builder<Builder, SltSBCLEnvironmentConfiguration> {
@@ -49,18 +49,17 @@ public class SltSBCLEnvironmentConfiguration implements SltLispEnvironmentProces
             return this;
         }
 
+        public Builder setCore(String core) {
+            checkNotBuilt();
+
+            c.corePath = core;
+            return this;
+        }
+
         public Builder setQuicklispStartScriptPath(String quicklispStartScript) {
             checkNotBuilt();
 
             c.quicklispStartScript = quicklispStartScript;
-            return this;
-        }
-
-        public Builder setPort(int port) {
-            checkNotBuilt();
-            assert(port >= 0 && port < 65536);
-
-            c.port = port;
             return this;
         }
 

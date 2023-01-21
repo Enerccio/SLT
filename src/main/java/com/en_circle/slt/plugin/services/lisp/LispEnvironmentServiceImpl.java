@@ -1,13 +1,15 @@
 package com.en_circle.slt.plugin.services.lisp;
 
 import com.en_circle.slt.plugin.SltBundle;
-import com.en_circle.slt.plugin.SltState;
 import com.en_circle.slt.plugin.SymbolState;
 import com.en_circle.slt.plugin.environment.*;
 import com.en_circle.slt.plugin.environment.SltLispEnvironment.SltOutput;
 import com.en_circle.slt.plugin.lisp.lisp.LispContainer;
 import com.en_circle.slt.plugin.lisp.lisp.LispElement;
 import com.en_circle.slt.plugin.lisp.psi.LispList;
+import com.en_circle.slt.plugin.sdk.LispProjectSdk;
+import com.en_circle.slt.plugin.sdk.LispSdk;
+import com.en_circle.slt.plugin.sdk.SdkList;
 import com.en_circle.slt.plugin.services.lisp.components.SltIndentationContainer;
 import com.en_circle.slt.plugin.services.lisp.components.SltLispEnvironmentMacroExpandCache;
 import com.en_circle.slt.plugin.services.lisp.components.SltLispEnvironmentSymbolCache;
@@ -71,14 +73,22 @@ public class LispEnvironmentServiceImpl implements LispEnvironmentService {
     }
 
     public boolean configured() {
+        LispProjectSdk projectSdk = LispProjectSdk.getInstance(project);
+        if (projectSdk.currentSDK == null) {
+            return false;
+        }
+        SdkList list = SdkList.getInstance();
+        LispSdk sdk = list.getSdkByUuid(projectSdk.currentSDK);
+        if (sdk == null) {
+            return false;
+        }
+
         environmentProvider = SltSBCLEnvironment::new;
         configurationBuilder = new SltSBCLEnvironmentConfiguration.Builder()
-                .setExecutable(SltState.getInstance().sbclExecutable)
-                .setPort(SltState.getInstance().port)
-                .setQuicklispStartScriptPath(SltState.getInstance().quicklispStartScript)
+                .setExecutable(sdk.sbclExecutable)
+                .setCore(sdk.sbclCorePath)
+                .setQuicklispStartScriptPath(sdk.quickLispPath)
                 .setProjectDirectory(ProjectUtils.getCurrentProject().getBasePath());
-
-        // add validation checks and custom "SDK"
 
         return true;
     }
@@ -131,7 +141,7 @@ public class LispEnvironmentServiceImpl implements LispEnvironmentService {
         });
     }
 
-    private void doStart() throws Exception {
+    private boolean doStart() throws Exception {
         try {
             if (configurationBuilder == null) {
                 if (!configured()) {
@@ -139,7 +149,7 @@ public class LispEnvironmentServiceImpl implements LispEnvironmentService {
                     Messages.showErrorDialog(ProjectUtils.getCurrentProject(),
                             SltBundle.message("slt.ui.errors.sbcl.start.noconf"),
                             SltBundle.message("slt.ui.errors.sbcl.start"));
-                    return;
+                    return false;
                 }
             }
 
@@ -156,7 +166,7 @@ public class LispEnvironmentServiceImpl implements LispEnvironmentService {
             environment.start(configuration);
 
             slimeListener = new SlimeListener(ProjectUtils.getCurrentProject(), true, logger, debugInterface);
-            client = new SwankClient("127.0.0.1", SltState.getInstance().port, slimeListener);
+            client = new SwankClient("127.0.0.1", environment.getSwankPort(), slimeListener);
 
             for (LispEnvironmentListener listener : serverListeners) {
                 listener.onPostStart();
@@ -164,6 +174,7 @@ public class LispEnvironmentServiceImpl implements LispEnvironmentService {
         } finally {
             starting = false;
         }
+        return true;
     }
 
     private void onServerOutput(SltOutput output, String newData) {
@@ -206,7 +217,10 @@ public class LispEnvironmentServiceImpl implements LispEnvironmentService {
                 ApplicationManager.getApplication().invokeLater(() -> {
                     try {
                         ensureToolWindowIsOpen();
-                        doStart();
+                        if (!doStart()) {
+                            return;
+                        }
+
                         doSend(request);
                     } catch (Exception e) {
                         log.warn(SltBundle.message("slt.error.sbclstart"), e);

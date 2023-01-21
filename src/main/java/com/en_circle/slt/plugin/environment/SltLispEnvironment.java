@@ -4,6 +4,7 @@ public interface SltLispEnvironment {
 
     void start(SltLispEnvironmentConfiguration configuration) throws SltProcessException;
     void stop() throws SltProcessException;
+    int getSwankPort();
 
     boolean isActive();
     SltLispProcessInformation getInformation();
