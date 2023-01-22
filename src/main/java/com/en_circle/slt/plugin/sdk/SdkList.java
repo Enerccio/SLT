@@ -13,7 +13,7 @@ import java.util.List;
 
 @State(
         name = "SltSdkList",
-        storages = @Storage("SdkSettingsPlugin.xml")
+        storages = @Storage("SltSettings.xml")
 )
 public class SdkList implements PersistentStateComponent<SdkList> {
 

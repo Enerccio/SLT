@@ -16,6 +16,8 @@
 
         <applicationService
                 serviceImplementation="com.en_circle.slt.plugin.sdk.SdkList" />
+        <applicationService
+                serviceImplementation="com.en_circle.slt.plugin.indentation.SltIndentationSettings" />
 
         <applicationConfigurable groupId="language"
                                  instance="com.en_circle.slt.plugin.ui.sdk.SdkConfigurer"/>
@@ -72,6 +74,8 @@
                              id="SLT_BRACE_MATCHER" />
 
         <statusBarWidgetFactory id="Common Lisp" implementation="com.en_circle.slt.plugin.SltStatusBarWidgetFactory"/>
+
+        <enterHandlerDelegate implementation="com.en_circle.slt.plugin.indentation.SltIndentator"/>
     </extensions>
 
     <actions resource-bundle="messages.SltBundle">

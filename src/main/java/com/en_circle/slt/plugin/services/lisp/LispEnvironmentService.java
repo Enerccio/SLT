@@ -11,6 +11,7 @@ import com.en_circle.slt.plugin.swank.SlimeRequest;
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiFile;
 
 
 public interface LispEnvironmentService extends Disposable {
@@ -51,6 +52,8 @@ public interface LispEnvironmentService extends Disposable {
     String macroexpand(LispList form, String packageName);
 
     void updateIndentation(LispElement element);
+
+    Integer calculateOffset(PsiElement element, PsiFile file, boolean wasAfter, String text, int offset);
 
     enum LispEnvironmentState {
         STOPPED, READY, INITIALIZING

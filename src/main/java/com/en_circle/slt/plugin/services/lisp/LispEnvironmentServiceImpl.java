@@ -25,6 +25,7 @@ import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ToolWindowManager;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiFile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,6 +56,7 @@ public class LispEnvironmentServiceImpl implements LispEnvironmentService {
     public synchronized boolean initProject(Project project) {
         if (this.project == null) {
             indentationContainer = new SltIndentationContainer();
+            indentationContainer.init(project);
             symbolCache = new SltLispEnvironmentSymbolCache(project);
             macroExpandCache = new SltLispEnvironmentMacroExpandCache();
             this.project = project;
@@ -286,6 +288,11 @@ public class LispEnvironmentServiceImpl implements LispEnvironmentService {
     @Override
     public void updateIndentation(LispElement element) {
         indentationContainer.update((LispContainer) element);
+    }
+
+    @Override
+    public Integer calculateOffset(PsiElement element, PsiFile file, boolean wasAfter, String text, int offset) {
+        return indentationContainer.calculateOffset(element, file, wasAfter, text, offset);
     }
 
     @Override
