@@ -132,7 +132,7 @@ public class SltIndentationContainer {
 
     public Integer calculateOffset(PsiElement element, PsiFile file, boolean wasAfter, String documentText, int offset,
                                    String packageOverride) {
-        SltIndentationSettings settings = SltIndentationSettings.getInstance();
+        SltIndentationSettings settings = SltIndentationSettings.getInstance(element.getProject());
         String packageName = packageOverride != null ? packageOverride : LispParserUtil.getPackage(file, offset);
         if (wasAfter) {
             if (element.getParent() != file) {

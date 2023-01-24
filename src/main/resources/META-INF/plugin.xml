@@ -14,10 +14,9 @@
 
     <extensions defaultExtensionNs="com.intellij">
 
+        <!-- SDK Configuration -->
         <applicationService
                 serviceImplementation="com.en_circle.slt.plugin.sdk.SdkList" />
-        <applicationService
-                serviceImplementation="com.en_circle.slt.plugin.indentation.SltIndentationSettings" />
 
         <applicationConfigurable groupId="language"
                                  instance="com.en_circle.slt.plugin.ui.sdk.SdkConfigurer"/>
@@ -25,11 +24,23 @@
         <projectService
                 serviceImplementation="com.en_circle.slt.plugin.sdk.LispProjectSdk" />
 
+        <projectConfigurable groupId="project"
+                             instance="com.en_circle.slt.plugin.ui.sdk.SdkSelector"/>
+
+        <!-- Indentation Configuration -->
+
+        <applicationService
+                serviceImplementation="com.en_circle.slt.plugin.indentation.SltIndentationSettings" />
+
+        <projectService
+                serviceImplementation="com.en_circle.slt.plugin.indentation.SltProjectIndentationSettings" />
+
+
+        <!-- Lisp Service -->
         <projectService serviceImplementation="com.en_circle.slt.plugin.services.lisp.LispEnvironmentServiceImpl"
                             serviceInterface="com.en_circle.slt.plugin.services.lisp.LispEnvironmentService" />
 
-        <projectConfigurable groupId="project"
-                             instance="com.en_circle.slt.plugin.ui.sdk.SdkSelector"/>
+        <!-- Templates -->
 
         <internalFileTemplate name="Common Lisp CL File.cl"/>
         <internalFileTemplate name="Common Lisp Lisp File.lisp"/>
@@ -39,6 +50,8 @@
                 name="Common Lisp" language="Common Lisp" extensions="cl;lisp;asdf"
                 fieldName="INSTANCE"
                 implementationClass="com.en_circle.slt.plugin.SltCommonLispFileType"/>
+
+        <!-- Language configuration -->
 
         <lang.commenter language="Common Lisp" implementationClass="com.en_circle.slt.plugin.SltCommenter"/>
 
@@ -58,13 +71,6 @@
         <lang.syntaxHighlighterFactory language="Common Lisp"
                 implementationClass="com.en_circle.slt.plugin.highlights.SltStaticHighlighterFactory"/>
 
-        <!-- Highlight annotators -->
-        <annotator language="Common Lisp" implementationClass="com.en_circle.slt.plugin.highlights.annotators.SymbolAnnotator"/>
-        <annotator language="Common Lisp" implementationClass="com.en_circle.slt.plugin.highlights.annotators.StaticHighlightAnnotator"/>
-
-        <!-- Functional annotators -->
-        <annotator language="Common Lisp" implementationClass="com.en_circle.slt.plugin.actions.annotators.MacroExpandAnnotator"/>
-
         <lang.directNavigationProvider
                 implementation="com.en_circle.slt.plugin.references.SltDirectNavigationProvider"/>
 
@@ -76,6 +82,13 @@
         <statusBarWidgetFactory id="Common Lisp" implementation="com.en_circle.slt.plugin.SltStatusBarWidgetFactory"/>
 
         <enterHandlerDelegate implementation="com.en_circle.slt.plugin.indentation.SltIndentator"/>
+
+        <!-- Highlight annotators -->
+        <annotator language="Common Lisp" implementationClass="com.en_circle.slt.plugin.highlights.annotators.SymbolAnnotator"/>
+        <annotator language="Common Lisp" implementationClass="com.en_circle.slt.plugin.highlights.annotators.StaticHighlightAnnotator"/>
+
+        <!-- Functional annotators -->
+        <annotator language="Common Lisp" implementationClass="com.en_circle.slt.plugin.actions.annotators.MacroExpandAnnotator"/>
     </extensions>
 
     <actions resource-bundle="messages.SltBundle">

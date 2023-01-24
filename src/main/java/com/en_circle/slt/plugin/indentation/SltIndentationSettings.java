@@ -4,6 +4,7 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.PersistentStateComponent;
 import com.intellij.openapi.components.State;
 import com.intellij.openapi.components.Storage;
+import com.intellij.openapi.project.Project;
 import com.intellij.util.xmlb.XmlSerializerUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -15,6 +16,16 @@ import org.jetbrains.annotations.Nullable;
 public class SltIndentationSettings implements PersistentStateComponent<SltIndentationSettings> {
 
     public static SltIndentationSettings getInstance() {
+        return getInstance(null);
+    }
+
+    public static SltIndentationSettings getInstance(@Nullable Project project) {
+        if (project != null) {
+            SltProjectIndentationSettings projectIndentationSettings = SltProjectIndentationSettings.getInstance(project);
+            if (projectIndentationSettings.overridingApplicationSetting) {
+                return projectIndentationSettings.indentationSettings;
+            }
+        }
         return ApplicationManager.getApplication().getService(SltIndentationSettings.class);
     }
 
