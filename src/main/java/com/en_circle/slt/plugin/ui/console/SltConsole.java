@@ -26,13 +26,14 @@ import java.awt.*;
 
 public abstract class SltConsole implements SltComponent {
     private static final Logger log = LoggerFactory.getLogger(SltConsole.class);
+    public static final String KEY = SltConsole.class.getName();
 
     private TabInfo tabInfo;
     protected LanguageConsoleView languageConsole;
     protected final JPanel content;
     protected final Project project;
 
-    protected String currentModule = "COMMON-LISP-USER";
+    protected String currentPackage = "COMMON-LISP-USER";
 
     public SltConsole(Project project) {
         this.content = new JPanel(new BorderLayout());
@@ -43,8 +44,8 @@ public abstract class SltConsole implements SltComponent {
         if (packageName == null) {
             packageName = "COMMON-LISP-USER";
         }
-        currentModule = packageName;
-        languageConsole.setPrompt(currentModule + ">");
+        currentPackage = packageName;
+        languageConsole.setPrompt(currentPackage + ">");
     }
 
     @Override
@@ -52,9 +53,10 @@ public abstract class SltConsole implements SltComponent {
         languageConsole = new LanguageConsoleBuilder()
                 .build(project, SltCommonLispLanguage.INSTANCE);
         Disposer.register(project, languageConsole);
-        languageConsole.setPrompt(currentModule + "> ");
+        languageConsole.setPrompt(currentPackage + "> ");
 
-        ConsoleExecuteAction action = new ConsoleExecuteAction(languageConsole, new SltConsoleExecuteActionHandler(languageConsole) {
+        ConsoleExecuteAction action = new ConsoleExecuteAction(languageConsole,
+                new SltConsoleExecuteActionHandler(languageConsole, this) {
 
             @Override
             protected void execute(String code) {
@@ -66,6 +68,7 @@ public abstract class SltConsole implements SltComponent {
         new ConsoleHistoryController(new MyConsoleRootType("cl"), null, languageConsole).install();
 
         content.add(languageConsole.getComponent(), BorderLayout.CENTER);
+        content.putClientProperty(SltConsole.KEY, this);
 
         tabInfo = new TabInfo(content);
         tabInfo.setText(getTitle());
@@ -75,7 +78,7 @@ public abstract class SltConsole implements SltComponent {
     protected void eval(String data) {
         try {
             if (StringUtils.isNotBlank(data)) {
-                LispEnvironmentService.getInstance(project).sendToLisp(Eval.eval(data, currentModule,
+                LispEnvironmentService.getInstance(project).sendToLisp(Eval.eval(data, currentPackage,
                         result -> languageConsole.print(result + "\n", ConsoleViewContentType.NORMAL_OUTPUT)));
             }
         } catch (Exception e) {
@@ -121,5 +124,9 @@ public abstract class SltConsole implements SltComponent {
 
     public void close() {
         languageConsole.dispose();
+    }
+
+    public String getPackage() {
+        return currentPackage;
     }
 }

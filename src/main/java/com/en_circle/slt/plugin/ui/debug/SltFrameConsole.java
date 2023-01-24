@@ -25,14 +25,14 @@ public class SltFrameConsole extends SltConsole {
         this.threadId = threadId;
         this.frame = frame;
         this.onChange = onChange;
-        this.currentModule = module;
+        this.currentPackage = module;
     }
 
     @Override
     protected void eval(String data) {
         try {
             if (StringUtils.isNotBlank(data)) {
-                LispEnvironmentService.getInstance(project).sendToLisp(EvalStringInFrameEval.evalInFrame(data, frame, threadId, currentModule,
+                LispEnvironmentService.getInstance(project).sendToLisp(EvalStringInFrameEval.evalInFrame(data, frame, threadId, currentPackage,
                         result -> {
                             languageConsole.print(result + "\n", ConsoleViewContentType.NORMAL_OUTPUT);
                             onChange.run();

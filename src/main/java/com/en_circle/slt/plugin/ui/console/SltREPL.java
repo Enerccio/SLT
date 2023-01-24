@@ -26,7 +26,7 @@ public class SltREPL extends SltConsole {
     public TabInfo create() {
         TabInfo tabInfo = super.create();
 
-        PackageSelectorComponent selectorComponent = new PackageSelectorComponent("Repl", () -> this.currentModule);
+        PackageSelectorComponent selectorComponent = new PackageSelectorComponent("Repl", () -> this.currentPackage);
         selectorComponent.refresh();
         selectorComponent.getActionToolbar().setTargetComponent(content);
         selectorComponent.setListener(this::setPackage);
