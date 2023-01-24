@@ -288,6 +288,9 @@ public class LispEnvironmentServiceImpl implements LispEnvironmentService {
     @Override
     public void updateIndentation(LispElement element) {
         indentationContainer.update((LispContainer) element);
+
+        // also clear macro cache since we get this hit on macro update
+        macroExpandCache.clear();
     }
 
     @Override

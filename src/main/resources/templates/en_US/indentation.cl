@@ -55,7 +55,7 @@
 (handler-bind (as let))
 (restart-bind (as let))
 (locally 1)
-;(loop           lisp-indent-loop)
+(loop           lispIndentLoop)
 ;(:method        lisp-indent-defmethod) ; in `defgeneric'
 (multiple-value-bind ((&whole 6 &rest 1) 4 &body))
 (multiple-value-call (4 &body))

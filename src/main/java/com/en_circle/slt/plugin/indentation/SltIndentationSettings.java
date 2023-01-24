@@ -29,7 +29,7 @@ public class SltIndentationSettings implements PersistentStateComponent<SltInden
         return ApplicationManager.getApplication().getService(SltIndentationSettings.class);
     }
 
-    public int defaultIndentation = 2;
+    public int defaultIndentation = 4;
     public int parameterIndentation = 4;
     public int lambdaIndentation = 4;
     public int restIndentation = 2;
