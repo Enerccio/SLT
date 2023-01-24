@@ -4,6 +4,7 @@ import com.en_circle.slt.plugin.SltCommonLispFileType;
 import com.en_circle.slt.plugin.indentation.SltIndentationSettings;
 import com.en_circle.slt.plugin.lisp.LispParserUtil;
 import com.en_circle.slt.plugin.lisp.lisp.*;
+import com.en_circle.slt.plugin.lisp.lisp.LispUtils.OffsetInfo;
 import com.en_circle.slt.plugin.lisp.psi.LispList;
 import com.en_circle.slt.plugin.lisp.psi.LispToplevel;
 import com.en_circle.slt.plugin.lisp.psi.LispTypes;
@@ -12,12 +13,14 @@ import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiFileFactory;
+import com.intellij.psi.PsiManager;
 import com.intellij.psi.util.PsiTreeUtil;
 import org.apache.commons.lang3.StringUtils;
 
 import java.lang.reflect.Method;
 import java.math.BigInteger;
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 public class SltIndentationContainer {
@@ -36,9 +39,8 @@ public class SltIndentationContainer {
         for (LispElement element : updates.getItems()) {
             LispContainer macro = (LispContainer) element;
             LispString symbolNameElement = (LispString) macro.getItems().get(0);
-            String symbolName = symbolNameElement.getValue();
+            String symbolName = symbolNameElement.getValue().toUpperCase();
             IndentationUpdate update = swankReportedIndentations.computeIfAbsent(symbolName, s -> new IndentationUpdate());
-            update.name = symbolName.toUpperCase(Locale.ROOT);
             update.bodyArg = (macro.getItems().get(1) instanceof LispInteger) ? ((LispInteger) macro.getItems().get(1)).getValue() : null;
             update.packages.clear();
             if (macro.getItems().size() > 2 && macro.getItems().get(2) instanceof LispContainer packages) {
@@ -69,12 +71,12 @@ public class SltIndentationContainer {
             } else if (definition.getItems().get(1) instanceof LispSymbol symbol) {
                 String refMethod = symbol.getValue();
                 try {
-                    Method method = SltIndentationContainer.class.getDeclaredMethod(refMethod,
+                    Method method = SltIndentationContainer.class.getDeclaredMethod(refMethod, LispElement.class,
                             LispContainer.class, Map.class, Project.class, SltIndentationSettings.class,
                             String.class, Stack.class);
                     method.setAccessible(true);
-                    indentation.indentationImplementation = (container, formIndentation, project1, settings, packageName, backTrackStack) ->
-                            (int) method.invoke(this, container, formIndentation, project1, settings, packageName, backTrackStack);
+                    indentation.indentationImplementation = (topLevel, container, formIndentation, project1, settings, packageName, backTrackStack) ->
+                            (int) method.invoke(this, topLevel, container, formIndentation, project1, settings, packageName, backTrackStack);
                 } catch (Throwable ignored) {
 
                 }
@@ -84,56 +86,66 @@ public class SltIndentationContainer {
                     indentation.ref = ((LispSymbol) definitionArg.getItems().get(1)).getValue().toUpperCase();
                 } else {
                     indentation.indentationSetup = new ArrayList<>();
-                    parseIndentation(indentation.indentationSetup, definitionArg);
+                    Stack<Integer> whole = new Stack<>();
+                    parseIndentation(indentation.indentationSetup, definitionArg, whole, x -> indentation.whole = x);
                 }
             }
         }
     }
 
-    private void parseIndentation(List<IndentationSetting> indentationSetup, LispContainer definitionArg) {
+    private void parseIndentation(List<IndentationSetting> indentationSetup, LispContainer definitionArg, Stack<Integer> whole,
+                                  Consumer<Integer> applyParentWhole) {
         int ix = 0;
+        whole.push(0);
         while (ix < definitionArg.getItems().size()) {
             LispElement e = definitionArg.getItems().get(ix++);
-            ix = parseSingleElement(e, definitionArg, indentationSetup, ix);
+            ix = parseSingleElement(e, definitionArg, indentationSetup, ix, whole, applyParentWhole);
         }
+        whole.pop();
     }
 
-    private int parseSingleElement(LispElement e, LispContainer definitionArg, List<IndentationSetting> indentationSetup, int ix) {
+    private int parseSingleElement(LispElement e, LispContainer definitionArg, List<IndentationSetting> indentationSetup, int ix,
+            Stack<Integer> whole, Consumer<Integer> applyParentWhole) {
         if (e instanceof LispSymbol symbol) {
             if (symbol.getValue().equalsIgnoreCase("NIL")) {
-                indentationSetup.add(null);
+                indentationSetup.add(new IndentationSetting());
             } else if (symbol.getValue().equals("&lambda")) {
                 IndentationSetting setting = new IndentationSetting();
+                setting.whole = whole.peek();
                 setting.type = IndentationType.LAMBDA;
                 indentationSetup.add(setting);
             } else if (symbol.getValue().equals("&rest")) {
                 LispElement e2 = definitionArg.getItems().get(ix++);
                 List<IndentationSetting> innerSetting = new ArrayList<>();
-                ix = parseSingleElement(e2, definitionArg, innerSetting, ix);
+                ix = parseSingleElement(e2, definitionArg, innerSetting, ix, whole, applyParentWhole);
                 IndentationSetting setting = new IndentationSetting();
+                setting.whole = whole.peek();
                 indentationSetup.add(setting);
                 setting.type = IndentationType.REST;
                 setting.inner = innerSetting.get(0);
             } else if (symbol.getValue().equals("&body")) {
                 IndentationSetting setting = new IndentationSetting();
+                setting.whole = whole.peek();
                 indentationSetup.add(setting);
                 setting.type = IndentationType.BODY;
             } else if (symbol.getValue().equals("&whole")) {
                 LispElement e2 = definitionArg.getItems().get(ix++);
-                IndentationSetting setting = new IndentationSetting();
-                indentationSetup.add(setting);
-                setting.type = IndentationType.WHOLE;
-                setting.value = ((LispInteger) e2).getValue().intValue();
+                int wholeAdd = ((LispInteger) e2).getValue().intValue();
+                int currentWhole = whole.pop() + (Integer) whole.stream().mapToInt(Integer::intValue).sum();
+                whole.push(currentWhole + wholeAdd);
+                if (ix == 2) {
+                    applyParentWhole.accept(currentWhole + wholeAdd);
+                }
             } else {
                 String refMethod = symbol.getValue();
                 try {
-                    Method method = SltIndentationContainer.class.getDeclaredMethod(refMethod,
+                    Method method = SltIndentationContainer.class.getDeclaredMethod(refMethod, LispElement.class,
                             LispContainer.class, Map.class, Project.class, SltIndentationSettings.class,
                             String.class, Stack.class);
                     method.setAccessible(true);
                     IndentationSetting setting = new IndentationSetting();
-                    setting.indentationImplementation = (container, formIndentation, project1, settings, packageName, backTrackStack) ->
-                            (int) method.invoke(this, container, formIndentation, project1, settings, packageName, backTrackStack);
+                    setting.indentationImplementation = (topLevel, container, formIndentation, project1, settings, packageName, backTrackStack) ->
+                            (int) method.invoke(this, topLevel, container, formIndentation, project1, settings, packageName, backTrackStack);
                     indentationSetup.add(setting);
                 } catch (Throwable ignored) {
 
@@ -141,13 +153,15 @@ public class SltIndentationContainer {
             }
         } else if (e instanceof LispInteger integer) {
             IndentationSetting setting = new IndentationSetting();
+            setting.whole = whole.peek();
             setting.value = integer.getValue().intValue();
             indentationSetup.add(setting);
         } else if (e instanceof LispContainer container) {
             IndentationSetting setting = new IndentationSetting();
+            setting.whole = whole.peek();
             setting.listSetting = new ArrayList<>();
             indentationSetup.add(setting);
-            parseIndentation(setting.listSetting, container);
+            parseIndentation(setting.listSetting, container, whole, w -> setting.listAdd = w);
         }
         return ix;
     }
@@ -157,13 +171,14 @@ public class SltIndentationContainer {
         SltIndentationSettings settings = SltIndentationSettings.getInstance(element.getProject());
         String packageName = packageOverride != null ? packageOverride : LispParserUtil.getPackage(file, offset);
         if (wasAfter) {
-            if (element.getParent() != file) {
+            PsiManager manager = PsiManager.getInstance(file.getProject());
+            if (!manager.areElementsEquivalent(element.getParent(), file)) {
                 PsiElement parent = element.getParent();
                 while (parent != null && !(parent instanceof LispToplevel)) {
                     parent = parent.getParent();
                 }
-                if (parent == null || parent.getLastChild() == element ||
-                        PsiTreeUtil.lastChild(parent) == element) {
+                if (parent == null || manager.areElementsEquivalent(parent.getLastChild(), element) ||
+                        manager.areElementsEquivalent(PsiTreeUtil.lastChild(parent), element)) {
                     // it is fully parsed and thus valid form, ie just do general offset 0
                     return 0;
                 }
@@ -231,7 +246,7 @@ public class SltIndentationContainer {
     }
 
     private Integer calculateOffset(String formText, Project project, SltIndentationSettings settings, String packageName) throws Exception {
-        Map<LispElement, Integer> formIndentation = new IdentityHashMap<>();
+        Map<LispElement, OffsetInfo> formIndentation = new IdentityHashMap<>();
         PsiFileFactory factory = PsiFileFactory.getInstance(project);
         PsiFile source = factory.createFileFromText("fragment.cl", SltCommonLispFileType.INSTANCE, formText);
         List<LispElement> elements = LispUtils.convertAst(source, formIndentation, formText);
@@ -240,39 +255,40 @@ public class SltIndentationContainer {
         LispElement element = elements.get(0);
         if (element instanceof LispContainer container) {
             Stack<IndentationBackTrack> backTrackStack = new Stack<>();
-            return calculateOffsetForForm(container, formIndentation, project, settings, packageName, backTrackStack);
+            return calculateOffsetForForm(element, container, formIndentation, project, settings, packageName, backTrackStack);
         }
-        return formIndentation.getOrDefault(element, 0);
+        return formIndentation.getOrDefault(element, OffsetInfo.DEFAULT).base;
     }
 
-    private Integer calculateOffsetForForm(LispContainer container, Map<LispElement, Integer> formIndentation, Project project,
+    private Integer calculateOffsetForForm(LispElement topLevel, LispContainer container,
+                                           Map<LispElement, OffsetInfo> formIndentation, Project project,
                                            SltIndentationSettings settings, String packageName,
                                            Stack<IndentationBackTrack> backTrackStack) throws Exception {
         if (container.getItems().isEmpty())
-            return formIndentation.getOrDefault(container, 0);
+            return formIndentation.getOrDefault(container, OffsetInfo.DEFAULT).parentForm;
 
         LispElement head = container.getItems().get(0);
         LispElement lastItem = container.getItems().get(container.getItems().size() - 1);
         int argPos = container.getItems().size() - 1;
         int argPosWithoutHead = container.getItems().size() - 2;
         boolean inSubform = backTrackStack.size() != 0;
-        boolean hasHead = false;
+        boolean hasHead;
 
         if (head == lastItem && !inSubform)
-            return formIndentation.getOrDefault(head, 0);
+            return formIndentation.getOrDefault(head, OffsetInfo.DEFAULT).parentForm;
         hasHead = head != lastItem;
 
-        Integer calculatedSubOffset = null;
+        Integer calculatedSubOffset;
         if (lastItem instanceof LispContainer subcontainer) {
             backTrackStack.add(new IndentationBackTrack(container, container.getItems().size() - 1));
-            calculatedSubOffset = calculateOffsetForForm(subcontainer, formIndentation,
+            calculatedSubOffset = calculateOffsetForForm(topLevel, subcontainer, formIndentation,
                     project, settings, packageName, backTrackStack);
             backTrackStack.pop();
             return calculatedSubOffset;
         }
 
         if (!(head instanceof LispSymbol) && !inSubform) {
-            return formIndentation.getOrDefault(lastItem, 0);
+            return formIndentation.getOrDefault(topLevel, OffsetInfo.DEFAULT).base;
         }
         if (!(head instanceof LispSymbol)) {
             hasHead = false;
@@ -292,7 +308,6 @@ public class SltIndentationContainer {
             if (backtrackIndentation != null) {
                 appliedSetting = backtrackIndentation.setting;
                 listOfSettings = backtrackIndentation.listOfSettings;
-                additionalOffset += backtrackIndentation.whole;
                 returnedFromBacktrack = true;
             }
         } else {
@@ -308,7 +323,7 @@ public class SltIndentationContainer {
                 if (backtrackIndentation != null) {
                     appliedSetting = backtrackIndentation.setting;
                     listOfSettings = backtrackIndentation.listOfSettings;
-                    additionalOffset += backtrackIndentation.whole;
+                    additionalOffset = backtrackIndentation.parentWhole;
                     returnedFromBacktrack = true;
                 }
             }
@@ -337,12 +352,7 @@ public class SltIndentationContainer {
                 if (argPosWithoutHead < indentation.indentationSetup.size()) {
                     appliedSetting = indentation.indentationSetup.get(argPosWithoutHead);
                 } else {
-                    IndentationSetting last = indentation.indentationSetup.get(indentation.indentationSetup.size() - 1);
-                    if (last.type != null) {
-                        if (last.type == IndentationType.REST || last.type == IndentationType.BODY) {
-                            appliedSetting = last;
-                        }
-                    }
+                    appliedSetting = indentation.indentationSetup.get(indentation.indentationSetup.size() - 1);
                 }
             } else if (indentation.indentationImplementation != null) {
                 // custom callback
@@ -354,12 +364,7 @@ public class SltIndentationContainer {
             if (argPosWithoutHead < listOfSettings.size()) {
                 appliedSetting = listOfSettings.get(argPosWithoutHead);
             } else {
-                IndentationSetting last = listOfSettings.get(listOfSettings.size() - 1);
-                if (last.type != null) {
-                    if (last.type == IndentationType.REST || last.type == IndentationType.BODY) {
-                        appliedSetting = last;
-                    }
-                }
+                appliedSetting = listOfSettings.get(listOfSettings.size() - 1);
             }
         }
 
@@ -377,55 +382,50 @@ public class SltIndentationContainer {
                     } else if (appliedSetting.type == IndentationType.BODY) {
                         // * &body.  This is equivalent to &rest lisp-body-indent, i.e., indent
                         //    all remaining elements by `lisp-body-indent'.
-
-                        additionalOffset += findAdditionalOffset(listOfSettings, originalSetting, settings);
+                        additionalOffset += findAdditionalOffset(originalSetting);
                         appliedOffset = additionalOffset + settings.bodyIndentation;
                     } else if (appliedSetting.type == IndentationType.LAMBDA) {
                         // * &lambda.  Indent the argument (which may be a list) by 4.
-
-                        additionalOffset += findAdditionalOffset(listOfSettings, originalSetting, settings);
+                        additionalOffset += findAdditionalOffset(originalSetting);
                         appliedOffset = additionalOffset + settings.lambdaIndentation;
-                    } else if (appliedSetting.type == IndentationType.WHOLE) {
-                        appliedOffset = additionalOffset +
-                                (appliedSetting.value == null ? settings.defaultIndentation : appliedSetting.value);
                     }
                 } else {
                     if (appliedSetting.value != null) {
-                        additionalOffset += findAdditionalOffset(listOfSettings, originalSetting, settings);
+                        additionalOffset += findAdditionalOffset(originalSetting);
                         appliedOffset = additionalOffset + appliedSetting.value;
+                    } else if (appliedSetting.listSetting != null) {
+                        appliedOffset = additionalOffset + appliedSetting.listAdd;
                     }
                 }
             }
 
             if (appliedSetting != null && appliedSetting.indentationImplementation != null) {
+                additionalOffset += findAdditionalOffset(originalSetting);
                 indentationImplementation = appliedSetting.indentationImplementation;
+            }
+        } else {
+            if (indentationImplementation == null) {
+                // special case, we failed to match, thus get this form's start offset + base offset
+                return appliedOffset + formIndentation.getOrDefault(lastItem, OffsetInfo.DEFAULT).parentForm;
             }
         }
 
         if (indentationImplementation != null) {
-            return indentationImplementation.calculateOffsetForForm(container, formIndentation,
+            return additionalOffset + indentationImplementation.calculateOffsetForForm(topLevel, container, formIndentation,
                     project, settings, packageName, backTrackStack);
         }
 
-        return appliedOffset + formIndentation.getOrDefault(container, 0);
+        return appliedOffset + formIndentation.getOrDefault(topLevel, OffsetInfo.DEFAULT).base;
     }
 
-    private int findAdditionalOffset(List<IndentationSetting> listOfSettings, IndentationSetting appliedSetting,
-                                     SltIndentationSettings settings) {
-        int ix = listOfSettings.indexOf(appliedSetting);
-        for (int i=ix-1; ix>=0; ix--) {
-            IndentationSetting setting = listOfSettings.get(ix);
-            if (setting != null) {
-                if (setting.type == IndentationType.WHOLE) {
-                    return setting.value == null ? settings.defaultIndentation : setting.value;
-                }
-            }
-        }
+    private int findAdditionalOffset(IndentationSetting appliedSetting) {
+        if (appliedSetting != null)
+            return appliedSetting.whole;
         return 0;
     }
 
     private ManualIndentation getMacroIndentation(String value, String packageName) {
-        IndentationUpdate update = swankReportedIndentations.get(value);
+        IndentationUpdate update = swankReportedIndentations.get(value.toUpperCase());
         if (update != null) {
             if (update.packages.contains(packageName.toUpperCase())) {
                 ManualIndentation indentation = new ManualIndentation();
@@ -482,17 +482,16 @@ public class SltIndentationContainer {
             //    associated function argument is itself a list.  Each element of the list
             //    specifies how to indent the associated argument.
             if (indentation.indentationSetup != null) {
-                boolean valid = true;
+                boolean valid = false;
                 BacktrackInformation information = new BacktrackInformation();
 
                 int clevel = i;
-                int whole = 0;
+                int parentWhole = 0;
                 boolean first = true;
 
                 List<IndentationSetting> settings = indentation.indentationSetup;
                 while (settings != null) {
                     if (backTrackStack.size() <= clevel) {
-                        valid = false;
                         break;
                     }
 
@@ -502,45 +501,37 @@ public class SltIndentationContainer {
                     }
                     LispElement element = backTrackStack.get(clevel).parentContainer.getItems().get(first ?  1 + pos : pos);
                     IndentationSetting setting;
-                    IndentationSetting originalSetting;
                     if (pos >= settings.size()) {
-                        IndentationSetting rest = settings.get(settings.size() - 1);
-                        if (rest.type == IndentationType.REST || rest.type == IndentationType.BODY) {
-                            setting = rest;
-                            originalSetting = setting;
-                            if (rest.type == IndentationType.REST) {
-                                setting = rest.inner;
-                            }
-                        } else {
-                            valid = false;
-                            break;
-                        }
+                        setting = settings.get(settings.size() - 1);
                     } else {
                         setting = settings.get(pos);
-                        originalSetting = setting;
-                        if (setting.type == IndentationType.REST) {
-                            setting = setting.inner;
-                        }
+                    }
+                    if (setting.type == IndentationType.REST) {
+                        setting = setting.inner;
                     }
 
                     if (clevel == backTrackStack.size() - 1) {
                         information.setting = setting;
                         information.listOfSettings = settings;
+                        information.parentWhole = parentWhole;
+                        valid = true;
                         break;
                     } else {
                         if (!(element instanceof LispContainer)) {
-                            valid = false;
                             break;
                         }
-                        whole += findAdditionalOffset(settings, originalSetting, sltSettings);
-                        settings = setting.listSetting;
+                        if (setting.listSetting == null) {
+                            settings = null;
+                        } else {
+                            settings = setting.listSetting;
+                        }
                     }
+                    parentWhole = setting.whole;
                     ++clevel;
                     first = false;
                 }
 
                 if (valid) {
-                    information.whole = whole;
                     return information;
                 }
             }
@@ -551,8 +542,6 @@ public class SltIndentationContainer {
     }
 
     private static class IndentationUpdate {
-
-        private String name;
         private BigInteger bodyArg;
         private final Set<String> packages = new HashSet<>();
 
@@ -564,6 +553,7 @@ public class SltIndentationContainer {
         public Integer normalArgumentCount;
         public List<IndentationSetting> indentationSetup;
         public IndentationImplementation indentationImplementation;
+        public int whole = 0; // should never be set
 
         @Override
         public String toString() {
@@ -588,18 +578,19 @@ public class SltIndentationContainer {
         public IndentationType type;
         public IndentationSetting inner;
         public List<IndentationSetting> listSetting;
+        public int listAdd; // listSetting != null -> apply this
         public IndentationImplementation indentationImplementation;
+        public int whole = 0;
 
         @Override
         public String toString() {
-            if (value != null && type != IndentationType.WHOLE) {
+            if (value != null) {
                 return "" + value;
             } else if (type != null) {
                 return switch (type) {
                     case LAMBDA -> "&lambda";
                     case REST -> "&rest " + (inner == null ? "NIL" : inner.toString());
                     case BODY -> "&body";
-                    case WHOLE -> "&whole " + (value == null ? "NIL" : value.toString());
                 };
             } else if (listSetting != null){
                 return "(" + listSetting.stream().map(x -> x == null ? "NIL" : x.toString())
@@ -612,14 +603,14 @@ public class SltIndentationContainer {
     }
 
     private enum IndentationType {
-        LAMBDA, REST, BODY, WHOLE
+        LAMBDA, REST, BODY
 
     }
 
     private static class IndentationBackTrack {
 
-        private LispContainer parentContainer;
-        private int position;
+        private final LispContainer parentContainer;
+        private final int position;
 
         public IndentationBackTrack(LispContainer parentContainer, int position) {
             this.parentContainer = parentContainer;
@@ -629,14 +620,14 @@ public class SltIndentationContainer {
     }
 
     private static class BacktrackInformation {
-        public int whole = 0;
         IndentationSetting setting;
         List<IndentationSetting> listOfSettings;
+        int parentWhole;
     }
 
     public interface IndentationImplementation {
 
-        Integer calculateOffsetForForm(LispContainer container, Map<LispElement, Integer> formIndentation, Project project,
+        Integer calculateOffsetForForm(LispElement topLevel, LispContainer container, Map<LispElement, OffsetInfo> formIndentation, Project project,
                                        SltIndentationSettings settings, String packageName,
                                        Stack<IndentationBackTrack> backTrackStack) throws Exception;
 
@@ -645,7 +636,7 @@ public class SltIndentationContainer {
     // specific implementations here:
 
     @SuppressWarnings("unused")
-    Integer lispIndentLoop(LispContainer container, Map<LispElement, Integer> formIndentation, Project project,
+    Integer lispIndentLoop(LispElement topLevel, LispContainer container, Map<LispElement, OffsetInfo> formIndentation, Project project,
                            SltIndentationSettings settings, String packageName,
                            Stack<IndentationBackTrack> backTrackStack) throws Exception {
         return settings.bodyIndentation;

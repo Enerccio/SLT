@@ -14,10 +14,7 @@ import com.intellij.openapi.editor.actionSystem.EditorActionManager;
 import com.intellij.openapi.editor.ex.util.EditorUIUtil;
 import com.intellij.openapi.editor.textarea.TextComponentEditor;
 import com.intellij.openapi.util.Ref;
-import com.intellij.psi.PsiDocumentManager;
-import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiFile;
-import com.intellij.psi.PsiWhiteSpace;
+import com.intellij.psi.*;
 import com.intellij.psi.util.PsiTreeUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
@@ -62,6 +59,21 @@ public class SltIndentator implements EnterHandlerDelegate {
         while (element == null) {
             element = file.findElementAt(offset--);
             wasAfter = true;
+            if (offset == 0) {
+                return 0;
+            }
+        }
+
+        while (element instanceof PsiWhiteSpace) {
+            element = file.findElementAt(offset--);
+            wasAfter = true;
+            if (offset == 0) {
+                return 0;
+            }
+        }
+
+        if (element == null) {
+            return null;
         }
 
         if (element.getNode().getElementType() == LispTypes.LPAREN) {
@@ -84,21 +96,15 @@ public class SltIndentator implements EnterHandlerDelegate {
                 }
             } else {
                 PsiElement topLevel = PsiTreeUtil.getParentOfType(element, LispToplevel.class);
+                PsiManager manager = PsiManager.getInstance(element.getProject());
                 if (topLevel != null) {
-                    if (topLevel.getFirstChild() == element || PsiTreeUtil.firstChild(topLevel) == element) {
+                    if (manager.areElementsEquivalent(topLevel.getFirstChild(), element)
+                            || manager.areElementsEquivalent(PsiTreeUtil.firstChild(topLevel), element)) {
                         // we are first ( of next toplevel
                         return 0;
                     }
                 }
             }
-        }
-
-        while (element instanceof PsiWhiteSpace) {
-            element = file.findElementAt(--offset);
-            wasAfter = true;
-        }
-        if (element == null) {
-            return null;
         }
 
         if (element.getNode().getElementType() == LispTypes.BLOCK_COMMENT) {

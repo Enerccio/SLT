@@ -29,7 +29,7 @@ public class LispUtils {
         return convertAst(source, null, null);
     }
 
-    public static List<LispElement> convertAst(PsiFile source, Map<LispElement, Integer> lineOffsets, String offsetText) {
+    public static List<LispElement> convertAst(PsiFile source, Map<LispElement, OffsetInfo> lineOffsets, String offsetText) {
         List<LispElement> elements = new ArrayList<>();
 
         source.accept(new LispVisitorImpl(elements, lineOffsets, offsetText));
@@ -56,10 +56,10 @@ public class LispUtils {
 
         private final Stack<List<LispElement>> stack;
         private final LispNumberLexerAdapter lexer = new LispNumberLexerAdapter();
-        private final Map<LispElement, Integer> lineOffsets;
+        private final Map<LispElement, OffsetInfo> lineOffsets;
         private final String offsetText;
 
-        public LispVisitorImpl(List<LispElement> elements, Map<LispElement, Integer> lineOffsets, String offsetText) {
+        public LispVisitorImpl(List<LispElement> elements, Map<LispElement, OffsetInfo> lineOffsets, String offsetText) {
             this.stack = new Stack<>();
             this.stack.add(elements);
             this.lineOffsets = lineOffsets;
@@ -221,7 +221,10 @@ public class LispUtils {
 
         private void addOffset(PsiElement element, LispElement elementDef) {
             if (lineOffsets != null) {
-                lineOffsets.put(elementDef, getOffsetFromLine(element));
+                OffsetInfo offsetInfo = new OffsetInfo();
+                offsetInfo.base = getOffsetFromLine(element);
+                offsetInfo.parentForm = getOffsetFromElemenet(element);
+                lineOffsets.put(elementDef, offsetInfo);
             }
         }
 
@@ -247,9 +250,46 @@ public class LispUtils {
             return offset;
         }
 
+        private Integer getOffsetFromElemenet(PsiElement element) {
+            int offset = element.getTextOffset();
+            return getOffsetForForm(offsetText, offset);
+        }
+
+        private Integer getOffsetForForm(String documentText, int textOffset) {
+            int offset = 0;
+            boolean parentMatched = false;
+            while (textOffset >= 0) {
+                if (documentText.charAt(textOffset) == '\n') {
+                    break;
+                }
+                if (parentMatched) {
+                    ++offset;
+                }
+                if (documentText.charAt(textOffset) == '(' && !parentMatched) {
+                    parentMatched = true;
+                }
+                --textOffset;
+            }
+            return offset;
+        }
+
         @Override
         public void visitElement(@NotNull PsiElement element) {
             element.acceptChildren(this);
         }
+    }
+
+    public static class OffsetInfo {
+
+        public static final OffsetInfo DEFAULT = new OffsetInfo();
+
+        public int base;
+        public int parentForm;
+
+        @Override
+        public String toString() {
+            return "OFS(" + base + "," + parentForm + ")";
+        }
+
     }
 }
