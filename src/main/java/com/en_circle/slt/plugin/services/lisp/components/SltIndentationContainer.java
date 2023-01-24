@@ -67,7 +67,7 @@ public class SltIndentationContainer {
             defaultIndentations.put(formName, indentation);
 
             if (definition.getItems().get(1) instanceof LispInteger) {
-                indentation.argCount = ((LispInteger) definition.getItems().get(1)).getValue().intValue();
+                indentation.normalArgumentCount = ((LispInteger) definition.getItems().get(1)).getValue().intValue();
             } else {
                 LispContainer definitionArg = (LispContainer) definition.getItems().get(1);
                 if (definitionArg.getItems().get(0) instanceof LispSymbol && ((LispSymbol) definitionArg.getItems().get(0)).getValue().equalsIgnoreCase("as")) {
@@ -161,6 +161,7 @@ public class SltIndentationContainer {
                 indentList.add(startIndent);
                 parent = PsiTreeUtil.getParentOfType(parent, LispList.class);
             }
+            Collections.reverse(indentList);
 
             try {
                 String formText = documentText.substring(toplevel.getTextOffset(), offset);
@@ -170,21 +171,24 @@ public class SltIndentationContainer {
 
             }
         } else {
-            int numBraces = element.getNode().getElementType() == LispTypes.RPAREN ? -1 : 0;
+            int numLeftBraces = 0;
+            int numRightBraces = element.getNode().getElementType() == LispTypes.RPAREN ? 1 : 0;
             PsiElement previousToplevel = element.getPrevSibling();
             while (!(previousToplevel instanceof LispToplevel)) {
                 if (previousToplevel == null)
                     break;
 
                 if (previousToplevel.getNode().getElementType() == LispTypes.LPAREN) {
-                    numBraces++;
-                    if (numBraces == 0) {
+                    if (numRightBraces > 0) {
+                        numRightBraces--;
+                    } else {
+                        numLeftBraces++;
                         int startIndent = getOffsetSinceNewLine(documentText, previousToplevel.getTextOffset());
                         indentList.add(startIndent);
                     }
                 }
                 if (previousToplevel.getNode().getElementType() == LispTypes.RPAREN) {
-                    numBraces--;
+                    numRightBraces--;
                 }
                 previousToplevel = previousToplevel.getPrevSibling();
             }
@@ -192,10 +196,11 @@ public class SltIndentationContainer {
             if (previousToplevel != null) {
                 startOffset = previousToplevel.getNextSibling().getTextOffset();
             }
+            Collections.reverse(indentList);
 
             try {
                 String formText = documentText.substring(startOffset, offset);
-                formText += StringUtils.repeat(')', numBraces);
+                formText += StringUtils.repeat(')', numLeftBraces);
                 return calculateOffset(formText, file.getProject(), indentList, settings, packageName);
             } catch (Exception ignored) {
 
@@ -224,13 +229,15 @@ public class SltIndentationContainer {
             return !indentList.isEmpty() ? indentList.get(0) : 0;
         LispElement element = elements.get(0);
         if (element instanceof LispContainer container) {
-            return calculateOffsetForForm(container, indentList, project, settings, packageName);
+            Stack<IndentationBackTrack> backTrackStack = new Stack<>();
+            return calculateOffsetForForm(container, indentList, project, settings, packageName, backTrackStack);
         }
         return !indentList.isEmpty() ? indentList.get(0) : 0;
     }
 
     private Integer calculateOffsetForForm(LispContainer container, List<Integer> indentList, Project project,
-                                           SltIndentationSettings settings, String packageName) throws Exception {
+                                           SltIndentationSettings settings, String packageName,
+                                           Stack<IndentationBackTrack> backTrackStack) throws Exception {
         if (container.getItems().isEmpty())
             return !indentList.isEmpty() ? indentList.get(0) : 0;
 
@@ -241,15 +248,89 @@ public class SltIndentationContainer {
         if (lastItem instanceof LispContainer subcontainer) {
             if (head == lastItem)
                 return !indentList.isEmpty() ? indentList.get(0) : 0;
-            calculatedSubOffset = calculateOffsetForForm(subcontainer, indentList.subList(1, indentList.size()-1),
-                    project, settings, packageName);
+            backTrackStack.add(new IndentationBackTrack(container, container.getItems().size() - 1));
+            List<Integer> sublist;
+            if (indentList.isEmpty()) {
+                sublist = new ArrayList<>();
+            } else {
+                sublist = indentList.subList(1, indentList.size());
+            }
+            calculatedSubOffset = calculateOffsetForForm(subcontainer, sublist,
+                    project, settings, packageName, backTrackStack);
+            backTrackStack.pop();
+            return calculatedSubOffset;
         }
 
         if (!(head instanceof LispSymbol headSymbol)) {
             return !indentList.isEmpty() ? indentList.get(0) : 0;
         }
 
-        return settings.restIndentation + (!indentList.isEmpty() ? indentList.get(0) : 0);
+        int additionalOffset = 0;
+        IndentationSetting appliedSetting = null;
+
+        ManualIndentation indentation = getManualIndentation(((LispSymbol) head).getValue());
+        if (indentation == null) {
+            indentation = getMacroIndentation(((LispSymbol) head).getValue(), packageName);
+        }
+        if (indentation == null) {
+            BacktrackInformation backtrackIndentation = getBacktrackIndentation(backTrackStack);
+            if (backtrackIndentation != null) {
+                indentation = backtrackIndentation.indentation;
+                appliedSetting = backtrackIndentation.setting;
+                additionalOffset = backtrackIndentation.additionalIndentation;
+            }
+        }
+
+        int appliedOffset = settings.restIndentation;
+        if (indentation != null) {
+            if (appliedSetting == null) {
+                // we are not backtracking and/or this is simple apply
+                if (indentation.normalArgumentCount != null) {
+                    // Applying: * an integer N, meaning indent the first N arguments like
+                    //                  function arguments, and any further arguments like a body.
+                    //                  This is equivalent to (4 4 ... &body).
+                    int argPos = container.getItems().size() - 1;
+                    if (argPos < indentation.normalArgumentCount) {
+                        appliedOffset = additionalOffset + settings.lambdaIndentation;
+                    } else {
+                        appliedOffset = additionalOffset + settings.bodyIndentation;
+                    }
+                }
+            }
+        }
+
+        return appliedOffset + (!indentList.isEmpty() ? indentList.get(0) : 0);
+    }
+
+    private ManualIndentation getMacroIndentation(String value, String packageName) {
+        IndentationUpdate update = swankReportedIndentations.get(value);
+        if (update != null) {
+            if (update.packages.contains(packageName.toUpperCase())) {
+                ManualIndentation indentation = new ManualIndentation();
+                if (update.bodyArg != null) {
+                    indentation.normalArgumentCount = update.bodyArg.intValue();
+                }
+                return indentation;
+            }
+        }
+        return null;
+    }
+
+    private ManualIndentation getManualIndentation(String value) {
+        value = value.toUpperCase();
+        ManualIndentation indentation = defaultIndentations.get(value);
+        while (indentation != null && indentation.ref != null) {
+            indentation = defaultIndentations.get(indentation.ref);
+        }
+        return indentation;
+    }
+
+    private BacktrackInformation getBacktrackIndentation(Stack<IndentationBackTrack> backTrackStack) {
+        if (backTrackStack.isEmpty()) {
+            return null;
+        }
+        // TODO: backtrack
+        return null;
     }
 
     private static class IndentationUpdate {
@@ -263,15 +344,15 @@ public class SltIndentationContainer {
     private static class ManualIndentation {
 
         public String ref;
-        public Integer argCount;
+        public Integer normalArgumentCount;
         public List<IndentationSetting> indentationSetup;
 
         @Override
         public String toString() {
             if (ref != null) {
                 return "(as " + ref + ")";
-            } else if (argCount != null) {
-                return "" + argCount;
+            } else if (normalArgumentCount != null) {
+                return "" + normalArgumentCount;
             } else if (indentationSetup != null) {
                 return "(" + indentationSetup.stream().map(x -> x == null ? "NIL" : x.toString())
                         .collect(Collectors.joining(" ")) + ")";
@@ -309,6 +390,25 @@ public class SltIndentationContainer {
 
     private enum IndentationType {
         LAMBDA, REST, BODY, WHOLE
+
+    }
+
+    private static class IndentationBackTrack {
+
+        private LispContainer parentContainer;
+        private int position;
+
+        public IndentationBackTrack(LispContainer parentContainer, int position) {
+            this.parentContainer = parentContainer;
+            this.position = position;
+        }
+
+    }
+
+    private static class BacktrackInformation {
+        int additionalIndentation = 0;
+        ManualIndentation indentation;
+        IndentationSetting setting;
 
     }
 

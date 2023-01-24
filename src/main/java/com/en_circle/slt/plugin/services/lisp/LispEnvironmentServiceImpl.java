@@ -53,7 +53,7 @@ public class LispEnvironmentServiceImpl implements LispEnvironmentService {
     private SltLispEnvironmentSymbolCache symbolCache;
     private SltLispEnvironmentMacroExpandCache macroExpandCache;
 
-    public synchronized boolean initProject(Project project) {
+    public boolean initProject(Project project) {
         if (this.project == null) {
             indentationContainer = new SltIndentationContainer();
             indentationContainer.init(project);
@@ -250,7 +250,7 @@ public class LispEnvironmentServiceImpl implements LispEnvironmentService {
 
     @Override
     public String getGlobalPackage() {
-        return "CL-USER";
+        return "COMMON-LISP-USER";
     }
 
     @Override

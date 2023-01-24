@@ -88,7 +88,7 @@ public class PackageSelectorComponent {
         if (packages.contains(currentPackage.get())) {
             packageComboBox.setSelectedItem(currentPackage.get());
         } else {
-            packageComboBox.setSelectedItem("CL-USER");
+            packageComboBox.setSelectedItem("COMMON-LISP-USER");
         }
     }
 

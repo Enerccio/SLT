@@ -18,7 +18,7 @@ public class GlobalPackageSelectorAction extends AnAction implements CustomCompo
 
     @Override
     public @NotNull JComponent createCustomComponent(@NotNull Presentation presentation, @NotNull String place) {
-        PackageSelectorComponent packageSelectorComponent = new PackageSelectorComponent("GlobalPackageSelector", () -> "CL-USER");
+        PackageSelectorComponent packageSelectorComponent = new PackageSelectorComponent("GlobalPackageSelector", () -> "COMMON-LISP-USER");
         return packageSelectorComponent.getComponent();
     }
 

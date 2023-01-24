@@ -32,7 +32,7 @@ public abstract class SltConsole implements SltComponent {
     protected final JPanel content;
     protected final Project project;
 
-    protected String currentModule = "CL-USER";
+    protected String currentModule = "COMMON-LISP-USER";
 
     public SltConsole(Project project) {
         this.content = new JPanel(new BorderLayout());
@@ -41,7 +41,7 @@ public abstract class SltConsole implements SltComponent {
 
     protected void setPackage(String packageName) {
         if (packageName == null) {
-            packageName = "CL-USER";
+            packageName = "COMMON-LISP-USER";
         }
         currentModule = packageName;
         languageConsole.setPrompt(currentModule + ">");

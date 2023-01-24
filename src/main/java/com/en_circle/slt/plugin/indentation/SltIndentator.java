@@ -58,8 +58,8 @@ public class SltIndentator implements EnterHandlerDelegate {
         int offset = editor.getCaretModel().getOffset();
 
         PsiElement element = file.findElementAt(offset);
-        if (element == null) {
-            return null;
+        while (element == null) {
+            element = file.findElementAt(offset--);
         }
 
         if (element.getNode().getElementType() == LispTypes.LPAREN) {
@@ -121,7 +121,7 @@ public class SltIndentator implements EnterHandlerDelegate {
                 try {
                     EditorUIUtil.hideCursorInEditor(editor);
                     Document document = editor.getDocument();
-                    if(!editor.isInsertMode()) {
+                    if (!editor.isInsertMode()) {
                         int caretLine = editor.getCaretModel().getLogicalPosition().line;
                         int lineCount = document.getLineCount();
                         if (caretLine < lineCount) {
