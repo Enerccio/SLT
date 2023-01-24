@@ -19,6 +19,7 @@ public class SltIndentationSettings implements PersistentStateComponent<SltInden
     }
 
     public int defaultIndentation = 2;
+    public int parameterIndentation = 4;
     public int lambdaIndentation = 4;
     public int restIndentation = 2;
     public int bodyIndentation = 2;

@@ -53,7 +53,7 @@ public interface LispEnvironmentService extends Disposable {
 
     void updateIndentation(LispElement element);
 
-    Integer calculateOffset(PsiElement element, PsiFile file, boolean wasAfter, String text, int offset);
+    Integer calculateOffset(PsiElement element, PsiFile file, boolean wasAfter, String text, int offset, String packageOverride);
 
     enum LispEnvironmentState {
         STOPPED, READY, INITIALIZING

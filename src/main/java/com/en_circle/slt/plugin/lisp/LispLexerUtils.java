@@ -7,7 +7,12 @@ import com.intellij.psi.TokenType;
 import com.intellij.psi.tree.IElementType;
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.regex.Pattern;
+
 public class LispLexerUtils {
+
+    // keep in sycn with flex!
+    private static final Pattern whitespace = Pattern.compile("[\\r\\n\\t \\x0c\\x0a]");
 
     public static IElementType processToken(LispNumberLexerAdapter lexer, String token) {
         if (StringUtils.containsOnly(token, ".")) {
@@ -29,4 +34,7 @@ public class LispLexerUtils {
         return LispTypes.SYMBOL_TOKEN;
     }
 
+    public static boolean isWhitespace(char charAt) {
+        return whitespace.matcher(String.valueOf(charAt)).matches();
+    }
 }

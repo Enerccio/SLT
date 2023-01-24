@@ -291,8 +291,8 @@ public class LispEnvironmentServiceImpl implements LispEnvironmentService {
     }
 
     @Override
-    public Integer calculateOffset(PsiElement element, PsiFile file, boolean wasAfter, String text, int offset) {
-        return indentationContainer.calculateOffset(element, file, wasAfter, text, offset);
+    public Integer calculateOffset(PsiElement element, PsiFile file, boolean wasAfter, String text, int offset, String packageOverride) {
+        return indentationContainer.calculateOffset(element, file, wasAfter, text, offset, packageOverride);
     }
 
     @Override

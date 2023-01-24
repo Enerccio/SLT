@@ -4,6 +4,7 @@ import com.en_circle.slt.plugin.SltCommonLispFileType;
 import com.en_circle.slt.plugin.lisp.psi.LispToplevel;
 import com.en_circle.slt.plugin.lisp.psi.LispTypes;
 import com.en_circle.slt.plugin.services.lisp.LispEnvironmentService;
+import com.en_circle.slt.plugin.ui.console.SltConsole;
 import com.intellij.codeInsight.editorActions.enter.EnterHandlerDelegate;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.application.ApplicationManager;
@@ -18,12 +19,11 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiWhiteSpace;
 import com.intellij.psi.util.PsiTreeUtil;
-import com.intellij.util.DocumentUtil;
-import com.intellij.util.text.CharArrayUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import javax.swing.*;
 import java.util.Objects;
 
 public class SltIndentator implements EnterHandlerDelegate {
@@ -55,11 +55,13 @@ public class SltIndentator implements EnterHandlerDelegate {
     }
 
     private Integer calculateIndentOffset(PsiFile file, Editor editor) {
+        boolean wasAfter = false;
         int offset = editor.getCaretModel().getOffset();
 
         PsiElement element = file.findElementAt(offset);
         while (element == null) {
             element = file.findElementAt(offset--);
+            wasAfter = true;
         }
 
         if (element.getNode().getElementType() == LispTypes.LPAREN) {
@@ -91,7 +93,6 @@ public class SltIndentator implements EnterHandlerDelegate {
             }
         }
 
-        boolean wasAfter = false;
         while (element instanceof PsiWhiteSpace) {
             element = file.findElementAt(--offset);
             wasAfter = true;
@@ -104,11 +105,25 @@ public class SltIndentator implements EnterHandlerDelegate {
             return null;
         }
 
-        int totalOffset = LispEnvironmentService.getInstance(Objects.requireNonNull(editor.getProject()))
-                .calculateOffset(element, file, wasAfter, editor.getDocument().getText(), editor.getCaretModel().getOffset());
-        int lineStartOffset = DocumentUtil.getLineStartOffset(editor.getCaretModel().getOffset(), editor.getDocument());
-        int lineStartWsEndOffset = CharArrayUtil.shiftForward(editor.getDocument().getText(), lineStartOffset, " \t");
-        return totalOffset - (lineStartWsEndOffset - lineStartOffset);
+        String packageOverride = getPackageOverride(editor.getContentComponent());
+
+        return LispEnvironmentService.getInstance(Objects.requireNonNull(editor.getProject()))
+                .calculateOffset(element, file, wasAfter, editor.getDocument().getText(), editor.getCaretModel().getOffset(),
+                        packageOverride);
+    }
+
+    private String getPackageOverride(JComponent contentComponent) {
+        while (contentComponent != null) {
+            if (contentComponent.getClientProperty(SltConsole.KEY) != null) {
+                return ((SltConsole) contentComponent.getClientProperty(SltConsole.KEY)).getPackage();
+            }
+            if (contentComponent.getParent() instanceof JComponent) {
+                contentComponent = (JComponent) contentComponent.getParent();
+            } else {
+                return null;
+            }
+        }
+        return null;
     }
 
     private void indentDocument(Editor editor, int additionalOffset) {
@@ -139,11 +154,7 @@ public class SltIndentator implements EnterHandlerDelegate {
                     // Smart indenting here:
                     CharSequence text = document.getCharsSequence();
                     int caretOffset = editor.getCaretModel().getOffset();
-                    int lineStartOffset = DocumentUtil.getLineStartOffset(caretOffset, document);
-                    int lineStartWsEndOffset = CharArrayUtil.shiftForward(text, lineStartOffset, " \t");
-                    String s = "\n" + text.subSequence(lineStartOffset, Math.min(caretOffset, lineStartWsEndOffset));
-                    String spaceInserts = StringUtils.repeat(' ', additionalOffset);
-                    s += spaceInserts;
+                    String s = "\n" + StringUtils.repeat(' ', additionalOffset);
                     document.insertString(caretOffset, s);
                     editor.getCaretModel().moveToOffset(caretOffset + s.length());
                     EditorModificationUtil.scrollToCaret(editor);
