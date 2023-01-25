@@ -48,7 +48,7 @@ public class DownloadSBCLMsiAction implements DownloadSBCLAction {
         String installUuid = StringUtils.replace(UUID.randomUUID().toString(), "-", "");
         SBCLInstallation installation = downloadSbcl(installUuid);
         if (installation != null) {
-            String quicklispPath = downloadQuicklisp(installUuid);
+            String quicklispPath = downloadQuicklisp();
             if (quicklispPath != null) {
                 String quicklispSetupFile = installQuicklisp(installUuid, installation, quicklispPath);
                 if (quicklispSetupFile != null) {
@@ -128,13 +128,13 @@ public class DownloadSBCLMsiAction implements DownloadSBCLAction {
         }
     }
 
-    private String downloadQuicklisp(String uuidInstall) {
+    private String downloadQuicklisp() {
         ProgressWindow verifyWindow = new ProgressWindow(true, false, null,
                 rootPane, SltBundle.message("slt.ui.settings.sdk.download.cancel"));
         verifyWindow.setTitle(SltBundle.message("slt.ui.settings.sdk.download.downloading.quicklisp.title"));
         Disposer.register(parentDisposable, verifyWindow);
 
-        ProgressResult<String> result = new ProgressRunner<>(pi -> downloadQuicklisp(uuidInstall, pi))
+        ProgressResult<String> result = new ProgressRunner<>(pi -> downloadQuicklisp(pi))
                 .sync()
                 .onThread(ProgressRunner.ThreadToUse.POOLED)
                 .withProgress(verifyWindow)
@@ -143,9 +143,9 @@ public class DownloadSBCLMsiAction implements DownloadSBCLAction {
         return result.getResult();
     }
 
-    private String downloadQuicklisp(String uuidInstall, ProgressIndicator pi) {
+    private String downloadQuicklisp(ProgressIndicator pi) {
         try {
-            URL url = new URL("http://beta.quicklisp.org/quicklisp.lisp");
+            URL url = new URL("https://beta.quicklisp.org/quicklisp.lisp");
             File tempFile = FileUtil.createTempFile(PluginPath.getPluginFolder(), "ql", ".lisp");
             if (!tempFile.delete()) {
                 return null;
@@ -194,6 +194,9 @@ public class DownloadSBCLMsiAction implements DownloadSBCLAction {
                     "--non-interactive", "--load", quicklispPath, "--eval", evalForm, "--quit")
                     .inheritIO()
                     .start();
+
+            if (pi.isCanceled())
+                return null;
 
             int res = p.waitFor();
             if (res == 0) {
