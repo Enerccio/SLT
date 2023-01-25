@@ -22,7 +22,6 @@ public class EvalFileFromEditor extends EvalActionBase {
 
             VirtualFile vf = FileDocumentManager.getInstance().getFile(editor.getDocument());
             if (vf != null) {
-
                 evaluateFile(editor.getProject(), vf.getPath(), vf);
             }
         }
