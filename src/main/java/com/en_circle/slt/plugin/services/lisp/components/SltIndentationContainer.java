@@ -166,7 +166,7 @@ public class SltIndentationContainer {
         return ix;
     }
 
-    public Integer calculateOffset(PsiElement element, PsiFile file, boolean wasAfter, String documentText, int offset,
+    public Integer calculateIndent(PsiElement element, PsiFile file, boolean wasAfter, String documentText, int offset,
                                    String packageOverride) {
         SltIndentationSettings settings = SltIndentationSettings.getInstance(element.getProject());
         String packageName = packageOverride != null ? packageOverride : LispParserUtil.getPackage(file, offset);
@@ -204,7 +204,7 @@ public class SltIndentationContainer {
                     formText += " 0";
                 }
                 formText += StringUtils.repeat(')', numBraces);
-                return calculateOffset(formText, file.getProject(), settings, packageName);
+                return calculateIndent(formText, file.getProject(), settings, packageName);
             } catch (Exception ignored) {
 
             }
@@ -237,7 +237,7 @@ public class SltIndentationContainer {
                 String formText = documentText.substring(startOffset, offset);
                 // insert fake element at the end, so we identify correct form
                 formText += " 0" + StringUtils.repeat(')', numLeftBraces);
-                return calculateOffset(formText, file.getProject(), settings, packageName);
+                return calculateIndent(formText, file.getProject(), settings, packageName);
             } catch (Exception ignored) {
 
             }
@@ -245,7 +245,7 @@ public class SltIndentationContainer {
         return 0;
     }
 
-    private Integer calculateOffset(String formText, Project project, SltIndentationSettings settings, String packageName) throws Exception {
+    private Integer calculateIndent(String formText, Project project, SltIndentationSettings settings, String packageName) throws Exception {
         Map<LispElement, OffsetInfo> formIndentation = new IdentityHashMap<>();
         PsiFileFactory factory = PsiFileFactory.getInstance(project);
         PsiFile source = factory.createFileFromText("fragment.cl", SltCommonLispFileType.INSTANCE, formText);
@@ -255,88 +255,137 @@ public class SltIndentationContainer {
         LispElement element = elements.get(0);
         if (element instanceof LispContainer container) {
             Stack<IndentationBackTrack> backTrackStack = new Stack<>();
-            return calculateOffsetForForm(element, container, formIndentation, project, settings, packageName, backTrackStack);
+            return calculateIndentForForm(element, container, formIndentation, project, settings, packageName, backTrackStack);
         }
         return formIndentation.getOrDefault(element, OffsetInfo.DEFAULT).base;
     }
 
-    private Integer calculateOffsetForForm(LispElement topLevel, LispContainer container,
+    private Integer calculateIndentForForm(LispElement topLevel, LispContainer container,
                                            Map<LispElement, OffsetInfo> formIndentation, Project project,
                                            SltIndentationSettings settings, String packageName,
                                            Stack<IndentationBackTrack> backTrackStack) throws Exception {
+        // if we have empty list just do same offset of parent form
         if (container.getItems().isEmpty())
             return formIndentation.getOrDefault(container, OffsetInfo.DEFAULT).parentForm;
 
         LispElement head = container.getItems().get(0);
         LispElement lastItem = container.getItems().get(container.getItems().size() - 1);
+        // rules are shifted in source, sigh, so we have to shift here, but only if we have matching head,
+        // otherwise we don't...
         int argPos = container.getItems().size() - 1;
         int argPosWithoutHead = container.getItems().size() - 2;
         boolean inSubform = backTrackStack.size() != 0;
         boolean hasHead;
 
+        // we have toplevel form and head is only item in list, there is nothing to format...
         if (head == lastItem && !inSubform)
             return formIndentation.getOrDefault(head, OffsetInfo.DEFAULT).parentForm;
         hasHead = head != lastItem;
 
         Integer calculatedSubOffset;
         if (lastItem instanceof LispContainer subcontainer) {
+            // last item in sexpr is list, thus we need to go further in.
+            // offset is always calculated for innermost last element of whole toplevel ast tree
+
+            // add information to backtrack, so we can backtrack later to search bottom rules
             backTrackStack.add(new IndentationBackTrack(container, container.getItems().size() - 1));
-            calculatedSubOffset = calculateOffsetForForm(topLevel, subcontainer, formIndentation,
+            calculatedSubOffset = calculateIndentForForm(topLevel, subcontainer, formIndentation,
                     project, settings, packageName, backTrackStack);
             backTrackStack.pop();
             return calculatedSubOffset;
         }
 
         if (!(head instanceof LispSymbol) && !inSubform) {
+            // first element is a number, and we are toplevel, just return default offset ...
             return formIndentation.getOrDefault(topLevel, OffsetInfo.DEFAULT).base;
         }
+
+        // if head is not symbol, but we possibly can be in subform we have to mark it so
         if (!(head instanceof LispSymbol)) {
             hasHead = false;
         }
 
+        // all other offsets, such as whole are added here
         int additionalOffset = 0;
+        // applied inner setting, if matched
         IndentationSetting appliedSetting = null;
+        // root indentation setting, if we matched head
         ManualIndentation indentation = null;
+        // list of rules to select if applicable
         List<IndentationSetting> listOfSettings = null;
+        // Custom callback rule - if non-null we call this instead of other rules
         IndentationImplementation indentationImplementation = null;
+        // Returns true if we found our rule on backtracking, not by head
         boolean returnedFromBacktrack = false;
+        // This denotes that backtrack has failed to fully apply rule and was forced to stop early, thus we
+        // need to apply basic indentation + this elements active indentation
+        LispElement backtrackRuleOnlyAppliedTo = null;
 
         if (!hasHead) {
+            // if head is not a symbol we don't bother with rule matching and instead go for backtrack immediately
+
             backTrackStack.add(new IndentationBackTrack(container, container.getItems().size() - 1));
-            BacktrackInformation backtrackIndentation = getBacktrackIndentation(packageName, backTrackStack, settings);
+            BacktrackInformation backtrackIndentation = getBacktrackIndentation(packageName, backTrackStack);
             backTrackStack.pop();
             if (backtrackIndentation != null) {
-                appliedSetting = backtrackIndentation.setting;
-                listOfSettings = backtrackIndentation.listOfSettings;
-                returnedFromBacktrack = true;
-            }
-        } else {
-            indentation = getManualIndentation(((LispSymbol) head).getValue());
-
-            if (indentation == null) {
-                indentation = getMacroIndentation(((LispSymbol) head).getValue(), packageName);
-            }
-            if (indentation == null) {
-                backTrackStack.add(new IndentationBackTrack(container, container.getItems().size() - 1));
-                BacktrackInformation backtrackIndentation = getBacktrackIndentation(packageName, backTrackStack, settings);
-                backTrackStack.pop();
-                if (backtrackIndentation != null) {
+                // we found rule on backtrack
+                backtrackRuleOnlyAppliedTo = backtrackIndentation.appliesRuleToOnly;
+                if (backtrackRuleOnlyAppliedTo == null) {
+                    // backtrack rule actually got hit
+                    // if backtrackRuleOnlyAppliedTo is not null we only got partial hit some level below,
+                    // so we skip all rules and just use that base element's indent + new base indent as rule
                     appliedSetting = backtrackIndentation.setting;
                     listOfSettings = backtrackIndentation.listOfSettings;
                     additionalOffset = backtrackIndentation.parentWhole;
                     returnedFromBacktrack = true;
                 }
             }
+        } else {
+            // get a base rule from indentation.cl
+            indentation = getManualIndentation(((LispSymbol) head).getValue());
+
+            if (indentation == null) {
+                // no base rule, try macro rule that we get from swank
+                indentation = getMacroIndentation(((LispSymbol) head).getValue(), packageName);
+            }
+
+            if (indentation == null) {
+                // no macro or base rule, we have to backtrack
+                backTrackStack.add(new IndentationBackTrack(container, container.getItems().size() - 1));
+                BacktrackInformation backtrackIndentation = getBacktrackIndentation(packageName, backTrackStack);
+                backTrackStack.pop();
+                if (backtrackIndentation != null) {
+                    // backtrack got hit
+                    backtrackRuleOnlyAppliedTo = backtrackIndentation.appliesRuleToOnly;
+                    if (backtrackRuleOnlyAppliedTo == null) {
+                        // backtrack rule actually got hit
+                        // if backtrackRuleOnlyAppliedTo is not null we only got partial hit some level below,
+                        // so we skip all rules and just use that base element's indent + new base indent as rule
+                        appliedSetting = backtrackIndentation.setting;
+                        listOfSettings = backtrackIndentation.listOfSettings;
+                        additionalOffset = backtrackIndentation.parentWhole;
+                        returnedFromBacktrack = true;
+                    }
+                }
+            }
         }
 
         int appliedOffset = settings.restIndentation;
+        if (backtrackRuleOnlyAppliedTo != null) {
+            // partial matching, see above
+            return appliedOffset + formIndentation.getOrDefault(topLevel, OffsetInfo.DEFAULT).parentForm;
+        }
+
+        // if we found it on backtrack, head does not matter, so
+        // we have to shift argument by 1 to normal position in rules
         if (!hasHead || returnedFromBacktrack) {
             argPosWithoutHead = argPos;
         }
+        // just sanity check, so we don't query negative rule
         assert argPosWithoutHead >= 0;
 
         if (indentation != null) {
-            // we are not backtracking and/or this is simple apply
+            // we are not backtracking and we found the main rule
             if (indentation.normalArgumentCount != null) {
                 // Applying: * an integer N, meaning indent the first N arguments like
                 //                  function arguments, and any further arguments like a body.
@@ -347,20 +396,24 @@ public class SltIndentationContainer {
                     appliedOffset = additionalOffset + settings.bodyIndentation;
                 }
             } else if (indentation.indentationSetup != null) {
+                // rule has multiple subrules, this handle it same as with backtrack, ie find correct subrule
                 listOfSettings = indentation.indentationSetup;
 
                 if (argPosWithoutHead < indentation.indentationSetup.size()) {
                     appliedSetting = indentation.indentationSetup.get(argPosWithoutHead);
                 } else {
+                    // any arguments above the rules are last rules (what is the point of &rest I don't get but
+                    // slime indent documentation is dumb anyways
                     appliedSetting = indentation.indentationSetup.get(indentation.indentationSetup.size() - 1);
                 }
             } else if (indentation.indentationImplementation != null) {
-                // custom callback
+                // rule is callback to code, so we assign it here
                 indentationImplementation = indentation.indentationImplementation;
             }
         }
 
         if (returnedFromBacktrack) {
+            // backtrack always has subrules so same matching as above
             if (argPosWithoutHead < listOfSettings.size()) {
                 appliedSetting = listOfSettings.get(argPosWithoutHead);
             } else {
@@ -369,16 +422,24 @@ public class SltIndentationContainer {
         }
 
         if (appliedSetting != null) {
+            // we actually have a matching rule
+
+            // original rule is preserved, so it can be later accessed because
+            // rest rule overwrites itself with child rule, as seen below
             IndentationSetting originalSetting = appliedSetting;
             if (appliedSetting.type == IndentationType.REST) {
                 // * &rest.  When used, this must be the penultimate element.  The
                 //    element after this one applies to all remaining arguments.
-                appliedSetting = appliedSetting.inner;
+                appliedSetting = appliedSetting.inner; // overwrites itself
             }
+
             if (appliedSetting != null) {
+                // another check because rest could have NULL subrule, and it would crash
                 if (appliedSetting.type != null) {
+                    // type matches if type is not null
                     if (appliedSetting.type == IndentationType.REST) {
-                        // should not happen!
+                        // should not happen unless source rule is garbage (ie &rest &rest)
+                        throw new IllegalStateException("bad rule setting");
                     } else if (appliedSetting.type == IndentationType.BODY) {
                         // * &body.  This is equivalent to &rest lisp-body-indent, i.e., indent
                         //    all remaining elements by `lisp-body-indent'.
@@ -390,16 +451,23 @@ public class SltIndentationContainer {
                         appliedOffset = additionalOffset + settings.lambdaIndentation;
                     }
                 } else {
+                    // type is null so this rule either has value or is callback or is "list add"
                     if (appliedSetting.value != null) {
+                        // just add value
                         additionalOffset += findAdditionalOffset(originalSetting);
                         appliedOffset = additionalOffset + appliedSetting.value;
                     } else if (appliedSetting.listSetting != null) {
+                        // this is "list add" rule, ie rule with listSetting not null but applied directly.
+                        // list add rules are list rules that usually start with &whole.
+                        // &whole argument is then applied both as list add for main list and as additional add
+                        // for all inner rules (this is already calculated and baked into subrules with preserving hierarchy)
                         appliedOffset = additionalOffset + appliedSetting.listAdd;
                     }
                 }
             }
 
             if (appliedSetting != null && appliedSetting.indentationImplementation != null) {
+                // we have callback so honor it
                 additionalOffset += findAdditionalOffset(originalSetting);
                 indentationImplementation = appliedSetting.indentationImplementation;
             }
@@ -411,10 +479,13 @@ public class SltIndentationContainer {
         }
 
         if (indentationImplementation != null) {
+            // call callback and let it deal with this shit
             return additionalOffset + indentationImplementation.calculateOffsetForForm(topLevel, container, formIndentation,
                     project, settings, packageName, backTrackStack);
         }
 
+        // general return of indent offset
+        // can be just generic value or calculated value
         return appliedOffset + formIndentation.getOrDefault(topLevel, OffsetInfo.DEFAULT).base;
     }
 
@@ -448,19 +519,19 @@ public class SltIndentationContainer {
     }
 
     private BacktrackInformation getBacktrackIndentation(String packageName,
-                                                         Stack<IndentationBackTrack> backTrackStack,
-                                                         SltIndentationSettings sltSettings) {
+                                                         Stack<IndentationBackTrack> backTrackStack) {
         if (backTrackStack.isEmpty()) {
             return null;
         }
 
         int ix = backTrackStack.size();
-        return doGetBacktrackIndentation(packageName, backTrackStack, ix-1, sltSettings);
+        return doGetBacktrackIndentation(packageName, backTrackStack, ix-1);
     }
 
     private BacktrackInformation doGetBacktrackIndentation(String packageName, Stack<IndentationBackTrack> backTrackStack,
-                                                           int i, SltIndentationSettings sltSettings) {
+                                                           int i) {
         if (i < 0) {
+            // we reached the end of backtrack stack and found nothing, just bail
             return null;
         }
         IndentationBackTrack backTrack = backTrackStack.get(i);
@@ -468,7 +539,7 @@ public class SltIndentationContainer {
         LispElement head = backTrack.parentContainer.getItems().get(0);
 
         if (!(head instanceof LispSymbol)) {
-            return doGetBacktrackIndentation(packageName, backTrackStack, i-1, sltSettings);
+            return doGetBacktrackIndentation(packageName, backTrackStack, i-1);
         }
 
         ManualIndentation indentation = getManualIndentation(((LispSymbol) head).getValue());
@@ -482,7 +553,6 @@ public class SltIndentationContainer {
             //    associated function argument is itself a list.  Each element of the list
             //    specifies how to indent the associated argument.
             if (indentation.indentationSetup != null) {
-                boolean valid = false;
                 BacktrackInformation information = new BacktrackInformation();
 
                 int clevel = i;
@@ -510,11 +580,12 @@ public class SltIndentationContainer {
                         setting = setting.inner;
                     }
 
+                    information.appliesRuleToOnly = element;
                     if (clevel == backTrackStack.size() - 1) {
                         information.setting = setting;
                         information.listOfSettings = settings;
                         information.parentWhole = parentWhole;
-                        valid = true;
+                        information.appliesRuleToOnly = null;
                         break;
                     } else {
                         if (!(element instanceof LispContainer)) {
@@ -531,14 +602,12 @@ public class SltIndentationContainer {
                     first = false;
                 }
 
-                if (valid) {
-                    return information;
-                }
+                return information;
             }
             return null;
         }
 
-        return doGetBacktrackIndentation(packageName, backTrackStack, i-1, sltSettings);
+        return doGetBacktrackIndentation(packageName, backTrackStack, i-1);
     }
 
     private static class IndentationUpdate {
@@ -623,6 +692,7 @@ public class SltIndentationContainer {
         IndentationSetting setting;
         List<IndentationSetting> listOfSettings;
         int parentWhole;
+        LispElement appliesRuleToOnly;
     }
 
     public interface IndentationImplementation {

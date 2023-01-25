@@ -157,8 +157,6 @@ public class SltIndentator implements EnterHandlerDelegate {
                         return;
                     }
                     EditorModificationUtil.deleteSelectedText(editor);
-                    // Smart indenting here:
-                    CharSequence text = document.getCharsSequence();
                     int caretOffset = editor.getCaretModel().getOffset();
                     String s = "\n" + StringUtils.repeat(' ', additionalOffset);
                     document.insertString(caretOffset, s);
