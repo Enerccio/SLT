@@ -3,6 +3,8 @@
 ### Added
 
 - Current package at editor cursor widget
+- Automatic Indentation
+- SDK support, Automatic download for Windows users
 
 ### Fixes
 
@@ -10,6 +12,7 @@
 - Fixed repl not closing
 - Fixed templates
 - Fixed lexer issue with comments
+- Various fixes related to windows
 
 
 ## 0.2.1 - 230120

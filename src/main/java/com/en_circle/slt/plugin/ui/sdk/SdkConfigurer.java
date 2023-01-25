@@ -3,12 +3,15 @@ package com.en_circle.slt.plugin.ui.sdk;
 import com.en_circle.slt.plugin.SltBundle;
 import com.en_circle.slt.plugin.sdk.LispSdk;
 import com.en_circle.slt.plugin.sdk.SdkList;
-import com.en_circle.slt.tools.RoswellUtils;
+import com.en_circle.slt.tools.platform.DownloadSBCLAction;
+import com.en_circle.slt.tools.platform.PlatformActionsContainer;
 import com.intellij.icons.AllIcons.Actions;
 import com.intellij.icons.AllIcons.General;
 import com.intellij.openapi.actionSystem.*;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.options.Configurable;
 import com.intellij.openapi.options.ConfigurationException;
+import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.util.NlsContexts.ConfigurableName;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.table.JBTable;
@@ -18,10 +21,8 @@ import org.jetbrains.annotations.Nullable;
 import javax.swing.*;
 import javax.swing.table.AbstractTableModel;
 import java.awt.*;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 public class SdkConfigurer implements Configurable {
 
@@ -131,8 +132,20 @@ public class SdkConfigurer implements Configurable {
         table.setModel(model);
     }
 
+    @SuppressWarnings("IncorrectParentDisposable")
     private void downloadSdk() {
-
+        Objects.requireNonNull(PlatformActionsContainer.getAction(DownloadSBCLAction.class))
+                .downloadSdk(ApplicationManager.getApplication(), root,
+                sdk -> {
+            if (sdk != null) {
+                definedSdks.add(sdk);
+                SdkListModel model = new SdkListModel(definedSdks);
+                table.setModel(model);
+            } else {
+                Messages.showErrorDialog(SltBundle.message("slt.ui.settings.sdk.download.failed"),
+                        SltBundle.message("slt.ui.settings.sdk.download.failed.title"));
+            }
+        });
     }
 
     private class EditSdkAction extends AnAction {
@@ -189,7 +202,7 @@ public class SdkConfigurer implements Configurable {
 
         @Override
         public void update(@NotNull AnActionEvent e) {
-            e.getPresentation().setEnabled(RoswellUtils.exists());
+            e.getPresentation().setEnabled(PlatformActionsContainer.hasAction(DownloadSBCLAction.class));
         }
 
         @Override

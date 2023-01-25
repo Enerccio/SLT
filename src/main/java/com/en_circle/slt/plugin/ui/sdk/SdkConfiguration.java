@@ -182,7 +182,7 @@ public class SdkConfiguration extends DialogWrapper {
     }
 
     private boolean verifySbcl(ProgressIndicator pi, String executable, String core, String quicklisp) {
-        return SBCLUtils.verifyAndInstallDependencies(executable, core, quicklisp);
+        return SBCLUtils.verifyAndInstallDependencies(executable, core, quicklisp, pi);
     }
 
     private void save() {

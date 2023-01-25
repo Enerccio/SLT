@@ -10,6 +10,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.BooleanSupplier;
 
 public class SltProcessStreamGobbler extends Thread {
 
@@ -93,11 +94,18 @@ public class SltProcessStreamGobbler extends Thread {
         }
 
         public boolean awaitFor(Process process, SltProcessStreamGobbler gobbler, long time, TimeUnit unit) {
+            return awaitFor(process, gobbler, time, unit, null);
+        }
+
+        public boolean awaitFor(Process process, SltProcessStreamGobbler gobbler, long time, TimeUnit unit, BooleanSupplier checkForEnd) {
             AtomicBoolean started = new AtomicBoolean(false);
             Awaitility.await()
                     .pollInterval(new FixedPollInterval(250, TimeUnit.MILLISECONDS))
                     .atMost(time, unit)
                     .until(() -> {
+                        if (checkForEnd != null && checkForEnd.getAsBoolean()) {
+                            return true;
+                        }
                         if (process != null && !process.isAlive()) {
                             return true;
                         }

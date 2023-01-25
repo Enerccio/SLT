@@ -3,6 +3,7 @@ package com.en_circle.slt.tools;
 import com.en_circle.slt.plugin.environment.SltProcessStreamGobbler;
 import com.en_circle.slt.plugin.environment.SltProcessStreamGobbler.WaitForOccurrence;
 import com.en_circle.slt.templates.SbclVerifyTemplate;
+import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.util.io.FileUtil;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -16,7 +17,7 @@ import java.util.concurrent.TimeUnit;
 public class SBCLUtils {
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
-    public static boolean verifyAndInstallDependencies(String executable, String core, String quicklisp) {
+    public static boolean verifyAndInstallDependencies(String executable, String core, String quicklisp, ProgressIndicator pi) {
         try {
             List<String> args = new ArrayList<>();
             args.add(executable);
@@ -40,16 +41,21 @@ public class SBCLUtils {
                 Process process = processBuilder.start();
 
                 StringBuilder returnValue = new StringBuilder();
+                StringBuilder textValue = new StringBuilder();
                 SltProcessStreamGobbler errorController = new SltProcessStreamGobbler(process.getErrorStream());
                 SltProcessStreamGobbler outputController = new SltProcessStreamGobbler(process.getInputStream());
                 errorController.addUpdateListener(returnValue::append);
+                outputController.addUpdateListener(textValue::append);
                 WaitForOccurrence waiter = new WaitForOccurrence("SltVerified");
                 errorController.addUpdateListener(waiter);
                 errorController.start();
                 outputController.start();
-                if (!waiter.awaitFor(null, errorController, 10, TimeUnit.MINUTES)) {
+                if (!waiter.awaitFor(null, errorController, 10, TimeUnit.MINUTES, pi::isCanceled)) {
                     if (process.isAlive())
                         process.destroy();
+
+                    errorController.join();
+                    outputController.join();
                     return false;
                 }
 
