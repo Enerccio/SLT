@@ -9,6 +9,7 @@ import com.intellij.openapi.options.colors.AttributesDescriptor;
 import com.intellij.openapi.options.colors.ColorDescriptor;
 import com.intellij.openapi.options.colors.ColorSettingsPage;
 import com.intellij.openapi.util.NlsContexts.ConfigurableName;
+import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -18,7 +19,11 @@ import java.util.Map;
 
 public class SltColorSettingsPage implements ColorSettingsPage {
 
-    public static final String DEMO_CODE = new CodeHighlightTemplate().render();
+    public static final String DEMO_CODE;
+    static {
+        String code = new CodeHighlightTemplate().render();
+        DEMO_CODE = StringUtils.replace(code, "\r\n", "\n");
+    }
 
     private static final AttributesDescriptor[] DESCRIPTORS = new AttributesDescriptor[] {
             new AttributesDescriptor(SltBundle.message("slt.ui.colorsettings.parenthesis"), SltHighlighterColors.PARENTS),

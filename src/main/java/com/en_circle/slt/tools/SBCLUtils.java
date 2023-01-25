@@ -39,21 +39,29 @@ public class SBCLUtils {
                 ProcessBuilder processBuilder = new ProcessBuilder(args.toArray(new String[0]));
                 Process process = processBuilder.start();
 
+                StringBuilder returnValue = new StringBuilder();
                 SltProcessStreamGobbler errorController = new SltProcessStreamGobbler(process.getErrorStream());
+                SltProcessStreamGobbler outputController = new SltProcessStreamGobbler(process.getInputStream());
+                errorController.addUpdateListener(returnValue::append);
                 WaitForOccurrence waiter = new WaitForOccurrence("SltVerified");
                 errorController.addUpdateListener(waiter);
                 errorController.start();
+                outputController.start();
                 if (!waiter.awaitFor(null, errorController, 10, TimeUnit.MINUTES)) {
                     if (process.isAlive())
                         process.destroy();
                     return false;
                 }
+
                 if (process.isAlive())
                     process.destroy();
+
+                errorController.join();
+                outputController.join();
+                return returnValue.toString().contains("SltVerified");
             } finally {
                 tempTestFile.delete();
             }
-            return true;
         } catch (Exception ignored) {
             return false;
         }

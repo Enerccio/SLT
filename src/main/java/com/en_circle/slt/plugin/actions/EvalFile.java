@@ -3,6 +3,7 @@ package com.en_circle.slt.plugin.actions;
 import com.en_circle.slt.plugin.SltCommonLispFileType;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.CommonDataKeys;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.util.FileContentUtilCore;
@@ -16,6 +17,7 @@ public class EvalFile extends EvalActionBase {
     public void actionPerformed(@NotNull AnActionEvent event) {
         VirtualFile vf = event.getData(CommonDataKeys.VIRTUAL_FILE);
         if (vf != null) {
+            ApplicationManager.getApplication().saveAll();
             evaluateFile(event.getProject(), vf.getPath(), vf);
             for (VirtualFile openedFiles : FileEditorManager.getInstance(Objects.requireNonNull(event.getProject()))
                     .getOpenFiles()) {

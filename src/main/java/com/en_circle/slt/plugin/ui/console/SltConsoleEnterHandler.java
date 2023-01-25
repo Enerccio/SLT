@@ -27,7 +27,7 @@ public class SltConsoleEnterHandler {
     public boolean handleEnterPressed(EditorEx editor) {
         Project project = editor.getProject();
         assert(project != null);
-        boolean isAtTheEndOfCommand = false;
+        boolean isAtTheEndOfCommand;
 
         int lineCount = editor.getDocument().getLineCount();
         if (lineCount > 0) {
@@ -36,6 +36,7 @@ public class SltConsoleEnterHandler {
             if (caretPosition.line == lineCount - 1) {
                 int lineEndOffset = editor.getDocument().getLineEndOffset(caretPosition.line);
                 editor.getCaretModel().moveToOffset(lineEndOffset);
+                isAtTheEndOfCommand = true;
             } else {
                 // try checking other lines if they are empty
                 boolean allEmpty = true;

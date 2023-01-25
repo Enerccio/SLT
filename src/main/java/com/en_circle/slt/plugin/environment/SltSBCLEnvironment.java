@@ -51,9 +51,6 @@ public class SltSBCLEnvironment extends SltLispEnvironmentProcess  {
             e.serverStartSetup = new File(tempDir, "startServer.cl");
             e.serverStartSetup.deleteOnExit();
             String sltCorePath = e.sltCore.getAbsolutePath();
-            if (sltCorePath.contains("\\")) {
-                sltCorePath = StringUtils.replace(sltCorePath, "\\", "\\\\");
-            }
             String startScriptTemplate = new SBCLInitScriptTemplate(c, sltCorePath, e.port).render();
             FileUtils.write(e.serverStartSetup, startScriptTemplate, StandardCharsets.UTF_8);
 
@@ -144,9 +141,20 @@ public class SltSBCLEnvironment extends SltLispEnvironmentProcess  {
     private static class SBCLInitScriptTemplate extends Template {
 
         public SBCLInitScriptTemplate(SltSBCLEnvironmentConfiguration configuration, String sltCoreScript, int port) {
-            add("qlpath", configuration.getQuicklispStartScript());
+            String quicklispPath = configuration.getQuicklispStartScript();
+            if (quicklispPath.contains("\\")) {
+                quicklispPath = StringUtils.replace(quicklispPath, "\\", "\\\\");
+            }
+            String cwd = configuration.getProjectDirectory();
+            if (cwd.contains("\\")) {
+                cwd = StringUtils.replace(cwd, "\\", "\\\\");
+            }
+            if (sltCoreScript.contains("\\")) {
+                sltCoreScript = StringUtils.replace(sltCoreScript, "\\", "\\\\");
+            }
+            add("qlpath", quicklispPath);
             add("port", "" + port);
-            add("cwd", configuration.getProjectDirectory());
+            add("cwd", cwd);
             add("sbclcorefile", sltCoreScript);
         }
 
