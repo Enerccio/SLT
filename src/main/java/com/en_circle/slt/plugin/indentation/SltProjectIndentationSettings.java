@@ -14,7 +14,7 @@ import org.jetbrains.annotations.Nullable;
 )
 public class SltProjectIndentationSettings implements PersistentStateComponent<SltProjectIndentationSettings> {
 
-    static SltProjectIndentationSettings getInstance(Project project) {
+    public static SltProjectIndentationSettings getInstance(Project project) {
         return project.getService(SltProjectIndentationSettings.class);
     }
 

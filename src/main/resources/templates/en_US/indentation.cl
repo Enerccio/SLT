@@ -47,7 +47,7 @@
 (restart-case (as handler-case))
 ;; single-else style (then and else equally indented)
 (if          (&rest nil))
-;(if*         common-lisp-indent-if*)
+; wtf is if*?
 (lambda      (&lambda &body))
 (let         ((&whole 4 &rest (&whole 1 1 2)) &body))
 (let*         (as let))

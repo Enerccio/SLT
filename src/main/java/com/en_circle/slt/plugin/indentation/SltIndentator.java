@@ -31,6 +31,7 @@ public class SltIndentator implements EnterHandlerDelegate {
         if (file.getFileType().equals(SltCommonLispFileType.INSTANCE)) {
             if (!EditorModificationUtil.checkModificationAllowed(editor)) return Result.Continue;
             if (!ApplicationManager.getApplication().isWriteAccessAllowed() && !EditorModificationUtil.requestWriting(editor)) return Result.Continue;
+            if (!SltIndentationSettings.getInstance(editor.getProject()).applies) return Result.Continue;
 
             PsiDocumentManager.getInstance(file.getProject()).commitDocument(editor.getDocument());
             Integer additionalOffset = calculateIndentOffset(file, editor);

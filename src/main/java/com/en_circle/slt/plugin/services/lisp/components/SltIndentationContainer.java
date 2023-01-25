@@ -199,7 +199,7 @@ public class SltIndentationContainer {
 
             try {
                 String formText = documentText.substring(toplevel.getTextOffset(), offset);
-                if (wasAfter) {
+                if (!wasAfter) {
                     // insert fake element at the end, so we identify correct form
                     formText += " 0";
                 }
@@ -260,7 +260,7 @@ public class SltIndentationContainer {
         return formIndentation.getOrDefault(element, OffsetInfo.DEFAULT).base;
     }
 
-    private Integer calculateIndentForForm(LispElement topLevel, LispContainer container,
+    protected Integer calculateIndentForForm(LispElement topLevel, LispContainer container,
                                            Map<LispElement, OffsetInfo> formIndentation, Project project,
                                            SltIndentationSettings settings, String packageName,
                                            Stack<IndentationBackTrack> backTrackStack) throws Exception {
@@ -370,10 +370,10 @@ public class SltIndentationContainer {
             }
         }
 
-        int appliedOffset = settings.restIndentation;
+        int appliedOffset = settings.defaultIndentation;
         if (backtrackRuleOnlyAppliedTo != null) {
             // partial matching, see above
-            return appliedOffset + formIndentation.getOrDefault(topLevel, OffsetInfo.DEFAULT).parentForm;
+            return appliedOffset + formIndentation.getOrDefault(backtrackRuleOnlyAppliedTo, OffsetInfo.DEFAULT).parentForm;
         }
 
         // if we found it on backtrack, head does not matter, so
@@ -386,6 +386,10 @@ public class SltIndentationContainer {
 
         if (indentation != null) {
             // we are not backtracking and we found the main rule
+
+            // since we actually matched head we consider this list "toplevel" with regards to indent
+            topLevel = container;
+
             if (indentation.normalArgumentCount != null) {
                 // Applying: * an integer N, meaning indent the first N arguments like
                 //                  function arguments, and any further arguments like a body.
@@ -671,12 +675,12 @@ public class SltIndentationContainer {
         }
     }
 
-    private enum IndentationType {
+    protected enum IndentationType {
         LAMBDA, REST, BODY
 
     }
 
-    private static class IndentationBackTrack {
+    protected static class IndentationBackTrack {
 
         private final LispContainer parentContainer;
         private final int position;
@@ -688,14 +692,14 @@ public class SltIndentationContainer {
 
     }
 
-    private static class BacktrackInformation {
+    protected static class BacktrackInformation {
         IndentationSetting setting;
         List<IndentationSetting> listOfSettings;
         int parentWhole;
         LispElement appliesRuleToOnly;
     }
 
-    public interface IndentationImplementation {
+    protected interface IndentationImplementation {
 
         Integer calculateOffsetForForm(LispElement topLevel, LispContainer container, Map<LispElement, OffsetInfo> formIndentation, Project project,
                                        SltIndentationSettings settings, String packageName,

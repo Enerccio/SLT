@@ -32,8 +32,14 @@
         <applicationService
                 serviceImplementation="com.en_circle.slt.plugin.indentation.SltIndentationSettings" />
 
+        <applicationConfigurable groupId="editor"
+                                 instance="com.en_circle.slt.plugin.ui.indentation.SltIndentationConfiguration"/>
+
         <projectService
                 serviceImplementation="com.en_circle.slt.plugin.indentation.SltProjectIndentationSettings" />
+
+        <projectConfigurable groupId="project"
+                                 instance="com.en_circle.slt.plugin.ui.indentation.SltProjectIndentationConfiguration"/>
 
 
         <!-- Lisp Service -->
@@ -88,7 +94,6 @@
         <annotator language="Common Lisp" implementationClass="com.en_circle.slt.plugin.highlights.annotators.StaticHighlightAnnotator"/>
 
         <!-- Functional annotators -->
-
     </extensions>
 
     <actions resource-bundle="messages.SltBundle">
