@@ -78,7 +78,7 @@ You can also open this as a project in Intellij Idea.
   * not a true SDK because that is only available in Intellij and not in  (for instance) PyCharm, thus
 this is implemented manually.
   * [x] Download SBCL and quicklisp for user
-* [ ] Automatic download of lisp interpret and quicklisp
+* [x] Automatic download of lisp interpret and quicklisp
 * [ ] Different lisp interpreter support 
 * [ ] Remote connections to interpreters
 * [ ] Rewrite everything into ABCL just for purity’s sake lol
