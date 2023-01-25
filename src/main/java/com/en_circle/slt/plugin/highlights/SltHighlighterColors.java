@@ -25,10 +25,6 @@ public class SltHighlighterColors {
     public static TextAttributesKey METHOD = TextAttributesKey.createTextAttributesKey("CL.METHOD", DefaultLanguageHighlighterColors.INSTANCE_METHOD);
 
     public static void setHighlighting(PsiElement element, AnnotationHolder holder, TextAttributesKey key) {
-//        Annotation a = holder.createInfoAnnotation(element, null);
-//        a.setTextAttributes(key);
-//        a.setNeedsUpdateOnTyping(true);
-
         holder.newSilentAnnotation(HighlightSeverity.INFORMATION)
                 .range(element)
                 .textAttributes(key)
@@ -37,11 +33,6 @@ public class SltHighlighterColors {
     }
 
     public static void setHighlightingStrict(PsiElement element, AnnotationHolder holder, TextAttributesKey key) {
-//        val annotation = holder.createInfoAnnotation(element, null)
-//        annotation.enforcedTextAttributes = TextAttributes.ERASE_MARKER
-//        annotation.enforcedTextAttributes = EditorColorsManager.getInstance().globalScheme.getAttributes(key)
-//        annotation.setNeedsUpdateOnTyping(false)
-
         holder.newSilentAnnotation(HighlightSeverity.WEAK_WARNING)
                 .range(element)
                 .enforcedTextAttributes(EditorColorsManager.getInstance().getGlobalScheme().getAttributes(key))
