@@ -8,7 +8,7 @@ import java.util.List;
 
 public class PlatformActionsContainer {
 
-    private static final List<Object> platformActions = new ArrayList<>();
+    private static final List<PlatformAction> platformActions = new ArrayList<>();
 
     static {
         if (SystemInfo.isWindows) {
@@ -16,14 +16,18 @@ public class PlatformActionsContainer {
         }
     }
 
-    public static <T extends Object> boolean hasAction(Class<T> trait) {
+    public static <T extends PlatformAction> boolean hasAction(Class<T> trait) {
         return getAction(trait) != null;
     }
 
     @SuppressWarnings("unchecked")
-    public static <T> @Nullable T getAction(Class<T> trait) {
-        return (T) platformActions.stream().filter(x -> trait.isAssignableFrom(x.getClass()))
+    public static <T extends PlatformAction> @Nullable T getAction(Class<T> trait) {
+        T t = (T) platformActions.stream().filter(x -> trait.isAssignableFrom(x.getClass()))
                 .findFirst().orElse(null);
+        if (t != null) {
+            return (T) t.newInstance();
+        }
+        return null;
     }
 
 }

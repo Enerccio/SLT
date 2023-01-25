@@ -234,6 +234,11 @@ public class DownloadSBCLMsiAction implements DownloadSBCLAction {
         return SBCLUtils.verifyAndInstallDependencies(executable, core, quicklisp, pi);
     }
 
+    @Override
+    public PlatformAction newInstance() {
+        return new DownloadSBCLMsiAction();
+    }
+
     private static class SBCLInstallation {
         String executableFilePath;
         String coreFilePath;
