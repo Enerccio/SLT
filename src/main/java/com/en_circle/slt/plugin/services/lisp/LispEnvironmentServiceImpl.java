@@ -48,24 +48,17 @@ public class LispEnvironmentServiceImpl implements LispEnvironmentService {
     private final List<LispEnvironmentListener> serverListeners = Collections.synchronizedList(new ArrayList<>());
     private volatile boolean starting = false;
 
-    private Project project;
-    private SltIndentationContainer indentationContainer;
-    private SltLispEnvironmentSymbolCache symbolCache;
-    private SltLispEnvironmentMacroExpandCache macroExpandCache;
+    private final Project project;
+    private final SltIndentationContainer indentationContainer;
+    private final SltLispEnvironmentSymbolCache symbolCache;
+    private final SltLispEnvironmentMacroExpandCache macroExpandCache;
 
-    public boolean initProject(Project project) {
-        if (this.project == null) {
-            indentationContainer = new SltIndentationContainer();
-            indentationContainer.init(project);
-            symbolCache = new SltLispEnvironmentSymbolCache(project);
-            macroExpandCache = new SltLispEnvironmentMacroExpandCache();
-            this.project = project;
-            return true;
-        }
-        return false;
-    }
-
-    public void postInit() {
+    public LispEnvironmentServiceImpl(Project project) {
+        this.project = project;
+        indentationContainer = new SltIndentationContainer();
+        indentationContainer.init(project);
+        symbolCache = new SltLispEnvironmentSymbolCache(project);
+        macroExpandCache = new SltLispEnvironmentMacroExpandCache();
         symbolCache.start();
     }
 

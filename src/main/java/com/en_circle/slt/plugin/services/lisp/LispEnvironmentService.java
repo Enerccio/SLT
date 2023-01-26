@@ -17,12 +17,7 @@ import com.intellij.psi.PsiFile;
 public interface LispEnvironmentService extends Disposable {
 
     static LispEnvironmentService getInstance(Project project) {
-        LispEnvironmentServiceImpl impl = (LispEnvironmentServiceImpl) project.getService(LispEnvironmentService.class);
-        boolean wasInit = impl.initProject(project);
-        if (wasInit) {
-            impl.postInit();
-        }
-        return impl;
+        return project.getService(LispEnvironmentService.class);
     }
 
     void resetConfiguration();
