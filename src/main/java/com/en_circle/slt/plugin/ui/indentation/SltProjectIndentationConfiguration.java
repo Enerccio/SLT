@@ -22,6 +22,7 @@ public class SltProjectIndentationConfiguration implements Configurable {
     private JBTextField parameterIndentation;
     private JBTextField lambdaIndentation;
     private JBTextField bodyIndentation;
+    private JBTextField tagbodyIndentation;
 
     public SltProjectIndentationConfiguration(Project project) {
         this.project = project;
@@ -40,6 +41,7 @@ public class SltProjectIndentationConfiguration implements Configurable {
         parameterIndentation = new JBTextField();
         lambdaIndentation = new JBTextField();
         bodyIndentation = new JBTextField();
+        tagbodyIndentation = new JBTextField();
 
         return FormBuilder.createFormBuilder()
                 .addComponent(applyProject, 1)
@@ -48,6 +50,7 @@ public class SltProjectIndentationConfiguration implements Configurable {
                 .addLabeledComponent(SltBundle.message("slt.ui.settings.indent.type.parameter"), parameterIndentation, 1, false)
                 .addLabeledComponent(SltBundle.message("slt.ui.settings.indent.type.lambda"), lambdaIndentation, 1, false)
                 .addLabeledComponent(SltBundle.message("slt.ui.settings.indent.type.body"), bodyIndentation, 1, false)
+                .addLabeledComponent(SltBundle.message("slt.ui.settings.indent.type.tagbody"), tagbodyIndentation, 1, false)
                 .addComponentFillVertically(new JPanel(), 0)
                 .getPanel();
     }
@@ -69,7 +72,8 @@ public class SltProjectIndentationConfiguration implements Configurable {
                     settings.defaultIndentation != old.defaultIndentation ||
                     settings.parameterIndentation != old.parameterIndentation ||
                     settings.lambdaIndentation != old.lambdaIndentation ||
-                    settings.bodyIndentation != old.bodyIndentation;
+                    settings.bodyIndentation != old.bodyIndentation ||
+                    settings.tagbodyIndentation != old.tagbodyIndentation;
         } catch (NumberFormatException | AssertionError ignored) {
             return true;
         }
@@ -98,6 +102,8 @@ public class SltProjectIndentationConfiguration implements Configurable {
         assert(settings.lambdaIndentation >= 0);
         settings.bodyIndentation = Integer.parseInt(bodyIndentation.getText());
         assert(settings.bodyIndentation >= 0);
+        settings.tagbodyIndentation = Integer.parseInt(tagbodyIndentation.getText());
+        assert(settings.tagbodyIndentation >= 0);
 
         SltProjectIndentationSettings projectIndentationSettings = new SltProjectIndentationSettings();
         projectIndentationSettings.copySettings(settings);
@@ -122,5 +128,6 @@ public class SltProjectIndentationConfiguration implements Configurable {
         parameterIndentation.setText("" + settings.parameterIndentation);
         lambdaIndentation.setText("" + settings.lambdaIndentation);
         bodyIndentation.setText("" + settings.bodyIndentation);
+        tagbodyIndentation.setText("" + settings.tagbodyIndentation);
     }
 }

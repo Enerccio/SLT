@@ -16,7 +16,6 @@ import com.intellij.psi.PsiFileFactory;
 
 import java.util.IdentityHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Stack;
 
 public class TestableSltIndentationContainer extends SltIndentationContainer {
@@ -34,20 +33,24 @@ public class TestableSltIndentationContainer extends SltIndentationContainer {
     }
 
     public Integer testIndentCL(String formText) throws Exception {
-        SltIndentationSettings settings = new SltIndentationSettings();
+        IndentationState state = new IndentationState();
+        state.project = getProject();
+        state.hasRealElement = false;
+        state.formIndentation = new IdentityHashMap<>();
+        state.packageName = "COMMON-LISP-USER";
+        state.settings = new SltIndentationSettings();
 
-        Map<LispElement, OffsetInfo> formIndentation = new IdentityHashMap<>();
         PsiFileFactory factory = PsiFileFactory.getInstance(getProject());
         PsiFile source = factory.createFileFromText("fragment.cl", SltCommonLispFileType.INSTANCE, formText);
-        List<LispElement> elements = LispUtils.convertAst(source, formIndentation, formText);
+        List<LispElement> elements = LispUtils.convertAst(source, state.formIndentation, formText);
         if (elements.isEmpty())
             return 0;
         LispElement element = elements.get(0);
         if (element instanceof LispContainer container) {
             Stack<IndentationBackTrack> backTrackStack = new Stack<>();
-            return calculateIndentForForm(element, container, formIndentation, getProject(), settings, "COMMON-LISP-USER", backTrackStack);
+            return calculateIndentForForm(state, element, container, backTrackStack);
         }
-        return formIndentation.getOrDefault(element, OffsetInfo.DEFAULT).base;
+        return state.formIndentation.getOrDefault(element, OffsetInfo.DEFAULT).base;
     }
 
 }

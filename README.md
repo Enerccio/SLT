@@ -10,6 +10,7 @@
 ![GitHub last commit](https://img.shields.io/github/last-commit/Enerccio/SLT)
 ![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/Enerccio/SLT)
 [![(want-to-support-me? T NIL)](https://img.shields.io/liberapay/receives/Enerccio.svg?logo=liberapay)](https://liberapay.com/Enerccio)
+[![Join the chat at https://gitter.im/SLT-Plugin/community](https://badges.gitter.im/SLT-Plugin/Lobby.svg)](https://gitter.im/SLT-Plugin/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 ![Image](src/main/resources/logo/logo.svg)
 

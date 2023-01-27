@@ -58,19 +58,19 @@ public class SltIndentator implements EnterHandlerDelegate {
 
         PsiElement element = file.findElementAt(offset);
         while (element == null) {
-            element = file.findElementAt(offset--);
-            wasAfter = true;
             if (offset == 0) {
                 return 0;
             }
+            element = file.findElementAt(offset--);
+            wasAfter = true;
         }
 
         while (element instanceof PsiWhiteSpace) {
-            element = file.findElementAt(offset--);
-            wasAfter = true;
             if (offset == 0) {
                 return 0;
             }
+            element = file.findElementAt(offset--);
+            wasAfter = true;
         }
 
         if (element == null) {
@@ -88,12 +88,12 @@ public class SltIndentator implements EnterHandlerDelegate {
                         break;
                     previousToplevel = previousToplevel.getPrevSibling();
                 }
-                if (previousToplevel == null)
-                    return null;
-                if (previousToplevel.getNextSibling() == element ||
-                        PsiTreeUtil.firstChild(previousToplevel.getNextSibling()) == element) {
-                    // we are first ( of next toplevel
-                    return 0;
+                if (previousToplevel != null) {
+                    if (previousToplevel.getNextSibling() == element ||
+                            PsiTreeUtil.firstChild(previousToplevel.getNextSibling()) == element) {
+                        // we are first ( of next toplevel
+                        return 0;
+                    }
                 }
             } else {
                 PsiElement topLevel = PsiTreeUtil.getParentOfType(element, LispToplevel.class);

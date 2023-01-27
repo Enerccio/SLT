@@ -224,6 +224,7 @@ public class LispUtils {
                 OffsetInfo offsetInfo = new OffsetInfo();
                 offsetInfo.base = getOffsetFromLine(element);
                 offsetInfo.parentForm = getOffsetFromElemenet(element);
+                offsetInfo.elementOffset = getElementOffset(element);
                 lineOffsets.put(elementDef, offsetInfo);
             }
         }
@@ -273,6 +274,23 @@ public class LispUtils {
             return offset;
         }
 
+        private Integer getElementOffset(PsiElement element) {
+            int offset = element.getTextOffset();
+            return getElementOffset(offsetText, offset);
+        }
+
+        private Integer getElementOffset(String documentText, int textOffset) {
+            int offset = 0;
+            while (textOffset >= 0) {
+                if (documentText.charAt(textOffset) == '\n') {
+                    break;
+                }
+                --textOffset;
+                ++offset;
+            }
+            return offset;
+        }
+
         @Override
         public void visitElement(@NotNull PsiElement element) {
             element.acceptChildren(this);
@@ -285,10 +303,11 @@ public class LispUtils {
 
         public int base;
         public int parentForm;
+        public int elementOffset;
 
         @Override
         public String toString() {
-            return "OFS(" + base + "," + parentForm + ")";
+            return "OFS(" + base + "," + parentForm + "," + elementOffset + ")";
         }
 
     }

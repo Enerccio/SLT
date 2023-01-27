@@ -34,6 +34,7 @@ public class SltIndentationSettings implements PersistentStateComponent<SltInden
     public int parameterIndentation = 4;
     public int lambdaIndentation = 4;
     public int bodyIndentation = 2;
+    public int tagbodyIndentation = 1;
 
     @Override
     public @Nullable SltIndentationSettings getState() {
