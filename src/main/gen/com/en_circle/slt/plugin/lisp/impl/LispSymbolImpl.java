@@ -6,6 +6,7 @@ import com.en_circle.slt.plugin.lisp.psi.LispVisitor;
 import com.en_circle.slt.plugin.lisp.psi.impl.LispNamedElementImpl;
 import com.en_circle.slt.plugin.lisp.psi.impl.LispPsiImplUtil;
 import com.intellij.lang.ASTNode;
+import com.intellij.navigation.ItemPresentation;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.PsiReference;
@@ -45,6 +46,11 @@ public class LispSymbolImpl extends LispNamedElementImpl implements LispSymbol {
   @Override
   public PsiReference[] getReferences() {
     return LispPsiImplUtil.getReferences(this);
+  }
+
+  @Override
+  public ItemPresentation getPresentation() {
+    return LispPsiImplUtil.getPresentation(this);
   }
 
 }

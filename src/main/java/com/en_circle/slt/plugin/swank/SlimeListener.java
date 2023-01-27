@@ -14,10 +14,7 @@ import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiFileFactory;
 
 import java.math.BigInteger;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class SlimeListener implements SwankClient.SwankReply {
 
@@ -94,10 +91,10 @@ public class SlimeListener implements SwankClient.SwankReply {
             projectEnvironment.getEnvironment()
                     .registerParserDefinition(SltCommonLispLanguage.INSTANCE, new SltCommonLispParserDefinition());
             PsiFileFactory factory = PsiFileFactory.getInstance(projectEnvironment.getProject());
-            source = factory.createFileFromText("swank-reply.cl", SltCommonLispFileType.INSTANCE, data);
+            source = factory.createFileFromText(UUID.randomUUID() + "swank-reply.cl", SltCommonLispFileType.INSTANCE, data);
         } else {
             PsiFileFactory factory = PsiFileFactory.getInstance(project);
-            source = factory.createFileFromText("swank-reply.cl", SltCommonLispFileType.INSTANCE, data);
+            source = factory.createFileFromText(UUID.randomUUID() + "swank-reply.cl", SltCommonLispFileType.INSTANCE, data);
         }
 
         return LispUtils.convertAst(source);

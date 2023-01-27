@@ -65,7 +65,7 @@ format suitable for Emacs."
   (loop for frame in (compute-backtrace start end)
         for i from start collect
         (list i (frame-to-string frame)
-                (print-frame-call-place frame)
+                (format NIL "~S" (print-frame-call-place frame))
                 (frame-source-location i)
                 (let ((pkg (frame-package i)))
                     (cond

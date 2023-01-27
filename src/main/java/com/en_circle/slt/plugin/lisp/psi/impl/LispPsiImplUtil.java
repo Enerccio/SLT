@@ -1,10 +1,12 @@
 package com.en_circle.slt.plugin.lisp.psi.impl;
 
 import com.en_circle.slt.plugin.SltCommonLispFileType;
+import com.en_circle.slt.plugin.lisp.LispSymbolPresentation;
 import com.en_circle.slt.plugin.lisp.psi.LispFile;
 import com.en_circle.slt.plugin.lisp.psi.LispSymbol;
 import com.en_circle.slt.plugin.lisp.psi.LispTypes;
 import com.intellij.lang.ASTNode;
+import com.intellij.navigation.ItemPresentation;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFileFactory;
@@ -78,6 +80,10 @@ public class LispPsiImplUtil {
 
     public static PsiReference[] getReferences(LispSymbol symbol) {
         return ReferenceProvidersRegistry.getReferencesFromProviders(symbol, Hints.NO_HINTS);
+    }
+
+    public static ItemPresentation getPresentation(LispSymbol symbol) {
+        return new LispSymbolPresentation(symbol);
     }
 
 }
