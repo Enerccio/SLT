@@ -232,6 +232,20 @@ public class SwankPacket {
         return new SwankPacket(formatted);
     }
 
+    public static SwankPacket xrefs(String types, String name, String packageName, BigInteger continuation) {
+        return xrefs(types, name, "T", packageName, continuation);
+    }
+
+    public static SwankPacket xrefs(String types, String name, String threadId, String requestPackageName, BigInteger continuation) {
+        name = StringUtils.replace(name, "\\", "\\\\");
+        name = StringUtils.replace(name, "\"", "\\\"");
+        requestPackageName = StringUtils.replace(requestPackageName, "\\", "\\\\");
+        requestPackageName = StringUtils.replace(requestPackageName, "\"", "\\\"");
+        String formatted = String.format("(:emacs-rex (swank:xrefs '(%s) \"%s\") \":%s\" %s %s)",
+                types, name, requestPackageName, threadId, continuation);
+        return new SwankPacket(formatted);
+    }
+
     private int length;
     private String expressionSource;
 

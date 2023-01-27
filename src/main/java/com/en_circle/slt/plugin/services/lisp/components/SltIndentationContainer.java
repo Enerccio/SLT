@@ -32,6 +32,7 @@ public class SltIndentationContainer {
                 "maximizing", "minimize", "minimizing"
                 )) {
             loopBodyForms.add(symbol.toUpperCase());
+            loopBodyForms.add(":" + symbol.toUpperCase());
         }
     }
 

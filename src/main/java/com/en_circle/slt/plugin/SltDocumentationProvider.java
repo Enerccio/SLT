@@ -10,6 +10,7 @@ import com.intellij.lang.documentation.AbstractDocumentationProvider;
 import com.intellij.openapi.util.text.HtmlBuilder;
 import com.intellij.openapi.util.text.HtmlChunk;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.util.PsiTreeUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.Nullable;
@@ -18,6 +19,9 @@ public class SltDocumentationProvider extends AbstractDocumentationProvider {
 
     @Override
     public @Nullable @Nls String getQuickNavigateInfo(PsiElement element, PsiElement originalElement) {
+        if (originalElement != null)
+            element = originalElement;
+
         String text = LispPsiImplUtil.getSExpressionHead(element);
         if (text != null) {
             String packageName = LispParserUtil.getPackage(element);
@@ -48,16 +52,21 @@ public class SltDocumentationProvider extends AbstractDocumentationProvider {
 
     @Override
     public @Nullable @Nls String generateDoc(PsiElement element, @Nullable PsiElement originalElement) {
-        if (element instanceof LispSymbol) {
+        if (originalElement != null)
+            element = originalElement;
+
+        element = PsiTreeUtil.getParentOfType(element, LispSymbol.class);
+
+        if (element != null) {
             String text = element.getText();
             String packageName = LispParserUtil.getPackage(element);
             SymbolState state = LispEnvironmentService.getInstance(element.getProject()).refreshSymbolFromServer(packageName, text, element);
-            return asHtml(state, packageName, element, originalElement);
+            return asHtml(state, packageName, element);
         }
         return null;
     }
 
-    private String asHtml(SymbolState state, String packageName, PsiElement element, @Nullable PsiElement originalElement) {
+    private String asHtml(SymbolState state, String packageName, PsiElement element) {
         HtmlBuilder builder = new HtmlBuilder();
         String documentation = StringUtils.replace(StringUtils.replace(state.documentation, " ", "&nbsp;"),
                 "\n", HtmlChunk.br().toString());
