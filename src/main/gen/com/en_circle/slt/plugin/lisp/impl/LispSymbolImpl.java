@@ -8,6 +8,7 @@ import com.en_circle.slt.plugin.lisp.psi.impl.LispPsiImplUtil;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
+import com.intellij.psi.PsiReference;
 import org.jetbrains.annotations.NotNull;
 
 public class LispSymbolImpl extends LispNamedElementImpl implements LispSymbol {
@@ -39,6 +40,11 @@ public class LispSymbolImpl extends LispNamedElementImpl implements LispSymbol {
   @Override
   public PsiElement getNameIdentifier() {
     return LispPsiImplUtil.getNameIdentifier(this);
+  }
+
+  @Override
+  public PsiReference[] getReferences() {
+    return LispPsiImplUtil.getReferences(this);
   }
 
 }

@@ -72,5 +72,5 @@ compound_symbol ::= UNINTERN? symbol
 symbol ::= SYMBOL_TOKEN {
     mixin="com.en_circle.slt.plugin.lisp.psi.impl.LispNamedElementImpl"
     implements="com.en_circle.slt.plugin.lisp.psi.LispNamedElement"
-    methods=[getName setName getNameIdentifier]
+    methods=[getName setName getNameIdentifier getReferences]
 }

@@ -77,8 +77,14 @@
         <lang.syntaxHighlighterFactory language="Common Lisp"
                 implementationClass="com.en_circle.slt.plugin.highlights.SltStaticHighlighterFactory"/>
 
-        <lang.directNavigationProvider
-                implementation="com.en_circle.slt.plugin.references.SltDirectNavigationProvider"/>
+        <psi.referenceContributor language="Common Lisp"
+                implementation="com.en_circle.slt.plugin.references.SltReferenceContributor"/>
+
+        <lang.elementManipulator forClass="com.en_circle.slt.plugin.lisp.psi.LispSymbol"
+                                 implementationClass="com.en_circle.slt.plugin.references.SltSymbolManipulator"/>
+
+<!--        <lang.directNavigationProvider-->
+<!--                implementation="com.en_circle.slt.plugin.references.SltDirectNavigationProvider"/>-->
 
         <completion.contributor language="Common Lisp" implementationClass="com.en_circle.slt.plugin.SltCompletionContributor"/>
 

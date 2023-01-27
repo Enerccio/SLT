@@ -8,7 +8,6 @@ import com.en_circle.slt.plugin.lisp.psi.LispCoreProjectEnvironment;
 import com.en_circle.slt.plugin.services.lisp.LispEnvironmentService;
 import com.en_circle.slt.plugin.swank.debug.SltDebugInfo;
 import com.en_circle.slt.plugin.swank.requests.*;
-import com.en_circle.slt.tools.ProjectUtils;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiFile;
@@ -82,7 +81,6 @@ public class SlimeListener implements SwankClient.SwankReply {
                 } else if (isDebugActivate(reply)) {
                     processDebugActivate(reply);
                 } else if (isIndentation(reply)) {
-                    Project project = ProjectUtils.getCurrentProject();
                     LispEnvironmentService.getInstance(project).updateIndentation(reply.getItems().get(1));
                 }
             }

@@ -2,6 +2,7 @@
 package com.en_circle.slt.plugin.lisp.psi;
 
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiReference;
 
 public interface LispSymbol extends LispNamedElement {
 
@@ -10,5 +11,7 @@ public interface LispSymbol extends LispNamedElement {
   PsiElement setName(String newName);
 
   PsiElement getNameIdentifier();
+
+  PsiReference[] getReferences();
 
 }

@@ -16,7 +16,7 @@ import org.jetbrains.annotations.Nullable;
 import java.io.File;
 
 public class SltReference extends PsiReferenceBase<LispSymbol> implements
-        PsiPolyVariantReference, ResolvingHint {
+        PsiPolyVariantReference {
 
     public SltReference(@NotNull LispSymbol element) {
         super(element);
@@ -66,8 +66,5 @@ public class SltReference extends PsiReferenceBase<LispSymbol> implements
         return resolveResults.length == 1 ? resolveResults[0].getElement() : null;
     }
 
-    @Override
-    public boolean canResolveTo(Class<? extends PsiElement> elementClass) {
-        return elementClass.isAssignableFrom(LispSymbol.class);
-    }
+
 }

@@ -8,6 +8,10 @@ import com.intellij.lang.ASTNode;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFileFactory;
+import com.intellij.psi.PsiReference;
+import com.intellij.psi.PsiReferenceService.Hints;
+import com.intellij.psi.impl.source.resolve.reference.ReferenceProvidersRegistry;
+import com.intellij.psi.util.PsiTreeUtil;
 
 public class LispPsiImplUtil {
 
@@ -43,7 +47,7 @@ public class LispPsiImplUtil {
 
     private static LispSymbol createSymbol(Project project, String name) {
         LispFile file = createFile(project, name);
-        return (LispSymbol) file.findChildByClass(LispSymbol.class);
+        return PsiTreeUtil.findChildOfType(file, LispSymbol.class);
     }
 
     private static LispFile createFile(Project project, String text) {
@@ -70,6 +74,10 @@ public class LispPsiImplUtil {
         } else {
             return null;
         }
+    }
+
+    public static PsiReference[] getReferences(LispSymbol symbol) {
+        return ReferenceProvidersRegistry.getReferencesFromProviders(symbol, Hints.NO_HINTS);
     }
 
 }
