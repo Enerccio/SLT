@@ -149,6 +149,10 @@ public class SlimeListener implements SwankClient.SwankReply {
             if (request instanceof Xrefs xrefs) {
                 xrefs.processReply((LispContainer) reply.getItems().get(1));
             }
+
+            if (request instanceof CompleteSearch completeSearch) {
+                completeSearch.processReply((LispContainer) reply.getItems().get(1));
+            }
         } finally {
             requests.remove(replyId.getValue());
         }

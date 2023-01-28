@@ -8,7 +8,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
-import java.util.concurrent.ExecutionException;
 
 public class SltReferenceResolveCache {
 
@@ -31,7 +30,7 @@ public class SltReferenceResolveCache {
     public ResolveResult[] resolve(SltReference sltReference) {
         try {
             return referenceCache.get(sltReference);
-        } catch (ExecutionException ignored) {
+        } catch (Exception ignored) {
             return new ResolveResult[0];
         }
     }

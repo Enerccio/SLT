@@ -246,6 +246,24 @@ public class SwankPacket {
         return new SwankPacket(formatted);
     }
 
+    public static SwankPacket completeSearch(String prefix, String type, BigInteger continuation) {
+        return completeSearch(prefix, type, ":CL-USER", continuation);
+    }
+
+    public static SwankPacket completeSearch(String prefix, String type, String packageName, BigInteger continuation) {
+        return completeSearch(prefix, type, "T", packageName, continuation);
+    }
+
+    public static SwankPacket completeSearch(String prefix, String type, String threadId, String packageName, BigInteger continuation) {
+        prefix = StringUtils.replace(prefix, "\\", "\\\\");
+        prefix = StringUtils.replace(prefix, "\"", "\\\"");
+        packageName = StringUtils.replace(packageName, "\\", "\\\\");
+        packageName = StringUtils.replace(packageName, "\"", "\\\"");
+        String formatted = String.format("(:emacs-rex (swank:find-reference-prefix \"%s\" %s) \":%s\" %s %s)",
+                prefix, type, packageName, threadId, continuation);
+        return new SwankPacket(formatted);
+    }
+
     private int length;
     private String expressionSource;
 

@@ -1,7 +1,9 @@
 package com.en_circle.slt.tools;
 
 import java.util.LinkedList;
+import java.util.Objects;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 public class BufferedString {
 
@@ -56,7 +58,7 @@ public class BufferedString {
 
     @Override
     public String toString() {
-        return String.join("", chunks);
+        return chunks.stream().filter(Objects::nonNull).collect(Collectors.joining(""));
     }
 
     public int getMaxSize() {

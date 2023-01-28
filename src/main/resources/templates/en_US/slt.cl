@@ -82,10 +82,57 @@ format suitable for Emacs."
                                  :position offset
                                  :filename filename))))))
 
+(in-package swank)
+
+(defun get-all-symbols-with-prefix (prefix)
+  (let ((all (get-all-symbols)))
+    (loop for data-pair in all
+              when (prefix-match-p prefix (first data-pair))
+                            collect data-pair)))
+
+(defun get-all-symbols ()
+  (let ((data '()))
+    (do-symbols (s)
+      (push (list (unparse-symbol s) s (symbol-package s)) data))
+    (remove-duplicates data :key (lambda (e) (second e)))))
+
+(defun find-reference-class-filter (symbol package)
+    (find-class symbol NIL))
+
+(defun get-reference-prefix (prefix type)
+  (let ((apply-func (cond
+                     ((eq type :class) #'find-reference-class-filter)
+                     (T (lambda (symbol package) T)))))
+    (let ((filtered-symbols (get-all-symbols-with-prefix prefix))
+          (*source-snippet-size* 0))
+      (loop for data-pair in filtered-symbols
+                  when (funcall apply-func (second data-pair) (third data-pair))
+                                   collect
+        (let* ((symbol (second data-pair))
+               (str (first data-pair))
+               (package (third data-pair))
+               (strpackage (format NIL "~S" package)))
+          (cond
+            ((not symbol) (list str strpackage NIL NIL))
+            ((macro-function symbol) (list str strpackage :macro (swank:find-source-location (symbol-function symbol))))
+            ((and (fboundp symbol)
+                 (typep (symbol-function symbol) 'generic-function))
+              (list str strpackage :method (swank:find-source-location (symbol-function symbol))))
+            ((fboundp symbol) (list str strpackage :function (swank:find-source-location (symbol-function symbol))))
+            ((find-class symbol NIL) (list str strpackage :class (swank:find-source-location (find-class symbol))))
+            (T (list str strpackage NIL NIL))))))))
+
+(defslimefun find-reference-prefix (prefix type)
+  (let ((references (get-reference-prefix prefix type)))
+    (when references
+      (sort references #'string< :key (lambda (x) (first x))))))
+
 (export 'slt-eval)
 (export 'compile-string-region-slt)
 
 (in-package swank/sbcl)
+
+(in-package swank/source-file-cache)
 
 (in-package :slt-core)
 
@@ -94,7 +141,8 @@ format suitable for Emacs."
 
 (defun analyze-symbol (test-sym)
     (cons test-sym
-        (let ((*standard-output* (make-string-output-stream)))
+        (let ((*standard-output* (make-string-output-stream))
+              (*source-snippet-size* 0))
             (cond
                 ((not test-sym) (list NIL NIL NIL))
                 ((and (fboundp test-sym)

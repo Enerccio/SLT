@@ -126,14 +126,12 @@ public class LispEnvironmentServiceImpl implements LispEnvironmentService {
 
     @Override
     public void stop() {
-        ApplicationManager.getApplication().invokeLater(() -> {
-            try {
-                doStop();
-            } catch (Exception e) {
-                log.warn(SltBundle.message("slt.error.sbclstop"), e);
-                Messages.showErrorDialog(ProjectUtils.getCurrentProject(), e.getMessage(), SltBundle.message("slt.ui.errors.sbcl.stop"));
-            }
-        });
+        try {
+            doStop();
+        } catch (Exception e) {
+            log.warn(SltBundle.message("slt.error.sbclstop"), e);
+            Messages.showErrorDialog(ProjectUtils.getCurrentProject(), e.getMessage(), SltBundle.message("slt.ui.errors.sbcl.stop"));
+        }
     }
 
     private boolean doStart() throws Exception {

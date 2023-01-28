@@ -333,6 +333,7 @@ public class SltIndentationContainer {
         // This denotes that backtrack has failed to fully apply rule and was forced to stop early, thus we
         // need to apply basic indentation + this elements active indentation
         LispElement backtrackRuleOnlyAppliedTo = null;
+        LispElement toplevelOffset = topLevel;
 
         if (!hasHead) {
             // if head is not a symbol we don't bother with rule matching and instead go for backtrack immediately
@@ -350,6 +351,9 @@ public class SltIndentationContainer {
                     appliedSetting = backtrackIndentation.setting;
                     listOfSettings = backtrackIndentation.listOfSettings;
                     additionalOffset = backtrackIndentation.parentWhole;
+                    toplevelOffset = backtrackIndentation.rulematchedForm;
+                } else {
+                    toplevelOffset = backtrackRuleOnlyAppliedTo;
                 }
                 indentationImplementation = backtrackIndentation.manualCallback;
                 returnedFromBacktrack = backtrackIndentation.exactHit;
@@ -357,10 +361,16 @@ public class SltIndentationContainer {
         } else {
             // get a base rule from indentation.cl
             indentation = getManualIndentation(state, ((LispSymbol) head).getValue());
+            if (indentation != null) {
+                toplevelOffset = container;
+            }
 
             if (indentation == null) {
                 // no base rule, try macro rule that we get from swank
                 indentation = getMacroIndentation(((LispSymbol) head).getValue(), state.packageName);
+                if (indentation != null) {
+                    toplevelOffset = container;
+                }
             }
 
             if (indentation == null) {
@@ -378,6 +388,9 @@ public class SltIndentationContainer {
                         appliedSetting = backtrackIndentation.setting;
                         listOfSettings = backtrackIndentation.listOfSettings;
                         additionalOffset = backtrackIndentation.parentWhole;
+                        toplevelOffset = backtrackIndentation.rulematchedForm;
+                    } else {
+                        toplevelOffset = backtrackRuleOnlyAppliedTo;
                     }
                     indentationImplementation = backtrackIndentation.manualCallback;
                     returnedFromBacktrack = backtrackIndentation.exactHit;
@@ -388,7 +401,7 @@ public class SltIndentationContainer {
         if (indentationImplementation != null) {
             Integer offset = indentationImplementation.calculateOffsetForForm(state, topLevel, container, backTrackStack);
             if (offset != null) {
-                return offset;
+                return offset + state.formIndentation.getOrDefault(toplevelOffset, OffsetInfo.DEFAULT).parentForm;
             }
         }
 
@@ -504,7 +517,7 @@ public class SltIndentationContainer {
         } else {
             if (indentationImplementation == null) {
                 // special case, we failed to match, thus get this form's start offset + base offset
-                return appliedOffset + state.formIndentation.getOrDefault(lastItem, OffsetInfo.DEFAULT).parentForm;
+                return appliedOffset + state.formIndentation.getOrDefault(toplevelOffset, OffsetInfo.DEFAULT).parentForm;
             }
         }
 
@@ -512,13 +525,13 @@ public class SltIndentationContainer {
             // call callback and let it deal with this shit
             Integer offset = indentationImplementation.calculateOffsetForForm(state, topLevel, container, backTrackStack);
             if (offset != null) {
-                return additionalOffset + offset;
+                return additionalOffset + offset + state.formIndentation.getOrDefault(toplevelOffset, OffsetInfo.DEFAULT).parentForm;
             }
         }
 
         // general return of indent offset
         // can be just generic value or calculated value
-        return appliedOffset + state.formIndentation.getOrDefault(topLevel, OffsetInfo.DEFAULT).base;
+        return appliedOffset + state.formIndentation.getOrDefault(toplevelOffset, OffsetInfo.DEFAULT).parentForm;
     }
 
     private int findAdditionalOffset(IndentationSetting appliedSetting) {
@@ -588,6 +601,7 @@ public class SltIndentationContainer {
         if (indentation != null) {
             BacktrackInformation information = new BacktrackInformation();
             information.manualCallback = indentation.indentationImplementation;
+            information.rulematchedForm = backTrack.parentContainer;
             // validate they all must be nested list except for last and they all must be in settings
             // * a list, with elements as described above.  This applies when the
             //    associated function argument is itself a list.  Each element of the list
@@ -731,6 +745,7 @@ public class SltIndentationContainer {
         List<IndentationSetting> listOfSettings;
         int parentWhole;
         LispElement appliesRuleToOnly;
+        LispElement rulematchedForm;
         IndentationImplementation manualCallback;
     }
 
@@ -775,16 +790,19 @@ public class SltIndentationContainer {
 
         int ix = container.getItems().size();
         LispElement checkedElement = container.getItems().get(ix - offsetDedent - 1);
-        LispElement last = checkedElement;
         while (checkedElement instanceof LispSymbol symbol) {
             if (loopBodyForms.contains(symbol.getValue().toUpperCase())) {
                 return state.settings.bodyIndentation;
             }
             ix--;
-            checkedElement = container.getItems().get(ix - offsetDedent - 1);
+            int pos = ix - offsetDedent - 1;
+            if (pos < 0) {
+                return state.settings.defaultIndentation + state.formIndentation.getOrDefault(checkedElement, OffsetInfo.DEFAULT).elementOffset;
+            }
+            checkedElement = container.getItems().get(pos);
         }
 
-        return state.settings.defaultIndentation + state.formIndentation.getOrDefault(last, OffsetInfo.DEFAULT).elementOffset;
+        return state.settings.defaultIndentation + state.formIndentation.getOrDefault(checkedElement, OffsetInfo.DEFAULT).elementOffset;
     }
 
     private Integer lispIndentDefsetf(IndentationState state, LispElement topLevel, LispContainer container,

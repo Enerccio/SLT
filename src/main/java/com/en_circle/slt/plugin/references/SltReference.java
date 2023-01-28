@@ -11,6 +11,7 @@ import com.en_circle.slt.plugin.services.lisp.LispEnvironmentService;
 import com.en_circle.slt.plugin.swank.components.SourceLocation;
 import com.en_circle.slt.plugin.swank.requests.Xrefs;
 import com.en_circle.slt.plugin.swank.requests.Xrefs.XrefType;
+import com.en_circle.slt.tools.LocationUtils;
 import com.en_circle.slt.tools.SltApplicationUtils;
 import com.intellij.lang.ASTNode;
 import com.intellij.lang.FileASTNode;
@@ -172,36 +173,8 @@ public class SltReference extends PsiPolyVariantReferenceBase<LispSymbol> {
     }
 
     private ResolveResult convertLocationToReference(SourceLocation location, String name) {
-        if (location.isFile()) {
-            VirtualFile vf = LocalFileSystem.getInstance().findFileByIoFile(new File(location.getLocation()));
-            if (vf != null) {
-                PsiFile file = PsiManager.getInstance(myElement.getProject()).findFile(vf);
-                if (file != null) {
-                    FileASTNode node = file.getNode();
-                    if (node != null) {
-                        ASTNode reference = node.findLeafElementAt(location.getPosition());
-                        if (reference != null) {
-                            PsiElement referenceElement = reference.getPsi();
-                            LispSymbol ls = PsiTreeUtil.getParentOfType(referenceElement, LispSymbol.class);
-                            if (ls != null && ls.getName() != null && ls.getName().equalsIgnoreCase(name)) {
-                                return new PsiElementResolveResult(ls);
-                            }
-
-                            PsiElement parent = PsiTreeUtil.getParentOfType(referenceElement, LispToplevel.class);
-                            if (parent != null) {
-                                Collection<LispSymbol> symbols = PsiTreeUtil.findChildrenOfType(parent, LispSymbol.class);
-                                for (LispSymbol symbol : symbols) {
-                                    if (symbol.getName() != null && symbol.getName().equalsIgnoreCase(name)) {
-                                        return new PsiElementResolveResult(symbol);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        return null;
+        return LocationUtils.convertFromLocationToSymbol(myElement.getProject(), location, name,
+                PsiElementResolveResult::new);
     }
 
     @Override

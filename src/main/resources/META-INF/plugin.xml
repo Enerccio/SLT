@@ -100,6 +100,10 @@
         <annotator language="Common Lisp" implementationClass="com.en_circle.slt.plugin.highlights.annotators.StaticHighlightAnnotator"/>
 
         <!-- Functional annotators -->
+
+        <!-- Contributors -->
+        <gotoClassContributor implementation="com.en_circle.slt.plugin.contributors.SltClassContributor"/>
+        <gotoSymbolContributor implementation="com.en_circle.slt.plugin.contributors.SltSymbolContributor"/>
     </extensions>
 
     <actions resource-bundle="messages.SltBundle">
