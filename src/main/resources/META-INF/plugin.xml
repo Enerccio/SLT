@@ -83,9 +83,6 @@
         <lang.elementManipulator forClass="com.en_circle.slt.plugin.lisp.psi.LispSymbol"
                                  implementationClass="com.en_circle.slt.plugin.references.SltSymbolManipulator"/>
 
-<!--        <lang.directNavigationProvider-->
-<!--                implementation="com.en_circle.slt.plugin.references.SltDirectNavigationProvider"/>-->
-
         <completion.contributor language="Common Lisp" implementationClass="com.en_circle.slt.plugin.SltCompletionContributor"/>
 
         <postStartupActivity implementation="com.en_circle.slt.plugin.highlights.SltBraceHighlighter"
@@ -155,8 +152,14 @@
 <!--        </action>-->
     </actions>
 
-    <change-notes>
-        0.3.0
-    </change-notes>
+    <change-notes><![CDATA[
+<p>0.3.0 New features:</p>
+
+<p>- Current package at editor cursor widget<br />
+- Automatic Indentation<br />
+- SDK support, Automatic download for Windows users<br />
+- References<br />
+- Global class/symbol search</p>
+]]></change-notes>
 
 </idea-plugin>

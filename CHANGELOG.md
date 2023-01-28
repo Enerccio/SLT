@@ -5,6 +5,8 @@
 - Current package at editor cursor widget
 - Automatic Indentation
 - SDK support, Automatic download for Windows users
+- References
+- Global class/symbol search
 
 ### Fixes
 
