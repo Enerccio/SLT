@@ -53,7 +53,7 @@ You can also open this as a project in Intellij Idea.
 ## Planned features / goals
 
 * [ ] Upload to marketplace when it has enough features
-* [ ] Automatic indentation
+* [x] Automatic indentation
 * [x] REPL
 * [x] Interactive debugging
 * [ ] Inspection
@@ -66,8 +66,8 @@ You can also open this as a project in Intellij Idea.
 * [x] Macro expand in documentation
   * Macro expand requires you to hover element twice for now
 * [x] Find function by symbol name
-* [ ] Search for symbols
-* [ ] Back references 
+* [x] Search for symbols
+* [x] Back references 
 * [ ] Refactoring
 * [ ] List of quicklisp installed packages / ASDF packages
 * [ ] List of modified top level forms that are yet to be evaluated
