@@ -82,7 +82,7 @@ Original license:
 (restart-case (as handler-case))
 (if          (&rest nil))
 (lambda      (&lambda &body))
-(let         ((&whole 4 &rest (&whole 2 1 2)) &body))
+(let         ((&whole 4 &rest (&whole 1 1 2)) &body))
 (let*         (as let))
 (compiler-let (as let))
 (handler-bind (as let))
