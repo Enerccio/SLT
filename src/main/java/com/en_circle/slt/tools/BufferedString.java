@@ -33,14 +33,16 @@ public class BufferedString {
         int diff = size - maxSize;
         while (!chunks.isEmpty()) {
             String left = chunks.removeFirst();
-            if (left.length() < diff) {
-                diff -= left.length();
-                size -= left.length();
-            } else {
-                left = left.substring(0, left.length() - diff);
-                size -= diff;
-                chunks.addFirst(left);
-                break;
+            if (left != null) {
+                if (left.length() < diff) {
+                    diff -= left.length();
+                    size -= left.length();
+                } else {
+                    left = left.substring(0, left.length() - diff);
+                    size -= diff;
+                    chunks.addFirst(left);
+                    break;
+                }
             }
         }
         completeReset.accept(toString());
