@@ -10,14 +10,13 @@ import com.en_circle.slt.plugin.lisp.psi.LispList;
 import com.en_circle.slt.plugin.sdk.LispProjectSdk;
 import com.en_circle.slt.plugin.sdk.LispSdk;
 import com.en_circle.slt.plugin.sdk.SdkList;
-import com.en_circle.slt.plugin.services.lisp.components.SltIndentationContainer;
-import com.en_circle.slt.plugin.services.lisp.components.SltLispEnvironmentMacroExpandCache;
-import com.en_circle.slt.plugin.services.lisp.components.SltLispEnvironmentSymbolCache;
+import com.en_circle.slt.plugin.services.lisp.components.*;
 import com.en_circle.slt.plugin.swank.SlimeListener;
 import com.en_circle.slt.plugin.swank.SlimeListener.DebugInterface;
 import com.en_circle.slt.plugin.swank.SlimeListener.RequestResponseLogger;
 import com.en_circle.slt.plugin.swank.SlimeRequest;
 import com.en_circle.slt.plugin.swank.SwankClient;
+import com.en_circle.slt.plugin.ui.debug.SltBreakpointProperties;
 import com.en_circle.slt.tools.ProjectUtils;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
@@ -26,10 +25,12 @@ import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ToolWindowManager;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
+import com.intellij.xdebugger.breakpoints.XBreakpoint;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Supplier;
@@ -52,6 +53,7 @@ public class LispEnvironmentServiceImpl implements LispEnvironmentService {
     private final SltIndentationContainer indentationContainer;
     private final SltLispEnvironmentSymbolCache symbolCache;
     private final SltLispEnvironmentMacroExpandCache macroExpandCache;
+    private final SltBreakpointContainer breakpointContainer;
 
     public LispEnvironmentServiceImpl(Project project) {
         this.project = project;
@@ -59,7 +61,10 @@ public class LispEnvironmentServiceImpl implements LispEnvironmentService {
         indentationContainer.init(project);
         symbolCache = new SltLispEnvironmentSymbolCache(project);
         macroExpandCache = new SltLispEnvironmentMacroExpandCache();
+        breakpointContainer = new SltBreakpointContainer(project);
         symbolCache.start();
+
+        addServerListener(breakpointContainer);
     }
 
     @Override
@@ -204,6 +209,9 @@ public class LispEnvironmentServiceImpl implements LispEnvironmentService {
 
     @Override
     public void sendToLisp(SlimeRequest request, boolean startServer) throws Exception {
+        if (request == null)
+            return;
+
         if (startServer && environment == null || !environment.isActive()) {
             ApplicationManager.getApplication().invokeLater(() -> {
                 starting = true;
@@ -287,6 +295,26 @@ public class LispEnvironmentServiceImpl implements LispEnvironmentService {
     @Override
     public Integer calculateOffset(PsiElement element, PsiFile file, boolean wasAfter, String text, int offset, String packageOverride) {
         return indentationContainer.calculateIndent(element, file, wasAfter, text, offset, packageOverride);
+    }
+
+    @Override
+    public void addBreakpoint(XBreakpoint<SltBreakpointProperties> nativeBreakpoint) {
+        breakpointContainer.addBreakpoint(nativeBreakpoint);
+    }
+
+    @Override
+    public void removeBreakpoint(XBreakpoint<SltBreakpointProperties> nativeBreakpoint) {
+        breakpointContainer.removeBreakpoint(nativeBreakpoint);
+    }
+
+    @Override
+    public void nativeBreakpointUpdated(XBreakpoint<SltBreakpointProperties> nativeBreakpoint) {
+        breakpointContainer.onUpdate(nativeBreakpoint);
+    }
+
+    @Override
+    public Collection<SltBreakpoint> getAllBreakpoints() {
+        return breakpointContainer.getAllBreakpoints();
     }
 
     @Override

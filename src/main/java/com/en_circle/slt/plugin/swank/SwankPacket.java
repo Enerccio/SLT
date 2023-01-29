@@ -188,6 +188,38 @@ public class SwankPacket {
         return new SwankPacket(formatted);
     }
 
+    public static SwankPacket activateStepping(BigInteger threadId, String packageName, BigInteger continuation) {
+        packageName = StringUtils.replace(packageName, "\\", "\\\\");
+        packageName = StringUtils.replace(packageName, "\"", "\\\"");
+        String formatted = String.format("(:emacs-rex (swank::activate-stepping 0) \":%s\" %s %s)",
+                packageName, threadId, continuation);
+        return new SwankPacket(formatted);
+    }
+
+    public static SwankPacket stepperIn(BigInteger threadId, String packageName, BigInteger continuation) {
+        packageName = StringUtils.replace(packageName, "\\", "\\\\");
+        packageName = StringUtils.replace(packageName, "\"", "\\\"");
+        String formatted = String.format("(:emacs-rex (swank:sldb-step 0) \":%s\" %s %s)",
+                packageName, threadId, continuation);
+        return new SwankPacket(formatted);
+    }
+
+    public static SwankPacket stepperOut(BigInteger threadId, String packageName, BigInteger continuation) {
+        packageName = StringUtils.replace(packageName, "\\", "\\\\");
+        packageName = StringUtils.replace(packageName, "\"", "\\\"");
+        String formatted = String.format("(:emacs-rex (swank:sldb-out 0) \":%s\" %s %s)",
+                packageName, threadId, continuation);
+        return new SwankPacket(formatted);
+    }
+
+    public static SwankPacket stepperNext(BigInteger threadId, String packageName, BigInteger continuation) {
+        packageName = StringUtils.replace(packageName, "\\", "\\\\");
+        packageName = StringUtils.replace(packageName, "\"", "\\\"");
+        String formatted = String.format("(:emacs-rex (swank:sldb-next 0) \":%s\" %s %s)",
+                packageName, threadId, continuation);
+        return new SwankPacket(formatted);
+    }
+
     public static SwankPacket loadFile(String file, BigInteger continuation) {
         return loadFile(file, "CL-USER", continuation);
     }

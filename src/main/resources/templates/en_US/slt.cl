@@ -4,6 +4,8 @@
     (:use :cl :swank)
     (:export analyze-symbol analyze-symbols read-fix-packages list-package-names
              initialize-or-get-debug-context debug-context debug-frame-variable register-variable
+             install-breakpoint uninstall-breakpoint ; TODO install-method-breakpoint uninstall-method-breakpoint
+             install-inner-breakpoint uninstall-inner-breakpoint
              ))
 
 ; swank/slime overrides
@@ -142,7 +144,7 @@ format suitable for Emacs."
 (defun analyze-symbol (test-sym)
     (cons test-sym
         (let ((*standard-output* (make-string-output-stream))
-              (*source-snippet-size* 0))
+              (swank::*source-snippet-size* 0))
             (cond
                 ((not test-sym) (list NIL NIL NIL))
                 ((and (fboundp test-sym)
@@ -218,5 +220,19 @@ format suitable for Emacs."
     (let ((packages (list-all-packages)))
         (loop for package in packages collect
             (package-name package))))
+
+(defun install-breakpoint (symbol)
+  (ignore-errors (eval `(trace ,symbol :break T)) T))
+
+(defun uninstall-breakpoint (symbol)
+  (ignore-errors (eval `(untrace ,symbol)) T))
+
+; for methods (method fname qualifiers* (specializers*)) denoting a method.
+
+(defun install-inner-breakpoint (symbol parent-symbol type)
+  (ignore-errors (eval `(trace (,type ,symbol :in ,parent-symbol) :break T)) T))
+
+(defun uninstall-inner-breakpoint (symbol parent-symbol type)
+  (ignore-errors (eval `(untrace (,type ,symbol :in ,parent-symbol))) T))
 
 (in-package :cl-user)

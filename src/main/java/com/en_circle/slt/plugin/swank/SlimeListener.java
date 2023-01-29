@@ -138,6 +138,10 @@ public class SlimeListener implements SwankClient.SwankReply {
                 action.processReply((LispContainer) reply.getItems().get(1));
             }
 
+            if (request instanceof StepperAction action) {
+                action.processReply((LispContainer) reply.getItems().get(1));
+            }
+
             if (request instanceof MacroexpandAll macroexpandAll) {
                 macroexpandAll.processReply((LispContainer) reply.getItems().get(1));
             }

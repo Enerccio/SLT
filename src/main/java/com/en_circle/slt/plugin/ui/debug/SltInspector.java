@@ -161,6 +161,11 @@ public class SltInspector {
         }
 
         @Override
+        public @NotNull ActionUpdateThread getActionUpdateThread() {
+            return ActionUpdateThread.EDT;
+        }
+
+        @Override
         public void update(@NotNull AnActionEvent e) {
             super.update(e);
 
@@ -187,6 +192,11 @@ public class SltInspector {
         }
 
         @Override
+        public @NotNull ActionUpdateThread getActionUpdateThread() {
+            return ActionUpdateThread.EDT;
+        }
+
+        @Override
         public void update(@NotNull AnActionEvent e) {
             super.update(e);
 
@@ -210,6 +220,11 @@ public class SltInspector {
                 log.warn(SltBundle.message("slt.error.sbclstart"), e);
                 Messages.showErrorDialog(project, e.getMessage(), SltBundle.message("slt.ui.errors.sbcl.start"));
             }
+        }
+
+        @Override
+        public @NotNull ActionUpdateThread getActionUpdateThread() {
+            return ActionUpdateThread.EDT;
         }
 
         @Override

@@ -92,6 +92,8 @@
 
         <enterHandlerDelegate implementation="com.en_circle.slt.plugin.indentation.SltIndentator"/>
 
+        <xdebugger.breakpointType implementation="com.en_circle.slt.plugin.ui.debug.SltSymbolBreakpointType"/>
+
         <!-- Highlight annotators -->
         <annotator language="Common Lisp" implementationClass="com.en_circle.slt.plugin.highlights.annotators.SymbolAnnotator"/>
         <annotator language="Common Lisp" implementationClass="com.en_circle.slt.plugin.highlights.annotators.StaticHighlightAnnotator"/>
@@ -101,6 +103,8 @@
         <!-- Contributors -->
         <gotoClassContributor implementation="com.en_circle.slt.plugin.contributors.SltClassContributor"/>
         <gotoSymbolContributor implementation="com.en_circle.slt.plugin.contributors.SltSymbolContributor"/>
+
+        <!-- Markers -->
     </extensions>
 
     <actions resource-bundle="messages.SltBundle">
@@ -151,6 +155,11 @@
 <!--            <add-to-group group-id="MainToolBar" anchor="first"/>-->
 <!--        </action>-->
     </actions>
+
+    <projectListeners>
+        <listener class="com.en_circle.slt.plugin.ui.debug.SltBreakpointListener"
+                  topic="com.intellij.xdebugger.breakpoints.XBreakpointListener" />
+    </projectListeners>
 
     <change-notes><![CDATA[
 <p>0.3.0 New features:</p>

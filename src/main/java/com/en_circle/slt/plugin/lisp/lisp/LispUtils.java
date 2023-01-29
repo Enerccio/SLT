@@ -37,6 +37,18 @@ public class LispUtils {
         return elements;
     }
 
+    public static List<LispElement> convertAst(LispToplevel source) {
+        return convertAst(source, null, null);
+    }
+
+    public static List<LispElement> convertAst(LispToplevel source, Map<LispElement, OffsetInfo> lineOffsets, String offsetText) {
+        List<LispElement> elements = new ArrayList<>();
+
+        source.accept(new LispVisitorImpl(elements, lineOffsets, offsetText));
+
+        return elements;
+    }
+
     public static String unescape(String text) {
         text = StringUtils.replace(text, "\\\"", "\"");
         return text;

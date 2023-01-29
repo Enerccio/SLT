@@ -182,6 +182,11 @@ public class SltCoreWindow implements LispEnvironmentListener {
         }
 
         @Override
+        public @NotNull ActionUpdateThread getActionUpdateThread() {
+            return ActionUpdateThread.EDT;
+        }
+
+        @Override
         public void update(@NotNull AnActionEvent e) {
             super.update(e);
 
@@ -201,6 +206,11 @@ public class SltCoreWindow implements LispEnvironmentListener {
         }
 
         @Override
+        public @NotNull ActionUpdateThread getActionUpdateThread() {
+            return ActionUpdateThread.EDT;
+        }
+
+        @Override
         public void update(@NotNull AnActionEvent e) {
             super.update(e);
 
@@ -217,6 +227,11 @@ public class SltCoreWindow implements LispEnvironmentListener {
         @Override
         public void actionPerformed(@NotNull AnActionEvent e) {
             addRepl();
+        }
+
+        @Override
+        public @NotNull ActionUpdateThread getActionUpdateThread() {
+            return ActionUpdateThread.EDT;
         }
 
         @Override

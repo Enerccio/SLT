@@ -54,7 +54,7 @@ public class LispSymbolPresentation implements ItemPresentation {
         return switch (state.binding) {
             case NONE, SPECIAL_FORM -> null;
             case FUNCTION -> Nodes.Function;
-            case MACRO -> Nodes.Template;
+            case MACRO -> Nodes.Annotationtype;
             case CONSTANT, KEYWORD -> Nodes.Constant;
             case SPECIAL_VARIABLE -> Nodes.Gvariable;
             case CLASS -> Nodes.Class;

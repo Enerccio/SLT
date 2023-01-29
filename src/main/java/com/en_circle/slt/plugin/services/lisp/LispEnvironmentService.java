@@ -5,13 +5,18 @@ import com.en_circle.slt.plugin.environment.SltLispEnvironment;
 import com.en_circle.slt.plugin.environment.SltLispEnvironment.SltLispOutputChangedListener;
 import com.en_circle.slt.plugin.lisp.lisp.LispElement;
 import com.en_circle.slt.plugin.lisp.psi.LispList;
+import com.en_circle.slt.plugin.services.lisp.components.SltBreakpoint;
 import com.en_circle.slt.plugin.swank.SlimeListener.DebugInterface;
 import com.en_circle.slt.plugin.swank.SlimeListener.RequestResponseLogger;
 import com.en_circle.slt.plugin.swank.SlimeRequest;
+import com.en_circle.slt.plugin.ui.debug.SltBreakpointProperties;
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
+import com.intellij.xdebugger.breakpoints.XBreakpoint;
+
+import java.util.Collection;
 
 
 public interface LispEnvironmentService extends Disposable {
@@ -49,6 +54,14 @@ public interface LispEnvironmentService extends Disposable {
     void updateIndentation(LispElement element);
 
     Integer calculateOffset(PsiElement element, PsiFile file, boolean wasAfter, String text, int offset, String packageOverride);
+
+    void addBreakpoint(XBreakpoint<SltBreakpointProperties> nativeBreakpoint);
+
+    void removeBreakpoint(XBreakpoint<SltBreakpointProperties> nativeBreakpoint);
+
+    void nativeBreakpointUpdated(XBreakpoint<SltBreakpointProperties> nativeBreakpoint);
+
+    Collection<SltBreakpoint> getAllBreakpoints();
 
     enum LispEnvironmentState {
         STOPPED, READY, INITIALIZING

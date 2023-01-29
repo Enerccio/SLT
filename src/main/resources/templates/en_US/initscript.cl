@@ -1,3 +1,5 @@
+(proclaim '(optimize (debug 3)))
+
 (load "~qlpath~")
 (ql:quickload :swank)
 (ql:quickload :eclector)
