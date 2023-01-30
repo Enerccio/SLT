@@ -1,3 +1,7 @@
+(in-package :cl)
+(defconstant +slt-interpret+ ~interpret~
+  "Defines current slt interpret. For SBCL the value is :sbcl")
+
 (load "~qlpath~")
 (ql:quickload :swank)
 (ql:quickload :eclector)
