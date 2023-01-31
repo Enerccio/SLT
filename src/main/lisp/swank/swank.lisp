@@ -4,6 +4,8 @@
 
 (in-package :swank)
 
+(setf *SOURCE-SNIPPET-SIZE* 0)
+
 (export 'find-source-location)
 
 (defslimefun slt-eval (string)
@@ -60,17 +62,17 @@ format suitable for Emacs."
                                  :position offset
                                  :filename filename))))))
 
-(defun get-all-symbols-with-prefix (prefix)
-  (let ((all (get-all-symbols)))
-    (loop for data-pair in all
-              when (prefix-match-p prefix (first data-pair))
-                            collect data-pair)))
-
 (defun get-all-symbols ()
   (let ((data '()))
     (do-symbols (s)
       (push (list (unparse-symbol s) s (symbol-package s)) data))
     (remove-duplicates data :key (lambda (e) (second e)))))
+
+(defun get-all-symbols-with-prefix (prefix)
+  (let ((all (get-all-symbols)))
+    (loop for data-pair in all
+              when (prefix-match-p prefix (first data-pair))
+                            collect data-pair)))
 
 (defun find-reference-class-filter (symbol package)
     (find-class symbol NIL))
@@ -79,8 +81,7 @@ format suitable for Emacs."
   (let ((apply-func (cond
                      ((eq type :class) #'find-reference-class-filter)
                      (T (lambda (symbol package) T)))))
-    (let ((filtered-symbols (get-all-symbols-with-prefix prefix))
-          (*source-snippet-size* 0))
+    (let ((filtered-symbols (get-all-symbols-with-prefix prefix)))
       (loop for data-pair in filtered-symbols
                   when (funcall apply-func (second data-pair) (third data-pair))
                                    collect

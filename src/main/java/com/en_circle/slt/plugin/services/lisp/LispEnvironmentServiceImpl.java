@@ -2,8 +2,10 @@ package com.en_circle.slt.plugin.services.lisp;
 
 import com.en_circle.slt.plugin.SltBundle;
 import com.en_circle.slt.plugin.SymbolState;
-import com.en_circle.slt.plugin.environment.*;
+import com.en_circle.slt.plugin.environment.SltLispEnvironment;
 import com.en_circle.slt.plugin.environment.SltLispEnvironment.SltOutput;
+import com.en_circle.slt.plugin.environment.SltLispEnvironmentConfiguration;
+import com.en_circle.slt.plugin.environment.SltProcessException;
 import com.en_circle.slt.plugin.lisp.lisp.LispContainer;
 import com.en_circle.slt.plugin.lisp.lisp.LispElement;
 import com.en_circle.slt.plugin.lisp.psi.LispList;
@@ -78,12 +80,10 @@ public class LispEnvironmentServiceImpl implements LispEnvironmentService {
             return false;
         }
 
-        environmentProvider = SltSBCLEnvironment::new;
-        configurationBuilder = new SltSBCLEnvironmentConfiguration.Builder()
-                .setExecutable(sdk.sbclExecutable)
-                .setCore(sdk.sbclCorePath)
-                .setQuicklispStartScriptPath(sdk.quickLispPath)
-                .setProjectDirectory(ProjectUtils.getCurrentProject().getBasePath());
+        environmentProvider = sdk.getEnvironment().getDefinition().getEnvironmentCreator();
+        configurationBuilder = sdk.getEnvironment().getDefinition().buildConfiguration(sdk);
+
+        // TODO: add UI resolve actions here
 
         return true;
     }

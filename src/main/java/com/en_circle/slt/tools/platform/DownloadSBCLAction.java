@@ -8,13 +8,14 @@ import org.slf4j.LoggerFactory;
 import javax.swing.*;
 import java.util.function.Consumer;
 
-public interface DownloadSBCLAction extends UIAction {
+public interface DownloadSBCLAction extends DownloadLispAction {
     Logger log = LoggerFactory.getLogger(DownloadSBCLAction.class);
 
     LispSdk getConfiguredSdk();
     void setDisposable(Disposable disposable);
     void setRootPane(JComponent rootPane);
 
+    @Override
     default void downloadSdk(Disposable disposable, JComponent rootPane, Consumer<LispSdk> acceptor) {
         setDisposable(disposable);
         setRootPane(rootPane);

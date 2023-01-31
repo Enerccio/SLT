@@ -1,9 +1,10 @@
 package com.en_circle.slt.plugin.ui.sdk;
 
 import com.en_circle.slt.plugin.SltBundle;
+import com.en_circle.slt.plugin.environment.Environment;
 import com.en_circle.slt.plugin.sdk.LispSdk;
 import com.en_circle.slt.plugin.sdk.SdkList;
-import com.en_circle.slt.tools.platform.DownloadSBCLAction;
+import com.en_circle.slt.tools.platform.PlatformAction;
 import com.en_circle.slt.tools.platform.PlatformActionsContainer;
 import com.intellij.icons.AllIcons.Actions;
 import com.intellij.icons.AllIcons.General;
@@ -11,6 +12,7 @@ import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.options.Configurable;
 import com.intellij.openapi.options.ConfigurationException;
+import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.util.NlsContexts.ConfigurableName;
 import com.intellij.ui.components.JBScrollPane;
@@ -99,11 +101,16 @@ public class SdkConfigurer implements Configurable {
         LispSdk newSdk = new LispSdk();
         newSdk.uuid = UUID.randomUUID().toString();
 
-        SdkConfiguration configuration = new SdkConfiguration(root, newSdk, SltBundle.message("slt.ui.settings.sdk.editor.title.new"),
+
+        // TODO: Environment selector
+        Environment environment = Environment.SBCL_PROCESS;
+        DialogWrapper configuration = environment.getDefinition().getDialogProvider().createSdkConfiguration(
+                root, newSdk, SltBundle.message("slt.ui.settings.sdk.editor.title.new"),
                 sdk -> {
-            definedSdks.add(sdk);
-            SdkListModel model = new SdkListModel(definedSdks);
-            table.setModel(model);
+                    sdk.environment = environment;
+                    definedSdks.add(sdk);
+                    SdkListModel model = new SdkListModel(definedSdks);
+                    table.setModel(model);
         });
         configuration.show();
     }
@@ -113,13 +120,17 @@ public class SdkConfigurer implements Configurable {
         LispSdk copy = new LispSdk();
         copy.loadState(sdk);
 
-        SdkConfiguration configuration = new SdkConfiguration(root, copy, SltBundle.message("slt.ui.settings.sdk.editor.title.edit"),
+        // TODO: Environment selector
+        Environment environment = Environment.SBCL_PROCESS;
+        DialogWrapper configuration = environment.getDefinition().getDialogProvider().createSdkConfiguration(
+                root, copy, SltBundle.message("slt.ui.settings.sdk.editor.title.edit"),
                 sdkModified -> {
-            int ix = definedSdks.indexOf(sdk);
-            definedSdks.remove(ix);
-            definedSdks.add(ix, sdkModified);
-            SdkListModel model = new SdkListModel(definedSdks);
-            table.setModel(model);
+                    sdkModified.environment = environment;
+                    int ix = definedSdks.indexOf(sdk);
+                    definedSdks.remove(ix);
+                    definedSdks.add(ix, sdkModified);
+                    SdkListModel model = new SdkListModel(definedSdks);
+                    table.setModel(model);
         });
         configuration.show();
     }
@@ -134,10 +145,14 @@ public class SdkConfigurer implements Configurable {
 
     @SuppressWarnings("IncorrectParentDisposable")
     private void downloadSdk() {
-        Objects.requireNonNull(PlatformActionsContainer.getAction(DownloadSBCLAction.class))
+        // TODO: Use Environment
+        Environment environment = Environment.SBCL_PROCESS;
+
+        Objects.requireNonNull(PlatformActionsContainer.getAction(environment.getDefinition().getDownloadActionDef()))
                 .downloadSdk(ApplicationManager.getApplication(), root,
                 sdk -> {
             if (sdk != null) {
+                sdk.environment = environment;
                 definedSdks.add(sdk);
                 SdkListModel model = new SdkListModel(definedSdks);
                 table.setModel(model);
@@ -202,7 +217,18 @@ public class SdkConfigurer implements Configurable {
 
         @Override
         public void update(@NotNull AnActionEvent e) {
-            e.getPresentation().setEnabled(PlatformActionsContainer.hasAction(DownloadSBCLAction.class));
+            boolean enable = false;
+            for (Environment environment : Environment.values()) {
+                Class<? extends PlatformAction> actionDef = environment.getDefinition().getDownloadActionDef();
+                if (actionDef != null) {
+                    if (PlatformActionsContainer.hasAction(actionDef)) {
+                        enable = true;
+                        break;
+                    }
+                }
+            }
+
+            e.getPresentation().setEnabled(enable);
         }
 
         @Override
@@ -257,7 +283,7 @@ public class SdkConfigurer implements Configurable {
         public Object getValueAt(int rowIndex, int columnIndex) {
             return switch (columnIndex) {
                 case 0 -> items.get(rowIndex).userName;
-                case 1 -> items.get(rowIndex).sbclExecutable;
+                case 1 -> items.get(rowIndex).getEnvironment().getDefinition().getName();
                 case 2 -> items.get(rowIndex).quickLispPath;
                 default -> null;
             };
@@ -267,7 +293,7 @@ public class SdkConfigurer implements Configurable {
         public String getColumnName(int column) {
             return switch (column) {
                 case 0 -> SltBundle.message("slt.ui.settings.sdk.table.column.name");
-                case 1 -> SltBundle.message("slt.ui.settings.sdk.table.column.executable");
+                case 1 -> SltBundle.message("slt.ui.settings.sdk.table.column.type");
                 case 2 -> SltBundle.message("slt.ui.settings.sdk.table.column.quicklisp");
                 default -> null;
             };

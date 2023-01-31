@@ -2,7 +2,14 @@
 
 ### Added
 
+### Changes
+
+- SLT library is now formatted into multiple chunks
+
 ### Fixes
+
+- Fixed tests
+
 
 ## 0.3.0 - 230108
 
