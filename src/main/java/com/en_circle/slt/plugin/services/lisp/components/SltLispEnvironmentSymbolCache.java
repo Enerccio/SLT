@@ -101,31 +101,6 @@ public class SltLispEnvironmentSymbolCache extends Thread {
         } catch (Exception e) {
             onFinish.consume(false);
         }
-
-//        List<List<SymbolState>> batched = new ArrayList<>(Lists.partition(withoutDuplicity, 500));
-//        List<Future<?>> futures = new ArrayList<>();
-//        for (List<SymbolState> batch : batched) {
-//            CompletableFuture<?> future = new CompletableFuture<>();
-//            ApplicationManager.getApplication().executeOnPooledThread(() -> {
-//                try {
-//                    refreshSymbolsBatched(batch, future);
-//                } catch (Exception e) {
-//                    throw new RuntimeException(e);
-//                }
-//            });
-//            futures.add(future);
-//        }
-//
-//        boolean success = true;
-//        for (Future<?> future : futures) {
-//            try {
-//                future.get(120, TimeUnit.SECONDS);
-//            } catch (Exception e) {
-//                success = false;
-//            }
-//        }
-//
-//        onFinish.consume(success);
     }
 
     private SymbolState getOrCreateBinding(String packageName, String symbolName) {

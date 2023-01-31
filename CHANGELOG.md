@@ -7,6 +7,7 @@
 ### Fixes
 
 - Fixed tests 
+- Speed optimizations
 
 ## 0.3.0 230108
 
