@@ -5,7 +5,6 @@ import com.en_circle.slt.plugin.SymbolState;
 import com.en_circle.slt.plugin.environment.SltLispEnvironment;
 import com.en_circle.slt.plugin.environment.SltLispEnvironment.SltOutput;
 import com.en_circle.slt.plugin.environment.SltLispEnvironmentConfiguration;
-import com.en_circle.slt.plugin.environment.SltProcessException;
 import com.en_circle.slt.plugin.lisp.lisp.LispContainer;
 import com.en_circle.slt.plugin.lisp.lisp.LispElement;
 import com.en_circle.slt.plugin.lisp.psi.LispList;
@@ -15,12 +14,13 @@ import com.en_circle.slt.plugin.sdk.SdkList;
 import com.en_circle.slt.plugin.services.lisp.components.SltIndentationContainer;
 import com.en_circle.slt.plugin.services.lisp.components.SltLispEnvironmentMacroExpandCache;
 import com.en_circle.slt.plugin.services.lisp.components.SltLispEnvironmentSymbolCache;
+import com.en_circle.slt.plugin.services.lisp.components.SltLispEnvironmentSymbolCache.BatchedSymbolRefreshAction;
 import com.en_circle.slt.plugin.swank.SlimeListener;
 import com.en_circle.slt.plugin.swank.SlimeListener.DebugInterface;
 import com.en_circle.slt.plugin.swank.SlimeListener.RequestResponseLogger;
 import com.en_circle.slt.plugin.swank.SlimeRequest;
 import com.en_circle.slt.plugin.swank.SwankClient;
-import com.en_circle.slt.tools.ProjectUtils;
+import com.intellij.codeInsight.daemon.DaemonCodeAnalyzer;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
@@ -81,7 +81,7 @@ public class LispEnvironmentServiceImpl implements LispEnvironmentService {
         }
 
         environmentProvider = sdk.getEnvironment().getDefinition().getEnvironmentCreator();
-        configurationBuilder = sdk.getEnvironment().getDefinition().buildConfiguration(sdk);
+        configurationBuilder = sdk.getEnvironment().getDefinition().buildConfiguration(sdk, project);
 
         // TODO: add UI resolve actions here
 
@@ -112,13 +112,13 @@ public class LispEnvironmentServiceImpl implements LispEnvironmentService {
                 doStart();
             } catch (Exception e) {
                 log.warn(SltBundle.message("slt.error.sbclstart"), e);
-                Messages.showErrorDialog(ProjectUtils.getCurrentProject(), e.getMessage(), SltBundle.message("slt.ui.errors.sbcl.start"));
+                Messages.showErrorDialog(project, e.getMessage(), SltBundle.message("slt.ui.errors.sbcl.start"));
             }
         });
     }
 
     private void ensureToolWindowIsOpen() {
-        ToolWindow toolWindow = ToolWindowManager.getInstance(ProjectUtils.getCurrentProject())
+        ToolWindow toolWindow = ToolWindowManager.getInstance(project)
                 .getToolWindow("Common Lisp");
         assert toolWindow != null;
         toolWindow.show();
@@ -130,7 +130,7 @@ public class LispEnvironmentServiceImpl implements LispEnvironmentService {
             doStop();
         } catch (Exception e) {
             log.warn(SltBundle.message("slt.error.sbclstop"), e);
-            Messages.showErrorDialog(ProjectUtils.getCurrentProject(), e.getMessage(), SltBundle.message("slt.ui.errors.sbcl.stop"));
+            Messages.showErrorDialog(project, e.getMessage(), SltBundle.message("slt.ui.errors.sbcl.stop"));
         }
     }
 
@@ -139,7 +139,7 @@ public class LispEnvironmentServiceImpl implements LispEnvironmentService {
             if (configurationBuilder == null) {
                 if (!configured()) {
                     log.warn(SltBundle.message("slt.error.sbclstart"));
-                    Messages.showErrorDialog(ProjectUtils.getCurrentProject(),
+                    Messages.showErrorDialog(project,
                             SltBundle.message("slt.ui.errors.sbcl.start.noconf"),
                             SltBundle.message("slt.ui.errors.sbcl.start"));
                     return false;
@@ -158,12 +158,14 @@ public class LispEnvironmentServiceImpl implements LispEnvironmentService {
             environment = environmentProvider.get();
             environment.start(configuration);
 
-            slimeListener = new SlimeListener(ProjectUtils.getCurrentProject(), true, logger, debugInterface);
+            slimeListener = new SlimeListener(project, true, logger, debugInterface);
             client = new SwankClient("127.0.0.1", environment.getSwankPort(), slimeListener);
 
             for (LispEnvironmentListener listener : serverListeners) {
                 listener.onPostStart();
             }
+
+            DaemonCodeAnalyzer.getInstance(project).restart();
         } finally {
             starting = false;
         }
@@ -204,33 +206,38 @@ public class LispEnvironmentServiceImpl implements LispEnvironmentService {
 
     @Override
     public void sendToLisp(SlimeRequest request, boolean startServer) throws Exception {
-        if (startServer && environment == null || !environment.isActive()) {
-            ApplicationManager.getApplication().invokeLater(() -> {
-                starting = true;
-                ApplicationManager.getApplication().invokeLater(() -> {
-                    try {
-                        ensureToolWindowIsOpen();
-                        if (!doStart()) {
-                            return;
-                        }
+        sendToLisp(request, startServer, null);
+    }
 
-                        doSend(request);
-                    } catch (Exception e) {
-                        log.warn(SltBundle.message("slt.error.sbclstart"), e);
-                        Messages.showErrorDialog(ProjectUtils.getCurrentProject(), e.getMessage(), SltBundle.message("slt.ui.errors.sbcl.start"));
-                    }
-                });
-            });
-            return;
-        }
-
+    @Override
+    public void sendToLisp(SlimeRequest request, boolean startServer, Runnable onFailureServerState) throws Exception {
         if (environment == null || !environment.isActive()) {
-            if (!startServer)
-                return; // ignored
-            throw new SltProcessException("server offline");
-        }
+            if (startServer) {
+                ApplicationManager.getApplication().invokeLater(() -> {
+                    starting = true;
+                    ApplicationManager.getApplication().invokeLater(() -> {
+                        try {
+                            ensureToolWindowIsOpen();
+                            if (!doStart()) {
+                                if (onFailureServerState != null)
+                                    onFailureServerState.run();
+                                return;
+                            }
 
-        doSend(request);
+                            doSend(request);
+                        } catch (Exception e) {
+                            log.warn(SltBundle.message("slt.error.sbclstart"), e);
+                            Messages.showErrorDialog(project, e.getMessage(), SltBundle.message("slt.ui.errors.sbcl.start"));
+                        }
+                    });
+                });
+            } else {
+                if (onFailureServerState != null)
+                    onFailureServerState.run();
+            }
+        } else {
+            doSend(request);
+        }
     }
 
     private void doSend(SlimeRequest request) {
@@ -245,8 +252,13 @@ public class LispEnvironmentServiceImpl implements LispEnvironmentService {
     }
 
     @Override
-    public SymbolState refreshSymbolFromServer(String packageName, String symbolName, PsiElement element) {
-        return symbolCache.refreshSymbolFromServer(packageName, symbolName, element);
+    public SymbolState refreshSymbolFromServer(String packageName, String symbolName) {
+        return symbolCache.refreshSymbolFromServer(packageName, symbolName);
+    }
+
+    @Override
+    public BatchedSymbolRefreshAction refreshSymbolsFromServer() {
+        return symbolCache.createNewBatch();
     }
 
     @Override

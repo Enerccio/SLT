@@ -9,6 +9,7 @@ import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.ProgressIndicatorProvider;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.Computable;
 import org.awaitility.Awaitility;
 import org.awaitility.core.ConditionTimeoutException;
 import org.awaitility.pollinterval.FixedPollInterval;
@@ -59,13 +60,15 @@ public class SltApplicationUtils {
 
         return ApplicationManager.getApplication().executeOnPooledThread(() -> {
             BlockingQueue<X> pointer = new ArrayBlockingQueue<>(1);
-            SlimeRequest r = request.apply(result -> {
-                try {
-                    pointer.put(result);
-                } catch (Exception ignored) {
+            SlimeRequest r = request.apply(result ->
+                    ApplicationManager.getApplication().invokeLater(() ->
+                            ApplicationManager.getApplication().runWriteAction(() -> {
+                                try {
+                                    pointer.put(result);
+                                } catch (Exception ignored) {
 
-                }
-            });
+                                }
+                            })));
             LispEnvironmentService.getInstance(project).sendToLisp(r, startLisp);
             try {
                 Awaitility.await()
@@ -97,4 +100,11 @@ public class SltApplicationUtils {
         return future.get();
     }
 
+    public static <T> T processAsync(Computable<T> supplier) {
+        try {
+            return ApplicationManager.getApplication().executeOnPooledThread(supplier::get).get();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
 }

@@ -5,9 +5,9 @@ import com.en_circle.slt.plugin.environment.SltLispEnvironmentConfiguration.Buil
 import com.en_circle.slt.plugin.sdk.LispSdk;
 import com.en_circle.slt.plugin.ui.sdk.SdkConfigurationSBCLProcess;
 import com.en_circle.slt.plugin.ui.sdk.SdkDialogProvider;
-import com.en_circle.slt.tools.ProjectUtils;
 import com.en_circle.slt.tools.platform.DownloadLispAction;
 import com.en_circle.slt.tools.platform.DownloadSBCLAction;
+import com.intellij.openapi.project.Project;
 
 import java.util.function.Supplier;
 
@@ -32,12 +32,12 @@ public enum Environment {
         @SuppressWarnings("unchecked")
         @Override
         public <T extends SltLispEnvironmentConfiguration.Builder<T, R>, R extends SltLispEnvironmentConfiguration>
-                SltLispEnvironmentConfiguration.Builder<T, R> buildConfiguration(LispSdk sdk) {
+                SltLispEnvironmentConfiguration.Builder<T, R> buildConfiguration(LispSdk sdk, Project project) {
             return (Builder<T, R>) new SltSBCLEnvironmentConfiguration.Builder()
                     .setExecutable(sdk.sbclExecutable)
                     .setCore(sdk.sbclCorePath)
                     .setQuicklispStartScriptPath(sdk.quickLispPath)
-                    .setProjectDirectory(ProjectUtils.getCurrentProject().getBasePath());
+                    .setProjectDirectory(project.getBasePath());
         }
 
         @Override
@@ -64,7 +64,7 @@ public enum Environment {
         public abstract Class<? extends DownloadLispAction> getDownloadActionDef();
         public abstract Supplier<SltLispEnvironment> getEnvironmentCreator();
         public abstract <T extends SltLispEnvironmentConfiguration.Builder<T, R>, R extends SltLispEnvironmentConfiguration>
-            SltLispEnvironmentConfiguration.Builder<T, R> buildConfiguration(LispSdk sdk);
+            SltLispEnvironmentConfiguration.Builder<T, R> buildConfiguration(LispSdk sdk, Project project);
         public abstract SdkDialogProvider getDialogProvider();
 
     }

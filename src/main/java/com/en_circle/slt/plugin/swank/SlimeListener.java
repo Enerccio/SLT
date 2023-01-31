@@ -54,7 +54,8 @@ public class SlimeListener implements SwankClient.SwankReply {
         String data = packet.getSentData();
 
         if (fromUi) {
-            ApplicationManager.getApplication().invokeLater(() -> resolve(data));
+            ApplicationManager.getApplication().executeOnPooledThread(() ->
+                    ApplicationManager.getApplication().runReadAction(() -> resolve(data)));
         } else {
             resolve(data);
         }

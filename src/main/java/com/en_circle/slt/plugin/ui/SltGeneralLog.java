@@ -8,6 +8,7 @@ import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.*;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.tabs.TabInfo;
+import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
@@ -131,11 +132,13 @@ public class SltGeneralLog implements SltComponent, RequestResponseLogger {
 
     @Override
     public void logRequest(String request) {
+        request = StringUtils.truncate(request, 0, 4069);
         bufferedString.append("\n\n" + request);
     }
 
     @Override
     public void logResponse(String response) {
+        response = StringUtils.truncate(response, 0, 4069);
         bufferedString.append("\n\n" + response);
     }
 }

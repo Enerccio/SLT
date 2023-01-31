@@ -11,8 +11,7 @@
 
 (defun analyze-symbol (test-sym)
     (cons test-sym
-        (let ((*standard-output* (make-string-output-stream))
-              (swank::*source-snippet-size* 0))
+        (let ((*standard-output* (make-string-output-stream)))
             (cond
                 ((not test-sym) (list NIL NIL NIL))
                 ((and (fboundp test-sym)
@@ -79,6 +78,8 @@
             (ECLECTOR.READER:SYMBOL-DOES-NOT-EXIST
                 #'reader-recover)
             (ECLECTOR.READER:PACKAGE-DOES-NOT-EXIST
+                #'reader-recover)
+            (ECLECTOR.READER:TWO-PACKAGE-MARKERS-MUST-BE-ADJACENT
                 #'reader-recover)
             (error (lambda (c)
                    (format *error-output* "general error: ~S ~%" c))))

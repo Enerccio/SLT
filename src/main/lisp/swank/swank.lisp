@@ -2,9 +2,11 @@
 (when (eq +slt-interpret+ :sbcl)
   (load (merge-pathnames "swank-sbcl.lisp" *load-truename*)))
 
-(in-package :swank)
+(in-package swank/source-file-cache)
 
 (setf *SOURCE-SNIPPET-SIZE* 0)
+
+(in-package :swank)
 
 (export 'find-source-location)
 

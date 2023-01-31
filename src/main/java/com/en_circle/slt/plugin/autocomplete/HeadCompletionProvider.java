@@ -40,7 +40,7 @@ public class HeadCompletionProvider extends CompletionProvider<CompletionParamet
                                     for (LispElement element : innerList.getItems()) {
                                         if (element instanceof LispString str) {
                                             SymbolState state = LispEnvironmentService.getInstance(project)
-                                                    .refreshSymbolFromServer(null, str.getValue(), null);
+                                                    .refreshSymbolFromServer(null, str.getValue());
                                             LookupElementBuilder builder = LookupElementBuilder.create(str.getValue());
                                             if (state.binding == SymbolBinding.MACRO) {
                                                 builder = builder.withIcon(Nodes.Template);
