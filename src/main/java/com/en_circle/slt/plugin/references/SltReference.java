@@ -94,6 +94,11 @@ public class SltReference extends PsiPolyVariantReferenceBase<LispSymbol> {
                 }
             }
         }
+
+        if (referenceElement instanceof LispSymbol) {
+            // default just move to this even if it is a different symbol
+            return new ResolveResult[] { new PsiElementResolveResult(referenceElement) };
+        }
         return new ResolveResult[0];
     }
 

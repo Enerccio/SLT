@@ -63,7 +63,7 @@ public class DownloadSBCLMsiAction implements DownloadSBCLAction {
     private SBCLInstallation downloadSbcl(String uuidInstall) {
         ProgressWindow verifyWindow = new ProgressWindow(true, false, null,
                 rootPane, SltBundle.message("slt.ui.settings.sdk.download.cancel"));
-        verifyWindow.setTitle(SltBundle.message("slt.ui.settings.sdk.download.downloading"));
+        verifyWindow.setTitle(SltBundle.message("slt.ui.settings.sdk.download.sbcl.downloading"));
         Disposer.register(parentDisposable, verifyWindow);
 
         ProgressResult<SBCLInstallation> result = new ProgressRunner<>(pi -> downloadSbcl(uuidInstall, pi))
