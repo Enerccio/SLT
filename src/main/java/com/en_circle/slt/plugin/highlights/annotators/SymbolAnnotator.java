@@ -51,6 +51,9 @@ public class SymbolAnnotator extends ExternalAnnotator<BatchedSymbolRefreshActio
 
     @Override
     public void apply(@NotNull PsiFile file, AnnotationResult annotationResult, @NotNull AnnotationHolder holder) {
+        if (annotationResult == AnnotationResult.FAILED)
+            return;
+
         file.accept(new LispVisitor() {
 
             @Override
