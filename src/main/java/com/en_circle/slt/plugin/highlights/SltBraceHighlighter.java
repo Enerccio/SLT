@@ -5,8 +5,6 @@ import com.en_circle.slt.plugin.SltCommonLispLanguage;
 import com.en_circle.slt.plugin.lisp.psi.LispTypes;
 import com.intellij.codeInsight.daemon.impl.IdentifierHighlighterPassFactory;
 import com.intellij.codeInsight.highlighting.BraceHighlightingHandler;
-import com.intellij.codeInsight.highlighting.BraceMatchingUtil;
-import com.intellij.codeInsight.highlighting.BraceMatchingUtil.BraceHighlightingAndNavigationContext;
 import com.intellij.codeInsight.template.impl.TemplateManagerImpl;
 import com.intellij.codeInsight.template.impl.TemplateState;
 import com.intellij.injected.editor.EditorWindow;
@@ -25,7 +23,6 @@ import com.intellij.openapi.editor.highlighter.HighlighterIterator;
 import com.intellij.openapi.editor.markup.HighlighterLayer;
 import com.intellij.openapi.editor.markup.HighlighterTargetArea;
 import com.intellij.openapi.editor.markup.RangeHighlighter;
-import com.intellij.openapi.extensions.ExtensionPointUtil;
 import com.intellij.openapi.fileEditor.FileEditor;
 import com.intellij.openapi.fileEditor.FileEditorManagerEvent;
 import com.intellij.openapi.fileEditor.FileEditorManagerListener;
@@ -35,7 +32,6 @@ import com.intellij.openapi.fileTypes.FileType;
 import com.intellij.openapi.fileTypes.FileTypes;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.startup.StartupActivity;
-import com.intellij.openapi.util.Disposer;
 import com.intellij.openapi.util.Key;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiBinaryFile;
@@ -69,9 +65,7 @@ public class SltBraceHighlighter implements StartupActivity.DumbAware {
             return;
         }
 
-        Disposable activityDisposable = ExtensionPointUtil.createExtensionDisposable(this, StartupActivity.POST_STARTUP_ACTIVITY);
-        // lul they have this in code with warning...
-        Disposer.register(project, activityDisposable);
+        Disposable activityDisposable = BraceHighlightService.getService(project);
         registerListeners(project, activityDisposable);
     }
 
@@ -339,7 +333,7 @@ public class SltBraceHighlighter implements StartupActivity.DumbAware {
     }
 
     @Nullable
-    private static BraceMatchingUtil.BraceHighlightingAndNavigationContext computeHighlightingAndNavigationContext(@NotNull Editor editor,
+    private static BraceHighlightingAndNavigationContext computeHighlightingAndNavigationContext(@NotNull Editor editor,
                                                                                                                   @NotNull PsiFile file,
                                                                                                                   int offset) {
         EditorHighlighter highlighter = BraceHighlightingHandler.getLazyParsableHighlighterIfAny(file.getProject(), editor, file);
@@ -507,4 +501,9 @@ public class SltBraceHighlighter implements StartupActivity.DumbAware {
             iterator.retreat();
         }
     }
+
+    public record BraceHighlightingAndNavigationContext(int currentBraceOffset, int navigationOffset,
+                                                        boolean isCaretAfterBrace) {
+    }
+
 }

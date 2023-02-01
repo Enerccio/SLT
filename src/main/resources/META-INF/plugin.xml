@@ -46,6 +46,8 @@
         <projectService serviceImplementation="com.en_circle.slt.plugin.services.lisp.LispEnvironmentServiceImpl"
                             serviceInterface="com.en_circle.slt.plugin.services.lisp.LispEnvironmentService" />
 
+        <projectService serviceImplementation="com.en_circle.slt.plugin.highlights.BraceHighlightService" />
+
         <!-- Templates -->
 
         <internalFileTemplate name="Common Lisp CL File.cl"/>
