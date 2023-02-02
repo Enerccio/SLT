@@ -33,7 +33,7 @@ public class SltLispEnvironmentSymbolCache extends Thread {
         this.project = project;
 
         setDaemon(true);
-        setName("SBCL Symbol Cache Thread");
+        setName("SLT Symbol Cache Thread");
     }
 
     @Override

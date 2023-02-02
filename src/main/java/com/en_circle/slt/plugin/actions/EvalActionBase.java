@@ -43,8 +43,8 @@ public abstract class EvalActionBase extends AnAction {
         try {
             LispEnvironmentService.getInstance(project).sendToLisp(Eval.eval(buffer, packageName, result -> callback.run()), true);
         } catch (Exception e) {
-            log.warn(SltBundle.message("slt.error.sbclstart"), e);
-            Messages.showErrorDialog(project, e.getMessage(), SltBundle.message("slt.ui.errors.sbcl.start"));
+            log.warn(SltBundle.message("slt.error.start"), e);
+            Messages.showErrorDialog(project, e.getMessage(), SltBundle.message("slt.ui.errors.lisp.start"));
         }
     }
 
@@ -53,8 +53,8 @@ public abstract class EvalActionBase extends AnAction {
             LispEnvironmentService.getInstance(project).sendToLisp(EvalFromVirtualFile
                     .eval(buffer, filename, bufferPosition, lineno, charno, packageName, result -> callback.run()), true);
         } catch (Exception e) {
-            log.warn(SltBundle.message("slt.error.sbclstart"), e);
-            Messages.showErrorDialog(project, e.getMessage(), SltBundle.message("slt.ui.errors.sbcl.start"));
+            log.warn(SltBundle.message("slt.error.start"), e);
+            Messages.showErrorDialog(project, e.getMessage(), SltBundle.message("slt.ui.errors.lisp.start"));
         }
     }
 
@@ -63,8 +63,8 @@ public abstract class EvalActionBase extends AnAction {
             LispEnvironmentService.getInstance(project).sendToLisp(LoadFile.loadFile(filename), true);
             FileContentUtilCore.reparseFiles(virtualFile);
         } catch (Exception e) {
-            log.warn(SltBundle.message("slt.error.sbclstart"), e);
-            Messages.showErrorDialog(project, e.getMessage(), SltBundle.message("slt.ui.errors.sbcl.start"));
+            log.warn(SltBundle.message("slt.error.start"), e);
+            Messages.showErrorDialog(project, e.getMessage(), SltBundle.message("slt.ui.errors.lisp.start"));
         }
     }
 

@@ -111,8 +111,8 @@ public class LispEnvironmentServiceImpl implements LispEnvironmentService {
                 ensureToolWindowIsOpen();
                 doStart();
             } catch (Exception e) {
-                log.warn(SltBundle.message("slt.error.sbclstart"), e);
-                Messages.showErrorDialog(project, e.getMessage(), SltBundle.message("slt.ui.errors.sbcl.start"));
+                log.warn(SltBundle.message("slt.error.start"), e);
+                Messages.showErrorDialog(project, e.getMessage(), SltBundle.message("slt.ui.errors.lisp.start"));
             }
         });
     }
@@ -129,8 +129,8 @@ public class LispEnvironmentServiceImpl implements LispEnvironmentService {
         try {
             doStop();
         } catch (Exception e) {
-            log.warn(SltBundle.message("slt.error.sbclstop"), e);
-            Messages.showErrorDialog(project, e.getMessage(), SltBundle.message("slt.ui.errors.sbcl.stop"));
+            log.warn(SltBundle.message("slt.error.stop"), e);
+            Messages.showErrorDialog(project, e.getMessage(), SltBundle.message("slt.ui.errors.lisp.stop"));
         }
     }
 
@@ -138,10 +138,10 @@ public class LispEnvironmentServiceImpl implements LispEnvironmentService {
         try {
             if (configurationBuilder == null) {
                 if (!configured()) {
-                    log.warn(SltBundle.message("slt.error.sbclstart"));
+                    log.warn(SltBundle.message("slt.error.start"));
                     Messages.showErrorDialog(project,
-                            SltBundle.message("slt.ui.errors.sbcl.start.noconf"),
-                            SltBundle.message("slt.ui.errors.sbcl.start"));
+                            SltBundle.message("slt.ui.errors.lisp.start.noconf"),
+                            SltBundle.message("slt.ui.errors.lisp.start"));
                     return false;
                 }
             }
@@ -226,8 +226,8 @@ public class LispEnvironmentServiceImpl implements LispEnvironmentService {
 
                             doSend(request);
                         } catch (Exception e) {
-                            log.warn(SltBundle.message("slt.error.sbclstart"), e);
-                            Messages.showErrorDialog(project, e.getMessage(), SltBundle.message("slt.ui.errors.sbcl.start"));
+                            log.warn(SltBundle.message("slt.error.start"), e);
+                            Messages.showErrorDialog(project, e.getMessage(), SltBundle.message("slt.ui.errors.lisp.start"));
                         }
                     });
                 });

@@ -1,7 +1,6 @@
 package com.en_circle.slt.plugin.ui;
 
 import com.en_circle.slt.plugin.SltBundle;
-import com.en_circle.slt.plugin.SltCommonLispFileType;
 import com.en_circle.slt.plugin.environment.SltLispEnvironment.SltOutput;
 import com.en_circle.slt.plugin.services.lisp.LispEnvironmentService;
 import com.en_circle.slt.plugin.services.lisp.LispEnvironmentService.LispEnvironmentListener;
@@ -12,15 +11,9 @@ import com.intellij.icons.AllIcons;
 import com.intellij.icons.AllIcons.Actions;
 import com.intellij.icons.AllIcons.General;
 import com.intellij.openapi.actionSystem.*;
-import com.intellij.openapi.application.ApplicationManager;
-import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.wm.ToolWindow;
-import com.intellij.psi.PsiFile;
-import com.intellij.psi.PsiManager;
 import com.intellij.ui.tabs.impl.JBTabsImpl;
-import com.intellij.util.FileContentUtil;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
@@ -72,14 +65,14 @@ public class SltCoreWindow implements LispEnvironmentListener {
 
     private void createSbclControls() {
         DefaultActionGroup controlGroup = new DefaultActionGroup();
-        controlGroup.add(new StartSbclAction());
+        controlGroup.add(new StartLispAction());
         controlGroup.add(new StopSbclAction());
         controlGroup.addSeparator();
         controlGroup.add(new ConsoleWindowAction());
 
         JPanel west = new JPanel(new BorderLayout());
         ActionToolbar toolbar = ActionManager.getInstance()
-                .createActionToolbar("SltProcessWindowSbclEvent", controlGroup, false);
+                .createActionToolbar("SltProcessWindowEvent", controlGroup, false);
         toolbar.setTargetComponent(content);
         west.add(toolbar.getComponent(), BorderLayout.NORTH);
         content.add(west, BorderLayout.WEST);
@@ -87,16 +80,6 @@ public class SltCoreWindow implements LispEnvironmentListener {
 
     public void start() {
         LispEnvironmentService.getInstance(project).start();
-
-        PsiManager psiManager = PsiManager.getInstance(project);
-        List<VirtualFile> toReparse = new ArrayList<>();
-        for (VirtualFile vf : FileEditorManager.getInstance(project).getOpenFiles()) {
-            PsiFile psiFile = psiManager.findFile(vf);
-            if (psiFile != null && psiFile.getFileType().equals(SltCommonLispFileType.INSTANCE)) {
-                toReparse.add(vf);
-            }
-        }
-        FileContentUtil.reparseFiles(project, toReparse, false);
     }
 
     public void stop() {
@@ -170,15 +153,20 @@ public class SltCoreWindow implements LispEnvironmentListener {
         return project;
     }
 
-    private class StartSbclAction extends AnAction {
+    private class StartLispAction extends AnAction {
 
-        private StartSbclAction() {
+        private StartLispAction() {
             super(SltBundle.message("slt.ui.process.startinstance"), "", AllIcons.RunConfigurations.TestState.Run);
         }
 
         @Override
         public void actionPerformed(@NotNull AnActionEvent e) {
-            ApplicationManager.getApplication().invokeLater(SltCoreWindow.this::start);
+            start();
+        }
+
+        @Override
+        public @NotNull ActionUpdateThread getActionUpdateThread() {
+            return ActionUpdateThread.EDT;
         }
 
         @Override
@@ -201,6 +189,11 @@ public class SltCoreWindow implements LispEnvironmentListener {
         }
 
         @Override
+        public @NotNull ActionUpdateThread getActionUpdateThread() {
+            return ActionUpdateThread.EDT;
+        }
+
+        @Override
         public void update(@NotNull AnActionEvent e) {
             super.update(e);
 
@@ -211,12 +204,17 @@ public class SltCoreWindow implements LispEnvironmentListener {
     private class ConsoleWindowAction extends AnAction {
 
         private ConsoleWindowAction() {
-            super(SltBundle.message("slt.ui.process.openrepl.sbcl"), "", General.Add);
+            super(SltBundle.message("slt.ui.process.openrepl"), "", General.Add);
         }
 
         @Override
         public void actionPerformed(@NotNull AnActionEvent e) {
             addRepl();
+        }
+
+        @Override
+        public @NotNull ActionUpdateThread getActionUpdateThread() {
+            return ActionUpdateThread.EDT;
         }
 
         @Override

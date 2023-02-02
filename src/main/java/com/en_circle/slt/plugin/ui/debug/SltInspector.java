@@ -71,8 +71,8 @@ public class SltInspector {
                     .sendToLisp(InspectFrameVar.inspectVariable(BigInteger.valueOf(local.ix), frame, threadId,
                             result -> ApplicationManager.getApplication().invokeLater(() -> processResult(result))));
         } catch (Exception e) {
-            log.warn(SltBundle.message("slt.error.sbclstart"), e);
-            Messages.showErrorDialog(project, e.getMessage(), SltBundle.message("slt.ui.errors.sbcl.start"));
+            log.warn(SltBundle.message("slt.error.start"), e);
+            Messages.showErrorDialog(project, e.getMessage(), SltBundle.message("slt.ui.errors.lisp.start"));
         }
     }
 
@@ -137,8 +137,8 @@ public class SltInspector {
                     .sendToLisp(InspectNth.inspectVariable(ix, threadId, result ->
                             ApplicationManager.getApplication().invokeLater(() -> processResult(result))));
         } catch (Exception e) {
-            log.warn(SltBundle.message("slt.error.sbclstart"), e);
-            Messages.showErrorDialog(project, e.getMessage(), SltBundle.message("slt.ui.errors.sbcl.start"));
+            log.warn(SltBundle.message("slt.error.start"), e);
+            Messages.showErrorDialog(project, e.getMessage(), SltBundle.message("slt.ui.errors.lisp.start"));
         }
     }
 
@@ -155,8 +155,8 @@ public class SltInspector {
                         .sendToLisp(InspectorAction.action(ActionType.GO_BACK, threadId, result ->
                                 ApplicationManager.getApplication().invokeLater(() -> processResult(result))));
             } catch (Exception e) {
-                log.warn(SltBundle.message("slt.error.sbclstart"), e);
-                Messages.showErrorDialog(project, e.getMessage(), SltBundle.message("slt.ui.errors.sbcl.start"));
+                log.warn(SltBundle.message("slt.error.start"), e);
+                Messages.showErrorDialog(project, e.getMessage(), SltBundle.message("slt.ui.errors.lisp.start"));
             }
         }
 
@@ -181,8 +181,8 @@ public class SltInspector {
                         .sendToLisp(InspectorAction.action(ActionType.GO_FORWARD, threadId, result ->
                                 ApplicationManager.getApplication().invokeLater(() -> processResult(result))));
             } catch (Exception e) {
-                log.warn(SltBundle.message("slt.error.sbclstart"), e);
-                Messages.showErrorDialog(project, e.getMessage(), SltBundle.message("slt.ui.errors.sbcl.start"));
+                log.warn(SltBundle.message("slt.error.start"), e);
+                Messages.showErrorDialog(project, e.getMessage(), SltBundle.message("slt.ui.errors.lisp.start"));
             }
         }
 
@@ -207,8 +207,8 @@ public class SltInspector {
                         .sendToLisp(InspectorAction.action(ActionType.REFRESH, threadId, result ->
                                 ApplicationManager.getApplication().invokeLater(() -> processResult(result))));
             } catch (Exception e) {
-                log.warn(SltBundle.message("slt.error.sbclstart"), e);
-                Messages.showErrorDialog(project, e.getMessage(), SltBundle.message("slt.ui.errors.sbcl.start"));
+                log.warn(SltBundle.message("slt.error.start"), e);
+                Messages.showErrorDialog(project, e.getMessage(), SltBundle.message("slt.ui.errors.lisp.start"));
             }
         }
 

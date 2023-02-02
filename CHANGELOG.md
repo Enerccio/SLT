@@ -1,5 +1,9 @@
 ## 0.3.1
 
+### Added
+
+- Thread list with actions
+
 ### Changes
 
 - SLT library is now formatted into multiple chunks

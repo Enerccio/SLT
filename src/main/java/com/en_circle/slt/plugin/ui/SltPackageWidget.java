@@ -1,6 +1,7 @@
 package com.en_circle.slt.plugin.ui;
 
 import com.en_circle.slt.plugin.SltBundle;
+import com.en_circle.slt.plugin.SltCommonLispFileType;
 import com.en_circle.slt.plugin.lisp.LispParserUtil;
 import com.en_circle.slt.plugin.services.lisp.LispEnvironmentService;
 import com.en_circle.slt.plugin.services.lisp.LispEnvironmentService.LispEnvironmentState;
@@ -154,8 +155,10 @@ public class SltPackageWidget extends EditorBasedWidget
             Document document = editor.getDocument();
             PsiFile psiFile = PsiDocumentManager.getInstance(myProject).getPsiFile(document);
             if (psiFile != null) {
-                int caretOffset = ex.getExpectedCaretOffset();
-                packageName = LispParserUtil.getPackage(psiFile, caretOffset, LispParserUtil.NULL_RETURN);
+                if (psiFile.getFileType() == SltCommonLispFileType.INSTANCE) {
+                    int caretOffset = ex.getExpectedCaretOffset();
+                    packageName = LispParserUtil.getPackage(psiFile, caretOffset, LispParserUtil.NULL_RETURN);
+                }
             }
             if (statusBar != null) {
                 statusBar.updateWidget(ID());

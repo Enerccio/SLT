@@ -62,7 +62,8 @@ You can also open this as a project in Intellij Idea.
   * [ ] Actions
   * [ ] Inspection eval
 * [ ] Walkable debugger without actions 
-* [ ] Breakpoints
+  * [ ] Breakpoints
+  * Currently impossible to do correctly with sbcl, investigating other options
 * [x] Documentation 
 * [x] Macro expand in documentation
   * Macro expand requires you to hover element twice for now
