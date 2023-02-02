@@ -1,3 +1,11 @@
+## 0.4.0
+
+### Added
+
+### Fixes
+
+### Changes
+
 ## 0.3.1
 
 ### Added
