@@ -1,9 +1,11 @@
 package com.en_circle.slt.plugin;
 
 import com.en_circle.slt.plugin.ui.SltCoreWindow;
+import com.en_circle.slt.plugin.ui.SltUIService;
 import com.en_circle.slt.plugin.ui.debug.SltDebuggers;
 import com.en_circle.slt.plugin.ui.instance.InstanceInfoPanel;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.Disposer;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ToolWindowFactory;
 import com.intellij.ui.content.Content;
@@ -20,6 +22,8 @@ public class SltWindowFactory implements ToolWindowFactory {
             Content content = contentFactory.createContent(sltCoreWindow.getContent(),
                     SltBundle.message("slt.ui.process.title"), false);
             toolWindow.getContentManager().addContent(content);
+
+            Disposer.register(SltUIService.getInstance(project), sltCoreWindow);
         }
 
         {

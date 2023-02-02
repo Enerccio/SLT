@@ -14,8 +14,7 @@ import com.intellij.ui.tabs.impl.JBTabsImpl;
 import javax.swing.*;
 import java.awt.*;
 import java.math.BigInteger;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class SltDebuggers implements DebugInterface, LispEnvironmentListener {
 
@@ -23,7 +22,8 @@ public class SltDebuggers implements DebugInterface, LispEnvironmentListener {
     private final JPanel content;
     private final JBTabsImpl tabs;
 
-    private final Map<BigInteger, SltDebugger> activeDebuggers = new HashMap<>();
+    private final Map<BigInteger, SltDebugger> activeDebuggers = Collections.synchronizedMap(new HashMap<>());
+    private final Set<BigInteger> toActivateDebuggers = Collections.synchronizedSet(new HashSet<>());
     private Content self;
 
     public SltDebuggers(ToolWindow toolWindow) {
@@ -50,6 +50,11 @@ public class SltDebuggers implements DebugInterface, LispEnvironmentListener {
                 debugger.redraw(info);
                 activeDebuggers.put(info.getThreadId(), debugger);
                 tabs.addTab(debugger.getTab());
+                if (toActivateDebuggers.contains(info.getThreadId())) {
+                    toActivateDebuggers.remove(info.getThreadId());
+
+                    onDebugActivate(info.getThreadId(), null);
+                }
             }
         });
     }
@@ -62,6 +67,8 @@ public class SltDebuggers implements DebugInterface, LispEnvironmentListener {
                 tabs.select(activeDebuggers.get(debugId).getTab(), true);
                 tabs.requestFocusInWindow();
                 toolWindow.getContentManager().setSelectedContent(self, true);
+            } else {
+                toActivateDebuggers.add(debugId);
             }
         });
     }
@@ -71,6 +78,8 @@ public class SltDebuggers implements DebugInterface, LispEnvironmentListener {
         ApplicationManager.getApplication().invokeLater(() -> {
             if (activeDebuggers.containsKey(debugId)) {
                 removeDebugger(activeDebuggers.get(debugId), debugId);
+            } else {
+                toActivateDebuggers.remove(debugId);
             }
         });
     }

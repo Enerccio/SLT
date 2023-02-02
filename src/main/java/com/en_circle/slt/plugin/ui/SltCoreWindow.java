@@ -10,8 +10,10 @@ import com.en_circle.slt.plugin.ui.console.SltREPL;
 import com.intellij.icons.AllIcons;
 import com.intellij.icons.AllIcons.Actions;
 import com.intellij.icons.AllIcons.General;
+import com.intellij.openapi.Disposable;
 import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.Disposer;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.ui.tabs.impl.JBTabsImpl;
 import org.jetbrains.annotations.NotNull;
@@ -22,7 +24,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class SltCoreWindow implements LispEnvironmentListener {
+public class SltCoreWindow implements LispEnvironmentListener, Disposable {
 
     private final Project project;
     private final JTextField process;
@@ -36,9 +38,17 @@ public class SltCoreWindow implements LispEnvironmentListener {
         LispEnvironmentService.getInstance(project).addServerListener(this);
 
         content = new JPanel(new BorderLayout());
-        components.add(new SltOutputHandlerComponent(this, SltOutput.STDOUT));
-        components.add(new SltOutputHandlerComponent(this, SltOutput.STDERR));
-        SltGeneralLog generalLog = new SltGeneralLog();
+        SltOutputHandlerComponent outputHandlerComponent = new SltOutputHandlerComponent(project, SltOutput.STDOUT);
+        components.add(outputHandlerComponent);
+        Disposer.register(this, outputHandlerComponent);
+
+        outputHandlerComponent = new SltOutputHandlerComponent(project, SltOutput.STDERR);
+        components.add(outputHandlerComponent);
+        Disposer.register(this, outputHandlerComponent);
+
+        SltGeneralLog generalLog = new SltGeneralLog(project);
+        Disposer.register(this, generalLog);
+
         components.add(generalLog);
         LispEnvironmentService.getInstance(project).setRequestResponseLogger(generalLog);
 
@@ -151,6 +161,11 @@ public class SltCoreWindow implements LispEnvironmentListener {
 
     public Project getProject() {
         return project;
+    }
+
+    @Override
+    public void dispose() {
+
     }
 
     private class StartLispAction extends AnAction {

@@ -48,6 +48,8 @@
 
         <projectService serviceImplementation="com.en_circle.slt.plugin.highlights.BraceHighlightService" />
 
+        <projectService serviceImplementation="com.en_circle.slt.plugin.ui.SltUIService" />
+
         <!-- Templates -->
 
         <internalFileTemplate name="Common Lisp CL File.cl"/>

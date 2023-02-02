@@ -252,13 +252,14 @@ public class SltDebuggerImpl implements SltDebugger, Disposable {
         try {
             LispEnvironmentService.getInstance(parent.getProject()).sendToLisp(FrameLocalsAndCatchTags.getLocals(BigInteger.valueOf(ix),
                     debugInfo.getThreadId(), result -> {
-                 ApplicationManager.getApplication().runWriteAction(() -> {
-                    SltFrameInfo frameInfo = new SltFrameInfo(parent.getProject(), debugInfo.getThreadId(), BigInteger.valueOf(ix),
-                            element.getFramePackage());
-                    singleFrameComponent.removeAll();
-                    singleFrameComponent.add(frameInfo.getContent(), BorderLayout.CENTER);
-                    frameInfo.refreshFrameValues(result);
-                });
+                ApplicationManager.getApplication().invokeLater(() ->
+                        ApplicationManager.getApplication().runWriteAction(() -> {
+                            SltFrameInfo frameInfo = new SltFrameInfo(parent.getProject(), debugInfo.getThreadId(), BigInteger.valueOf(ix),
+                                    element.getFramePackage());
+                            singleFrameComponent.removeAll();
+                            singleFrameComponent.add(frameInfo.getContent(), BorderLayout.CENTER);
+                            frameInfo.refreshFrameValues(result);
+                }));
             }), true);
         } catch (Exception e) {
             log.warn(SltBundle.message("slt.error.start"), e);

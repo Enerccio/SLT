@@ -5,6 +5,7 @@ import com.en_circle.slt.plugin.services.lisp.LispEnvironmentService.LispEnviron
 import com.en_circle.slt.plugin.swank.SlimeRequest;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.ex.ApplicationUtil;
+import com.intellij.openapi.progress.ProcessCanceledException;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.ProgressIndicatorProvider;
 import com.intellij.openapi.progress.ProgressManager;
@@ -34,6 +35,9 @@ public class SltApplicationUtils {
         try {
             return getAsyncResult(project, request, startLisp);
         } catch (Exception e) {
+            if (e instanceof ProcessCanceledException)
+                return null;
+
             log.warn(e.getMessage());
             return null;
         }

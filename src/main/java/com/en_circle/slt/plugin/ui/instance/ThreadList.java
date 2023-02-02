@@ -135,31 +135,27 @@ public class ThreadList implements InstanceInfoPanelComponent {
 
     private void pauseThread() {
         int row = table.getSelectionModel().getSelectedIndices()[0];
-        Object id = info.getData(row, 0);
-        if (id instanceof BigInteger lispId) {
-            try {
-                LispEnvironmentService.getInstance(project)
-                        .sendToLisp(SuspendThread.suspend(lispId,
-                                () -> ApplicationManager.getApplication().invokeLater(this::refreshThreads)), false);
-            } catch (Exception e) {
-                log.warn(SltBundle.message("slt.error.start"), e);
-                Messages.showErrorDialog(project, e.getMessage(), SltBundle.message("slt.ui.errors.lisp.start"));
-            }
+        BigInteger lispId = BigInteger.valueOf(row);
+        try {
+            LispEnvironmentService.getInstance(project)
+                    .sendToLisp(SuspendThread.suspend(lispId,
+                            () -> ApplicationManager.getApplication().invokeLater(this::refreshThreads)), false);
+        } catch (Exception e) {
+            log.warn(SltBundle.message("slt.error.start"), e);
+            Messages.showErrorDialog(project, e.getMessage(), SltBundle.message("slt.ui.errors.lisp.start"));
         }
     }
 
     private void terminateThread() {
         int row = table.getSelectionModel().getSelectedIndices()[0];
-        Object id = info.getData(row, 0);
-        if (id instanceof BigInteger lispId) {
-            try {
-                LispEnvironmentService.getInstance(project)
-                        .sendToLisp(KillThread.kill(lispId,
-                                () -> ApplicationManager.getApplication().invokeLater(this::refreshThreads)), false);
-            } catch (Exception e) {
-                log.warn(SltBundle.message("slt.error.start"), e);
-                Messages.showErrorDialog(project, e.getMessage(), SltBundle.message("slt.ui.errors.lisp.start"));
-            }
+        BigInteger lispId = BigInteger.valueOf(row);
+        try {
+            LispEnvironmentService.getInstance(project)
+                    .sendToLisp(KillThread.kill(lispId,
+                            () -> ApplicationManager.getApplication().invokeLater(this::refreshThreads)), false);
+        } catch (Exception e) {
+            log.warn(SltBundle.message("slt.error.start"), e);
+            Messages.showErrorDialog(project, e.getMessage(), SltBundle.message("slt.ui.errors.lisp.start"));
         }
     }
 
