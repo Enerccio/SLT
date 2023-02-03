@@ -93,3 +93,5 @@ This project is licensed under [Apache License v2](LICENSE.txt).
 ### What does SLT even mean?
 
 SLT - Speech Language Therapy. Only cure for LISP!
+
+Also, backronym for Superior Lisp Tooling!

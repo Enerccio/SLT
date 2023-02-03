@@ -24,7 +24,7 @@
         <projectService
                 serviceImplementation="com.en_circle.slt.plugin.sdk.LispProjectSdk" />
 
-        <projectConfigurable groupId="project"
+        <projectConfigurable groupId="language"
                              instance="com.en_circle.slt.plugin.ui.sdk.SdkSelector"/>
 
         <!-- Indentation Configuration -->
@@ -38,17 +38,16 @@
         <projectService
                 serviceImplementation="com.en_circle.slt.plugin.indentation.SltProjectIndentationSettings" />
 
-        <projectConfigurable groupId="project"
+        <projectConfigurable groupId="editor"
                                  instance="com.en_circle.slt.plugin.ui.indentation.SltProjectIndentationConfiguration"/>
-
-
-        <!-- Lisp Service -->
-        <projectService serviceImplementation="com.en_circle.slt.plugin.services.lisp.LispEnvironmentServiceImpl"
-                            serviceInterface="com.en_circle.slt.plugin.services.lisp.LispEnvironmentService" />
 
         <projectService serviceImplementation="com.en_circle.slt.plugin.highlights.BraceHighlightService" />
 
         <projectService serviceImplementation="com.en_circle.slt.plugin.ui.SltUIService" />
+
+        <!-- Lisp Service -->
+        <projectService serviceImplementation="com.en_circle.slt.plugin.services.lisp.LispEnvironmentServiceImpl"
+                            serviceInterface="com.en_circle.slt.plugin.services.lisp.LispEnvironmentService" />
 
         <!-- Templates -->
 
