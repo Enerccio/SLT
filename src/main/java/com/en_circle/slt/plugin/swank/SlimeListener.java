@@ -166,6 +166,10 @@ public class SlimeListener implements SwankClient.SwankReply {
             if (request instanceof SuspendThread suspendThread) {
                 suspendThread.processReply((LispContainer) reply.getItems().get(1));
             }
+
+            if (request instanceof Argslist argslist) {
+                argslist.processReply((LispContainer) reply.getItems().get(1));
+            }
         } finally {
             requests.remove(replyId.getValue());
         }

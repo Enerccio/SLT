@@ -3,10 +3,12 @@
 ### Added
 
 - Thread list with actions
+- Argslist
 
 ### Changes
 
 - SLT library is now formatted into multiple chunks
+- Grammar now properly reacts to user errors or unfinished forms
 
 ### Fixes
 

@@ -43,7 +43,8 @@ array ::= ARRAY_START list
 
 structure ::= STRUCTURE_TOKEN list
 
-list ::= LPAREN sexpr* RPAREN
+list ::= LPAREN sexpr* RPAREN { pin = 2 recoverWhile=list_recovery }
+private list_recovery ::= !(RPAREN | sexpr)
 
 pair ::= LPAREN sexpr+ DOT sexpr RPAREN
 

@@ -192,14 +192,14 @@ public class LispParser implements PsiParser, LightPsiParser {
   // LPAREN sexpr* RPAREN
   public static boolean list(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "list")) return false;
-    if (!nextTokenIs(b, LPAREN)) return false;
-    boolean r;
-    Marker m = enter_section_(b);
+    boolean r, p;
+    Marker m = enter_section_(b, l, _NONE_, LIST, "<list>");
     r = consumeToken(b, LPAREN);
     r = r && list_1(b, l + 1);
+    p = r; // pin = 2
     r = r && consumeToken(b, RPAREN);
-    exit_section_(b, m, LIST, r);
-    return r;
+    exit_section_(b, l, m, r, p, LispParser::list_recovery);
+    return r || p;
   }
 
   // sexpr*
@@ -211,6 +211,26 @@ public class LispParser implements PsiParser, LightPsiParser {
       if (!empty_element_parsed_guard_(b, "list_1", c)) break;
     }
     return true;
+  }
+
+  /* ********************************************************** */
+  // !(RPAREN | sexpr)
+  static boolean list_recovery(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "list_recovery")) return false;
+    boolean r;
+    Marker m = enter_section_(b, l, _NOT_);
+    r = !list_recovery_0(b, l + 1);
+    exit_section_(b, l, m, r, false, null);
+    return r;
+  }
+
+  // RPAREN | sexpr
+  private static boolean list_recovery_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "list_recovery_0")) return false;
+    boolean r;
+    r = consumeToken(b, RPAREN);
+    if (!r) r = sexpr(b, l + 1);
+    return r;
   }
 
   /* ********************************************************** */

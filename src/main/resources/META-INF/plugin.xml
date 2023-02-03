@@ -95,6 +95,8 @@
 
         <enterHandlerDelegate implementation="com.en_circle.slt.plugin.indentation.SltIndentator"/>
 
+        <codeInsight.parameterInfo language="Common Lisp" implementationClass="com.en_circle.slt.plugin.params.SltParameterInfoHandler" />
+
         <!-- Highlight annotators -->
         <externalAnnotator language="Common Lisp"
                            implementationClass="com.en_circle.slt.plugin.highlights.annotators.SymbolAnnotator"/>

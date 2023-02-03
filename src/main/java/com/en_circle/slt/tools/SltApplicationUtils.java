@@ -17,10 +17,9 @@ import org.awaitility.pollinterval.FixedPollInterval;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -63,27 +62,25 @@ public class SltApplicationUtils {
         }
 
         return ApplicationManager.getApplication().executeOnPooledThread(() -> {
-            BlockingQueue<X> pointer = new ArrayBlockingQueue<>(1);
-            SlimeRequest r = request.apply(result ->
-                    ApplicationManager.getApplication().invokeLater(() ->
-                            ApplicationManager.getApplication().runWriteAction(() -> {
-                                try {
-                                    pointer.put(result);
-                                } catch (Exception ignored) {
+            AtomicReference<X> pointer = new AtomicReference<>(null);
+            SlimeRequest r = request.apply(result -> {
+                try {
+                    pointer.set(result);
+                } catch (Exception ignored) {
 
-                                }
-                            })));
+                }
+            });
             LispEnvironmentService.getInstance(project).sendToLisp(r, startLisp);
             try {
                 Awaitility.await()
                         .atMost(2, TimeUnit.SECONDS)
                         .pollInterval(new FixedPollInterval(10, TimeUnit.MILLISECONDS))
                         .failFast(ProgressManager::checkCanceled)
-                        .until(() -> pointer.peek() != null);
+                        .until(() -> pointer.get() != null);
             } catch (ConditionTimeoutException exception) {
                 return null;
             }
-            return pointer.isEmpty() ? null : pointer.take();
+            return pointer.get();
         });
     }
 

@@ -57,6 +57,7 @@ You can also open this as a project in Intellij Idea.
 * [x] Automatic indentation
 * [x] REPL
 * [x] Interactive debugging
+* [x] Argument help (Ctrl+P)
 * [ ] Inspection
   * [x] Basic inspection
   * [ ] Actions
