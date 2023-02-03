@@ -1,3 +1,20 @@
+## 0.3.1 230203
+
+### Added
+
+- Thread list with actions
+- Argslist
+
+### Changes
+
+- SLT library is now formatted into multiple chunks
+- Grammar now properly reacts to user errors or unfinished forms
+
+### Fixes
+
+- Fixed tests 
+- Speed optimizations
+
 ## 0.3.0 230108
 
 ### Added

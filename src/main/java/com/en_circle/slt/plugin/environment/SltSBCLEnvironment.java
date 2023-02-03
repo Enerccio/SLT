@@ -1,8 +1,8 @@
 package com.en_circle.slt.plugin.environment;
 
+import com.en_circle.slt.plugin.SltLibrary;
 import com.en_circle.slt.plugin.environment.SltProcessStreamGobbler.ProcessInitializationWaiter;
 import com.en_circle.slt.plugin.environment.SltProcessStreamGobbler.WaitForOccurrence;
-import com.en_circle.slt.templates.SltScriptTemplate;
 import com.en_circle.slt.tools.PluginPath;
 import com.intellij.openapi.util.io.FileUtil;
 import org.apache.commons.io.FileUtils;
@@ -43,10 +43,7 @@ public class SltSBCLEnvironment extends SltLispEnvironmentProcess  {
             File tempDir = FileUtil.createTempDirectory(PluginPath.getPluginFolder(),
                     "SLTinit", "");
 
-            e.sltCore = new File(tempDir, "slt.cl");
-            e.sltCore.deleteOnExit();
-            String sltScriptTemplate = new SltScriptTemplate().render();
-            FileUtils.write(e.sltCore, sltScriptTemplate, StandardCharsets.UTF_8);
+            e.sltCore = SltLibrary.getLibraryInitFile();
 
             e.serverStartSetup = new File(tempDir, "startServer.cl");
             e.serverStartSetup.deleteOnExit();
@@ -156,6 +153,7 @@ public class SltSBCLEnvironment extends SltLispEnvironmentProcess  {
             add("port", "" + port);
             add("cwd", cwd);
             add("sbclcorefile", sltCoreScript);
+            add("interpret", LispInterpret.SBCL.symbolName);
         }
 
         @Override

@@ -194,8 +194,8 @@ public class SltDebuggerImpl implements SltDebugger, Disposable {
                 LispEnvironmentService.getInstance(parent.getProject()).sendToLisp(InvokeNthRestart.nthRestart(debugInfo.getThreadId(),
                         BigInteger.valueOf(ix), debugInfo.getDebugLevel(), "NIL", "NIL", () -> {}));
             } catch (Exception e) {
-                log.warn(SltBundle.message("slt.error.sbclstart"), e);
-                Messages.showErrorDialog(parent.getProject(), e.getMessage(), SltBundle.message("slt.ui.errors.sbcl.start"));
+                log.warn(SltBundle.message("slt.error.start"), e);
+                Messages.showErrorDialog(parent.getProject(), e.getMessage(), SltBundle.message("slt.ui.errors.lisp.start"));
             }
         } else {
             List<String> arguments = new ArrayList<>();
@@ -218,8 +218,8 @@ public class SltDebuggerImpl implements SltDebugger, Disposable {
                 LispEnvironmentService.getInstance(parent.getProject()).sendToLisp(InvokeNthRestart.nthRestart(debugInfo.getThreadId(),
                         BigInteger.valueOf(ix), debugInfo.getDebugLevel(), args, rest, () -> {}));
             } catch (Exception e) {
-                log.warn(SltBundle.message("slt.error.sbclstart"), e);
-                Messages.showErrorDialog(parent.getProject(), e.getMessage(), SltBundle.message("slt.ui.errors.sbcl.start"));
+                log.warn(SltBundle.message("slt.error.start"), e);
+                Messages.showErrorDialog(parent.getProject(), e.getMessage(), SltBundle.message("slt.ui.errors.lisp.start"));
             }
         }
 
@@ -252,17 +252,18 @@ public class SltDebuggerImpl implements SltDebugger, Disposable {
         try {
             LispEnvironmentService.getInstance(parent.getProject()).sendToLisp(FrameLocalsAndCatchTags.getLocals(BigInteger.valueOf(ix),
                     debugInfo.getThreadId(), result -> {
-                 ApplicationManager.getApplication().runWriteAction(() -> {
-                    SltFrameInfo frameInfo = new SltFrameInfo(parent.getProject(), debugInfo.getThreadId(), BigInteger.valueOf(ix),
-                            element.getFramePackage());
-                    singleFrameComponent.removeAll();
-                    singleFrameComponent.add(frameInfo.getContent(), BorderLayout.CENTER);
-                    frameInfo.refreshFrameValues(result);
-                });
+                ApplicationManager.getApplication().invokeLater(() ->
+                        ApplicationManager.getApplication().runWriteAction(() -> {
+                            SltFrameInfo frameInfo = new SltFrameInfo(parent.getProject(), debugInfo.getThreadId(), BigInteger.valueOf(ix),
+                                    element.getFramePackage());
+                            singleFrameComponent.removeAll();
+                            singleFrameComponent.add(frameInfo.getContent(), BorderLayout.CENTER);
+                            frameInfo.refreshFrameValues(result);
+                }));
             }), true);
         } catch (Exception e) {
-            log.warn(SltBundle.message("slt.error.sbclstart"), e);
-            Messages.showErrorDialog(parent.getProject(), e.getMessage(), SltBundle.message("slt.ui.errors.sbcl.start"));
+            log.warn(SltBundle.message("slt.error.start"), e);
+            Messages.showErrorDialog(parent.getProject(), e.getMessage(), SltBundle.message("slt.ui.errors.lisp.start"));
         }
     }
 
@@ -270,8 +271,8 @@ public class SltDebuggerImpl implements SltDebugger, Disposable {
         try {
             LispEnvironmentService.getInstance(parent.getProject()).sendToLisp(new ThrowToToplevel(lastDebugId));
         } catch (Exception e) {
-            log.warn(SltBundle.message("slt.error.sbclstart"), e);
-            Messages.showErrorDialog(parent.getProject(), e.getMessage(), SltBundle.message("slt.ui.errors.sbcl.start"));
+            log.warn(SltBundle.message("slt.error.start"), e);
+            Messages.showErrorDialog(parent.getProject(), e.getMessage(), SltBundle.message("slt.ui.errors.lisp.start"));
         }
     }
 

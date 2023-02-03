@@ -3,91 +3,38 @@ package com.en_circle.slt.plugin.ui;
 import com.en_circle.slt.plugin.SltBundle;
 import com.en_circle.slt.plugin.environment.SltLispEnvironment.SltOutput;
 import com.en_circle.slt.plugin.swank.SlimeListener.RequestResponseLogger;
-import com.en_circle.slt.tools.BufferedString;
-import com.intellij.icons.AllIcons;
-import com.intellij.openapi.actionSystem.*;
-import com.intellij.ui.components.JBScrollPane;
+import com.intellij.execution.filters.TextConsoleBuilderFactory;
+import com.intellij.execution.ui.ConsoleView;
+import com.intellij.execution.ui.ConsoleViewContentType;
+import com.intellij.openapi.Disposable;
+import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.Disposer;
 import com.intellij.ui.tabs.TabInfo;
-import org.jetbrains.annotations.NotNull;
+import org.apache.commons.lang3.StringUtils;
 
 import javax.swing.*;
-import javax.swing.text.DefaultCaret;
 import java.awt.*;
 
-public class SltGeneralLog implements SltComponent, RequestResponseLogger {
+public class SltGeneralLog implements SltComponent, RequestResponseLogger, Disposable {
 
     private final JPanel dataContainer;
-    private JTextArea area;
+    private ConsoleView consoleView;
     private TabInfo tabInfo;
-    private BufferedString bufferedString;
 
-    public SltGeneralLog() {
+    private final Project project;
+
+    public SltGeneralLog(Project project) {
+        this.project = project;
         this.dataContainer = new JPanel(new BorderLayout());
     }
 
     @Override
     public TabInfo create() {
-        area = new JTextArea();
-        area.setEditable(false);
-        DefaultCaret caret = (DefaultCaret) area.getCaret();
-        caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
-
-        JBScrollPane scrollPane = new JBScrollPane(area);
-        dataContainer.add(scrollPane, BorderLayout.CENTER);
-
-        DefaultActionGroup controlGroup = new DefaultActionGroup();
-        ActionToolbar toolbar = ActionManager.getInstance().createActionToolbar("SltProcessWindowWrapEvent", controlGroup, false);
-        toolbar.setTargetComponent(dataContainer);
-        dataContainer.add(toolbar.getComponent(), BorderLayout.EAST);
-
-        bufferedString = new BufferedString(data -> SwingUtilities.invokeLater(() -> {
-            area.setText(area.getText() + data);
-            if (caret.getUpdatePolicy() == DefaultCaret.ALWAYS_UPDATE)
-                area.setCaretPosition(area.getDocument().getLength());
-        }), fullData -> SwingUtilities.invokeLater(() -> {
-            area.setText(fullData);
-            if (caret.getUpdatePolicy() == DefaultCaret.ALWAYS_UPDATE)
-                area.setCaretPosition(area.getDocument().getLength());
-        }));
-
-        controlGroup.add(new AnAction(SltBundle.message("slt.ui.process.gl.clear"), "", AllIcons.Actions.GC) {
-
-            @Override
-            public void actionPerformed(@NotNull AnActionEvent e) {
-                bufferedString.clear();
-            }
-        });
-        controlGroup.add(new ToggleAction(SltBundle.message("slt.ui.process.gl.wrap"), "", AllIcons.Actions.ToggleSoftWrap) {
-
-            @Override
-            public boolean isSelected(@NotNull AnActionEvent e) {
-                return area.getLineWrap();
-            }
-
-            @Override
-            public void setSelected(@NotNull AnActionEvent e, boolean state) {
-                area.setLineWrap(state);
-            }
-
-        });
-        controlGroup.add(new ToggleAction(SltBundle.message("slt.ui.process.gl.scroll"), "", AllIcons.RunConfigurations.Scroll_down) {
-
-            @Override
-            public boolean isSelected(@NotNull AnActionEvent e) {
-                return caret.getUpdatePolicy() == DefaultCaret.ALWAYS_UPDATE;
-            }
-
-            @Override
-            public void setSelected(@NotNull AnActionEvent e, boolean state) {
-                if (state) {
-                    caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
-                    area.setCaretPosition(area.getDocument().getLength());
-                } else {
-                    caret.setUpdatePolicy(DefaultCaret.NEVER_UPDATE);
-                }
-            }
-
-        });
+        consoleView = TextConsoleBuilderFactory.getInstance()
+                .createBuilder(project)
+                .getConsole();
+        Disposer.register(this, consoleView);
+        dataContainer.add(consoleView.getComponent());
 
         tabInfo = new TabInfo(dataContainer);
         tabInfo.setText(getTitle());
@@ -131,11 +78,18 @@ public class SltGeneralLog implements SltComponent, RequestResponseLogger {
 
     @Override
     public void logRequest(String request) {
-        bufferedString.append("\n\n" + request);
+        request = StringUtils.truncate(request, 0, 4069);
+        consoleView.print("\n\n" + request, ConsoleViewContentType.LOG_INFO_OUTPUT);
     }
 
     @Override
     public void logResponse(String response) {
-        bufferedString.append("\n\n" + response);
+        response = StringUtils.truncate(response, 0, 4069);
+        consoleView.print("\n\n" + response, ConsoleViewContentType.LOG_INFO_OUTPUT);
+    }
+
+    @Override
+    public void dispose() {
+
     }
 }

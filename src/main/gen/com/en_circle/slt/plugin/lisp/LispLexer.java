@@ -24,22 +24,23 @@ class LispLexer implements FlexLexer {
 
   /** lexical states */
   public static final int YYINITIAL = 0;
-  public static final int LINE_COMMENT = 2;
-  public static final int STRING = 4;
-  public static final int STRING_ESCAPE = 6;
-  public static final int SHARPSIGN = 8;
-  public static final int BIT_ARRAY = 10;
-  public static final int CHARACTER = 12;
-  public static final int BLOCK_COMMENT = 14;
-  public static final int BLOCK_COMMENT_TEST = 16;
-  public static final int BINARY_NUM = 18;
-  public static final int OCTAL_NUM = 20;
-  public static final int RADIX_NUM = 22;
-  public static final int HEX_NUM = 24;
-  public static final int STEP8 = 26;
-  public static final int STEP8ESCAPE = 28;
-  public static final int STEP9 = 30;
-  public static final int STEP9ESCAPE = 32;
+  public static final int UNQUOTE_STATE = 2;
+  public static final int LINE_COMMENT = 4;
+  public static final int STRING = 6;
+  public static final int STRING_ESCAPE = 8;
+  public static final int SHARPSIGN = 10;
+  public static final int BIT_ARRAY = 12;
+  public static final int CHARACTER = 14;
+  public static final int BLOCK_COMMENT = 16;
+  public static final int BLOCK_COMMENT_TEST = 18;
+  public static final int BINARY_NUM = 20;
+  public static final int OCTAL_NUM = 22;
+  public static final int RADIX_NUM = 24;
+  public static final int HEX_NUM = 26;
+  public static final int STEP8 = 28;
+  public static final int STEP8ESCAPE = 30;
+  public static final int STEP9 = 32;
+  public static final int STEP9ESCAPE = 34;
 
   /**
    * ZZ_LEXSTATE[l] is the state in the DFA for the lexical state l
@@ -50,7 +51,7 @@ class LispLexer implements FlexLexer {
   private static final int ZZ_LEXSTATE[] = { 
      0,  0,  1,  1,  2,  2,  3,  3,  4,  4,  5,  5,  6,  6,  7,  7, 
      8,  8,  9,  9, 10, 10, 11, 11, 12, 12, 13, 13, 14, 14, 15, 15, 
-    16, 16
+    16, 16, 17, 17
   };
 
   /** 
@@ -72,11 +73,11 @@ class LispLexer implements FlexLexer {
 
   /* The ZZ_CMAP_A table has 256 entries */
   static final char ZZ_CMAP_A[] = zzUnpackCMap(
-    "\11\0\1\1\1\14\1\0\1\1\1\14\22\0\1\1\1\17\1\10\1\12\3\17\1\6\1\4\1\5\1\20"+
-    "\1\23\1\3\1\24\1\25\1\26\2\40\6\41\2\16\1\21\1\7\1\2\1\22\3\17\1\27\1\30\1"+
-    "\31\3\42\10\32\1\33\1\34\1\32\1\35\1\36\4\32\1\37\2\32\1\17\1\15\3\17\1\11"+
-    "\1\27\1\30\1\31\3\42\10\32\1\33\1\34\1\32\1\35\1\36\4\32\1\37\2\32\1\17\1"+
-    "\13\2\17\201\0");
+    "\11\0\1\1\1\15\1\0\1\1\1\15\22\0\1\1\1\20\1\10\1\12\3\20\1\6\1\4\1\5\1\21"+
+    "\1\24\1\3\1\25\1\26\1\27\2\41\6\42\2\17\1\22\1\7\1\2\1\23\2\20\1\14\1\30\1"+
+    "\31\1\32\3\43\10\33\1\34\1\35\1\33\1\36\1\37\4\33\1\40\2\33\1\20\1\16\3\20"+
+    "\1\11\1\30\1\31\1\32\3\43\10\33\1\34\1\35\1\33\1\36\1\37\4\33\1\40\2\33\1"+
+    "\20\1\13\2\20\201\0");
 
   /** 
    * Translates DFA states to action switch labels.
@@ -84,16 +85,16 @@ class LispLexer implements FlexLexer {
   private static final int [] ZZ_ACTION = zzUnpackAction();
 
   private static final String ZZ_ACTION_PACKED_0 =
-    "\21\0\1\1\1\2\1\3\1\4\1\5\1\6\1\7"+
+    "\22\0\1\1\1\2\1\3\1\4\1\5\1\6\1\7"+
     "\1\10\1\11\1\12\1\13\1\14\1\15\1\16\1\17"+
     "\1\20\1\21\1\22\1\23\1\24\1\25\1\26\1\27"+
     "\1\30\1\31\1\32\1\33\1\34\1\35\1\36\1\37"+
     "\1\40\1\41\1\42\1\43\1\44\1\45\1\46\1\47"+
     "\1\50\1\51\1\52\1\53\1\54\1\55\1\56\1\57"+
-    "\1\60\1\61\1\62\1\63\1\64";
+    "\1\60\1\61\1\62\1\63\1\64\1\65\1\66";
 
   private static int [] zzUnpackAction() {
-    int [] result = new int[69];
+    int [] result = new int[72];
     int offset = 0;
     offset = zzUnpackAction(ZZ_ACTION_PACKED_0, offset, result);
     return result;
@@ -118,18 +119,18 @@ class LispLexer implements FlexLexer {
   private static final int [] ZZ_ROWMAP = zzUnpackRowMap();
 
   private static final String ZZ_ROWMAP_PACKED_0 =
-    "\0\0\0\43\0\106\0\151\0\214\0\257\0\322\0\365"+
-    "\0\u0118\0\u013b\0\u015e\0\u0181\0\u01a4\0\u01c7\0\u01ea\0\u020d"+
-    "\0\u0230\0\u0253\0\u0276\0\u0253\0\u0253\0\u0253\0\u0253\0\u0253"+
-    "\0\u0253\0\u0253\0\u0253\0\u0253\0\u0253\0\u0253\0\u0253\0\u0253"+
-    "\0\u0253\0\u0253\0\u0253\0\u0253\0\u0253\0\u0253\0\u0253\0\u0253"+
-    "\0\u0253\0\u0253\0\u0253\0\u0253\0\u0253\0\u0253\0\u0253\0\u0253"+
-    "\0\u0253\0\u0253\0\u0253\0\u0253\0\u0253\0\u0253\0\u0253\0\u0253"+
-    "\0\u0253\0\u0253\0\u0253\0\u0253\0\u0253\0\u0253\0\u0253\0\u0253"+
-    "\0\u0253\0\u0253\0\u0253\0\u0253\0\u0253";
+    "\0\0\0\44\0\110\0\154\0\220\0\264\0\330\0\374"+
+    "\0\u0120\0\u0144\0\u0168\0\u018c\0\u01b0\0\u01d4\0\u01f8\0\u021c"+
+    "\0\u0240\0\u0264\0\u0288\0\u02ac\0\u0288\0\u0288\0\u0288\0\u0288"+
+    "\0\u0288\0\u0288\0\u0288\0\u0288\0\u0288\0\u0288\0\u0288\0\u0288"+
+    "\0\u0288\0\u0288\0\u0288\0\u0288\0\u0288\0\u0288\0\u0288\0\u0288"+
+    "\0\u0288\0\u0288\0\u0288\0\u0288\0\u0288\0\u0288\0\u0288\0\u0288"+
+    "\0\u0288\0\u0288\0\u0288\0\u0288\0\u0288\0\u0288\0\u0288\0\u0288"+
+    "\0\u0288\0\u0288\0\u0288\0\u0288\0\u0288\0\u0288\0\u0288\0\u0288"+
+    "\0\u0288\0\u0288\0\u0288\0\u0288\0\u0288\0\u0288\0\u0288\0\u0288";
 
   private static int [] zzUnpackRowMap() {
-    int [] result = new int[69];
+    int [] result = new int[72];
     int offset = 0;
     offset = zzUnpackRowMap(ZZ_ROWMAP_PACKED_0, offset, result);
     return result;
@@ -152,23 +153,24 @@ class LispLexer implements FlexLexer {
   private static final int [] ZZ_TRANS = zzUnpackTrans();
 
   private static final String ZZ_TRANS_PACKED_0 =
-    "\1\22\1\23\1\24\1\25\1\26\1\27\1\30\1\31"+
-    "\1\32\1\33\1\34\1\35\1\23\1\22\25\24\14\36"+
-    "\1\37\36\36\1\40\4\36\1\41\25\36\43\32\3\22"+
-    "\1\42\1\43\1\22\1\44\3\42\1\45\1\46\1\22"+
-    "\1\47\1\36\1\42\1\50\1\51\1\52\1\53\1\54"+
-    "\1\55\1\42\1\56\1\57\1\60\1\42\1\61\1\62"+
-    "\1\63\1\64\1\65\2\36\1\42\13\66\1\36\24\66"+
-    "\1\36\2\66\43\67\13\36\1\70\27\36\12\46\1\71"+
-    "\30\46\26\72\1\36\11\72\1\36\2\72\26\73\1\36"+
-    "\11\73\2\36\1\73\16\74\1\36\7\74\15\36\16\75"+
-    "\1\36\7\75\4\36\6\75\3\36\1\0\1\76\1\77"+
-    "\7\76\1\77\1\100\1\76\1\101\25\77\43\102\1\0"+
-    "\12\77\1\103\1\77\1\104\25\77\43\105\44\0\1\23"+
-    "\12\0\1\23\26\0";
+    "\1\23\1\24\1\25\1\26\1\27\1\30\1\31\1\32"+
+    "\1\33\1\34\1\35\1\36\1\25\1\24\1\23\25\25"+
+    "\14\37\1\40\27\37\15\41\1\42\36\41\1\43\5\41"+
+    "\1\44\25\41\44\33\3\23\1\45\1\46\1\23\1\47"+
+    "\3\45\1\50\1\51\1\45\1\23\1\52\1\41\1\45"+
+    "\1\53\1\54\1\55\1\56\1\57\1\60\1\45\1\61"+
+    "\1\62\1\63\1\45\1\64\1\65\1\66\1\67\1\70"+
+    "\2\41\1\45\13\71\1\41\25\71\1\41\2\71\44\72"+
+    "\13\41\1\73\30\41\12\51\1\74\31\51\27\75\1\41"+
+    "\11\75\1\41\2\75\27\76\1\41\11\76\2\41\1\76"+
+    "\17\77\1\41\7\77\15\41\17\100\1\41\7\100\4\41"+
+    "\6\100\3\41\1\0\1\101\1\102\7\101\1\102\1\103"+
+    "\1\102\1\101\1\104\25\102\44\105\1\0\12\102\1\106"+
+    "\2\102\1\107\25\102\44\110\45\0\1\24\13\0\1\24"+
+    "\26\0";
 
   private static int [] zzUnpackTrans() {
-    int [] result = new int[665];
+    int [] result = new int[720];
     int offset = 0;
     offset = zzUnpackTrans(ZZ_TRANS_PACKED_0, offset, result);
     return result;
@@ -206,10 +208,10 @@ class LispLexer implements FlexLexer {
   private static final int [] ZZ_ATTRIBUTE = zzUnpackAttribute();
 
   private static final String ZZ_ATTRIBUTE_PACKED_0 =
-    "\21\0\1\11\1\1\62\11";
+    "\22\0\1\11\1\1\64\11";
 
   private static int [] zzUnpackAttribute() {
-    int [] result = new int[69];
+    int [] result = new int[72];
     int offset = 0;
     offset = zzUnpackAttribute(ZZ_ATTRIBUTE_PACKED_0, offset, result);
     return result;
@@ -535,71 +537,75 @@ IElementType processBuffer(boolean unget) {
             case YYINITIAL: {
               return null;
             }  // fall though
-            case 70: break;
+            case 73: break;
+            case UNQUOTE_STATE: {
+              yybegin(YYINITIAL); return LispTypes.UNQUOTE;
+            }  // fall though
+            case 74: break;
             case LINE_COMMENT: {
               yybegin(YYINITIAL); return LispTypes.LINE_COMMENT;
             }  // fall though
-            case 71: break;
+            case 75: break;
             case STRING: {
               yybegin(YYINITIAL); return TokenType.ERROR_ELEMENT;
             }  // fall though
-            case 72: break;
+            case 76: break;
             case STRING_ESCAPE: {
               yybegin(YYINITIAL); return TokenType.ERROR_ELEMENT;
             }  // fall though
-            case 73: break;
+            case 77: break;
             case SHARPSIGN: {
               yybegin(YYINITIAL); return TokenType.ERROR_ELEMENT;
             }  // fall though
-            case 74: break;
+            case 78: break;
             case BIT_ARRAY: {
               yybegin(YYINITIAL); yypushback(1); return LispTypes.BIT_ARRAY;
             }  // fall though
-            case 75: break;
+            case 79: break;
             case CHARACTER: {
               yybegin(YYINITIAL); return TokenType.ERROR_ELEMENT;
             }  // fall though
-            case 76: break;
+            case 80: break;
             case BLOCK_COMMENT: {
               yybegin(YYINITIAL); return TokenType.ERROR_ELEMENT;
             }  // fall though
-            case 77: break;
+            case 81: break;
             case BLOCK_COMMENT_TEST: {
               yybegin(YYINITIAL); return TokenType.ERROR_ELEMENT;
             }  // fall though
-            case 78: break;
+            case 82: break;
             case BINARY_NUM: {
               yybegin(YYINITIAL); return TokenType.ERROR_ELEMENT;
             }  // fall though
-            case 79: break;
+            case 83: break;
             case OCTAL_NUM: {
               yybegin(YYINITIAL); return TokenType.ERROR_ELEMENT;
             }  // fall though
-            case 80: break;
+            case 84: break;
             case RADIX_NUM: {
               yybegin(YYINITIAL); return TokenType.ERROR_ELEMENT;
             }  // fall though
-            case 81: break;
+            case 85: break;
             case HEX_NUM: {
               yybegin(YYINITIAL); return TokenType.ERROR_ELEMENT;
             }  // fall though
-            case 82: break;
+            case 86: break;
             case STEP8: {
               yybegin(YYINITIAL); return processBuffer(false);
             }  // fall though
-            case 83: break;
+            case 87: break;
             case STEP8ESCAPE: {
               yybegin(YYINITIAL); return TokenType.ERROR_ELEMENT;
             }  // fall though
-            case 84: break;
+            case 88: break;
             case STEP9: {
               yybegin(YYINITIAL); return TokenType.ERROR_ELEMENT;
             }  // fall though
-            case 85: break;
+            case 89: break;
             case STEP9ESCAPE: {
               yybegin(YYINITIAL); return TokenType.ERROR_ELEMENT;
             }  // fall though
-            case 86: break;
+            case 90: break;
             default:
         return null;
         }
@@ -610,262 +616,272 @@ IElementType processBuffer(boolean unget) {
             { yybegin(YYINITIAL); return TokenType.ERROR_ELEMENT;
             } 
             // fall through
-          case 53: break;
+          case 55: break;
           case 2: 
             { yybegin(YYINITIAL); return TokenType.WHITE_SPACE;
             } 
             // fall through
-          case 54: break;
+          case 56: break;
           case 3: 
             { yybegin(STEP8); escapeCount=0; tokenBuffer.setLength(0); tokenBuffer.append(yytext());
             } 
             // fall through
-          case 55: break;
+          case 57: break;
           case 4: 
-            { yybegin(YYINITIAL); return LispTypes.COMMA;
+            { yybegin(UNQUOTE_STATE);
             } 
             // fall through
-          case 56: break;
+          case 58: break;
           case 5: 
             { yybegin(YYINITIAL); return LispTypes.LPAREN;
             } 
             // fall through
-          case 57: break;
+          case 59: break;
           case 6: 
             { yybegin(YYINITIAL); return LispTypes.RPAREN;
             } 
             // fall through
-          case 58: break;
+          case 60: break;
           case 7: 
             { yybegin(YYINITIAL); return LispTypes.QUOTE;
             } 
             // fall through
-          case 59: break;
+          case 61: break;
           case 8: 
             { yybegin(LINE_COMMENT);
             } 
             // fall through
-          case 60: break;
+          case 62: break;
           case 9: 
             { yybegin(STRING);
             } 
             // fall through
-          case 61: break;
+          case 63: break;
           case 10: 
             { yybegin(YYINITIAL); return LispTypes.BACKQUOTE;
             } 
             // fall through
-          case 62: break;
+          case 64: break;
           case 11: 
             { yybegin(SHARPSIGN);
             } 
             // fall through
-          case 63: break;
+          case 65: break;
           case 12: 
             { yybegin(STEP9); escapeCount=1; tokenBuffer.setLength(0);
             } 
             // fall through
-          case 64: break;
-          case 13: 
-            { 
-            } 
-            // fall through
-          case 65: break;
-          case 14: 
-            { yybegin(YYINITIAL); return LispTypes.LINE_COMMENT;
-            } 
-            // fall through
           case 66: break;
-          case 15: 
-            { yybegin(YYINITIAL); return LispTypes.STRING_TOKEN;
+          case 13: 
+            { yybegin(YYINITIAL); yypushback(1); return LispTypes.UNQUOTE;
             } 
             // fall through
           case 67: break;
-          case 16: 
-            { yybegin(STRING_ESCAPE);
+          case 14: 
+            { yybegin(YYINITIAL); return LispTypes.UNQUOTE_SPLICE;
             } 
             // fall through
           case 68: break;
-          case 17: 
-            { yybegin(YYINITIAL); return LispTypes.UNDEFINED_SEQUENCE;
+          case 15: 
+            { 
             } 
             // fall through
           case 69: break;
-          case 18: 
-            { yybegin(YYINITIAL); return LispTypes.HASH_LPAREN;
+          case 16: 
+            { yybegin(YYINITIAL); return LispTypes.LINE_COMMENT;
             } 
             // fall through
           case 70: break;
-          case 19: 
-            { yybegin(YYINITIAL); return LispTypes.FUNCTION;
+          case 17: 
+            { yybegin(YYINITIAL); return LispTypes.STRING_TOKEN;
             } 
             // fall through
           case 71: break;
-          case 20: 
-            { yybegin(YYINITIAL); return LispTypes.REFERENCE_LABEL;
+          case 18: 
+            { yybegin(STRING_ESCAPE);
             } 
             // fall through
           case 72: break;
-          case 21: 
-            { yybegin(BLOCK_COMMENT);
+          case 19: 
+            { yybegin(YYINITIAL); return LispTypes.UNDEFINED_SEQUENCE;
             } 
             // fall through
           case 73: break;
-          case 22: 
-            { yybegin(CHARACTER);
+          case 20: 
+            { yybegin(YYINITIAL); return LispTypes.HASH_LPAREN;
             } 
             // fall through
           case 74: break;
-          case 23: 
-            { yybegin(BIT_ARRAY);
+          case 21: 
+            { yybegin(YYINITIAL); return LispTypes.FUNCTION;
             } 
             // fall through
           case 75: break;
-          case 24: 
-            { yybegin(YYINITIAL); return LispTypes.UNINTERN;
+          case 22: 
+            { yybegin(YYINITIAL); return LispTypes.REFERENCE_LABEL;
             } 
             // fall through
           case 76: break;
-          case 25: 
-            { yybegin(YYINITIAL); return LispTypes.REFERENCE_SET;
+          case 23: 
+            { yybegin(BLOCK_COMMENT);
             } 
             // fall through
           case 77: break;
-          case 26: 
-            { yybegin(YYINITIAL); return LispTypes.TEST_SUCCESS;
+          case 24: 
+            { yybegin(CHARACTER);
             } 
             // fall through
           case 78: break;
-          case 27: 
-            { yybegin(YYINITIAL); return LispTypes.TEST_FALURE;
+          case 25: 
+            { yybegin(BIT_ARRAY);
             } 
             // fall through
           case 79: break;
-          case 28: 
-            { yybegin(YYINITIAL); return LispTypes.EVAL_VALUE;
+          case 26: 
+            { yybegin(YYINITIAL); return LispTypes.UNINTERN;
             } 
             // fall through
           case 80: break;
-          case 29: 
-            { yybegin(YYINITIAL); return LispTypes.ARRAY_START;
+          case 27: 
+            { yybegin(YYINITIAL); return LispTypes.REFERENCE_SET;
             } 
             // fall through
           case 81: break;
-          case 30: 
-            { yybegin(BINARY_NUM);
+          case 28: 
+            { yybegin(YYINITIAL); return LispTypes.TEST_SUCCESS;
             } 
             // fall through
           case 82: break;
-          case 31: 
-            { yybegin(YYINITIAL); return LispTypes.REAL_PAIR_START;
+          case 29: 
+            { yybegin(YYINITIAL); return LispTypes.TEST_FALURE;
             } 
             // fall through
           case 83: break;
-          case 32: 
-            { yybegin(OCTAL_NUM);
+          case 30: 
+            { yybegin(YYINITIAL); return LispTypes.EVAL_VALUE;
             } 
             // fall through
           case 84: break;
-          case 33: 
-            { yybegin(YYINITIAL); return LispTypes.PATHNAME_INDICATOR;
+          case 31: 
+            { yybegin(YYINITIAL); return LispTypes.ARRAY_START;
             } 
             // fall through
           case 85: break;
-          case 34: 
-            { yybegin(RADIX_NUM);
+          case 32: 
+            { yybegin(BINARY_NUM);
             } 
             // fall through
           case 86: break;
-          case 35: 
-            { yybegin(YYINITIAL); return LispTypes.STRUCTURE_TOKEN;
+          case 33: 
+            { yybegin(YYINITIAL); return LispTypes.REAL_PAIR_START;
             } 
             // fall through
           case 87: break;
-          case 36: 
-            { yybegin(HEX_NUM);
+          case 34: 
+            { yybegin(OCTAL_NUM);
             } 
             // fall through
           case 88: break;
-          case 37: 
-            { yybegin(YYINITIAL); yypushback(1); return LispTypes.BIT_ARRAY;
+          case 35: 
+            { yybegin(YYINITIAL); return LispTypes.PATHNAME_INDICATOR;
             } 
             // fall through
           case 89: break;
-          case 38: 
-            { yybegin(YYINITIAL); return LispTypes.CHARACTER;
+          case 36: 
+            { yybegin(RADIX_NUM);
             } 
             // fall through
           case 90: break;
-          case 39: 
-            { yybegin(BLOCK_COMMENT_TEST);
+          case 37: 
+            { yybegin(YYINITIAL); return LispTypes.STRUCTURE_TOKEN;
             } 
             // fall through
           case 91: break;
-          case 40: 
-            { yybegin(YYINITIAL); return LispTypes.BLOCK_COMMENT;
+          case 38: 
+            { yybegin(HEX_NUM);
             } 
             // fall through
           case 92: break;
-          case 41: 
-            { yybegin(YYINITIAL); yypushback(1); return LispTypes.BINARY_NUMBER_TOKEN;
+          case 39: 
+            { yybegin(YYINITIAL); yypushback(1); return LispTypes.BIT_ARRAY;
             } 
             // fall through
           case 93: break;
-          case 42: 
-            { yybegin(YYINITIAL); yypushback(1); return LispTypes.OCTAL_NUMBER_TOKEN;
+          case 40: 
+            { yybegin(YYINITIAL); return LispTypes.CHARACTER;
             } 
             // fall through
           case 94: break;
-          case 43: 
-            { yybegin(YYINITIAL); yypushback(1); return LispTypes.RADIX_NUMBER_TOKEN;
+          case 41: 
+            { yybegin(BLOCK_COMMENT_TEST);
             } 
             // fall through
           case 95: break;
-          case 44: 
-            { yybegin(YYINITIAL); yypushback(1); return LispTypes.HEX_NUMBER_TOKEN;
+          case 42: 
+            { yybegin(YYINITIAL); return LispTypes.BLOCK_COMMENT;
             } 
             // fall through
           case 96: break;
-          case 45: 
-            { yybegin(YYINITIAL); return processBuffer(true);
+          case 43: 
+            { yybegin(YYINITIAL); yypushback(1); return LispTypes.BINARY_NUMBER_TOKEN;
             } 
             // fall through
           case 97: break;
-          case 46: 
-            { tokenBuffer.append(yytext());
+          case 44: 
+            { yybegin(YYINITIAL); yypushback(1); return LispTypes.OCTAL_NUMBER_TOKEN;
             } 
             // fall through
           case 98: break;
-          case 47: 
-            { yybegin(STEP9); escapeCount++;
+          case 45: 
+            { yybegin(YYINITIAL); yypushback(1); return LispTypes.RADIX_NUMBER_TOKEN;
             } 
             // fall through
           case 99: break;
-          case 48: 
-            { yybegin(STEP8ESCAPE);
+          case 46: 
+            { yybegin(YYINITIAL); yypushback(1); return LispTypes.HEX_NUMBER_TOKEN;
             } 
             // fall through
           case 100: break;
-          case 49: 
-            { yybegin(STEP8); tokenBuffer.append(yytext());
+          case 47: 
+            { yybegin(YYINITIAL); return processBuffer(true);
             } 
             // fall through
           case 101: break;
-          case 50: 
-            { yybegin(STEP8); escapeCount++;
+          case 48: 
+            { tokenBuffer.append(yytext());
             } 
             // fall through
           case 102: break;
-          case 51: 
-            { yybegin(STEP9ESCAPE);
+          case 49: 
+            { yybegin(STEP9); escapeCount++;
             } 
             // fall through
           case 103: break;
-          case 52: 
-            { yybegin(STEP9); tokenBuffer.append(yytext());
+          case 50: 
+            { yybegin(STEP8ESCAPE);
             } 
             // fall through
           case 104: break;
+          case 51: 
+            { yybegin(STEP8); tokenBuffer.append(yytext());
+            } 
+            // fall through
+          case 105: break;
+          case 52: 
+            { yybegin(STEP8); escapeCount++;
+            } 
+            // fall through
+          case 106: break;
+          case 53: 
+            { yybegin(STEP9ESCAPE);
+            } 
+            // fall through
+          case 107: break;
+          case 54: 
+            { yybegin(STEP9); tokenBuffer.append(yytext());
+            } 
+            // fall through
+          case 108: break;
           default:
             zzScanError(ZZ_NO_MATCH);
           }

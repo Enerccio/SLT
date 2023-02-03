@@ -24,7 +24,7 @@
         <projectService
                 serviceImplementation="com.en_circle.slt.plugin.sdk.LispProjectSdk" />
 
-        <projectConfigurable groupId="project"
+        <projectConfigurable groupId="language"
                              instance="com.en_circle.slt.plugin.ui.sdk.SdkSelector"/>
 
         <!-- Indentation Configuration -->
@@ -38,9 +38,12 @@
         <projectService
                 serviceImplementation="com.en_circle.slt.plugin.indentation.SltProjectIndentationSettings" />
 
-        <projectConfigurable groupId="project"
+        <projectConfigurable groupId="editor"
                                  instance="com.en_circle.slt.plugin.ui.indentation.SltProjectIndentationConfiguration"/>
 
+        <projectService serviceImplementation="com.en_circle.slt.plugin.highlights.BraceHighlightService" />
+
+        <projectService serviceImplementation="com.en_circle.slt.plugin.ui.SltUIService" />
 
         <!-- Lisp Service -->
         <projectService serviceImplementation="com.en_circle.slt.plugin.services.lisp.LispEnvironmentServiceImpl"
@@ -50,10 +53,10 @@
 
         <internalFileTemplate name="Common Lisp CL File.cl"/>
         <internalFileTemplate name="Common Lisp Lisp File.lisp"/>
-        <internalFileTemplate name="Asdf System.asdf"/>
+        <internalFileTemplate name="Asdf System.asd"/>
 
         <fileType
-                name="Common Lisp" language="Common Lisp" extensions="cl;lisp;asdf"
+                name="Common Lisp" language="Common Lisp" extensions="cl;lisp;asdf;asd"
                 fieldName="INSTANCE"
                 implementationClass="com.en_circle.slt.plugin.SltCommonLispFileType"/>
 
@@ -92,8 +95,11 @@
 
         <enterHandlerDelegate implementation="com.en_circle.slt.plugin.indentation.SltIndentator"/>
 
+        <codeInsight.parameterInfo language="Common Lisp" implementationClass="com.en_circle.slt.plugin.params.SltParameterInfoHandler" />
+
         <!-- Highlight annotators -->
-        <annotator language="Common Lisp" implementationClass="com.en_circle.slt.plugin.highlights.annotators.SymbolAnnotator"/>
+        <externalAnnotator language="Common Lisp"
+                           implementationClass="com.en_circle.slt.plugin.highlights.annotators.SymbolAnnotator"/>
         <annotator language="Common Lisp" implementationClass="com.en_circle.slt.plugin.highlights.annotators.StaticHighlightAnnotator"/>
 
         <!-- Functional annotators -->

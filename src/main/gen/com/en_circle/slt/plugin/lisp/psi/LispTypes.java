@@ -40,7 +40,6 @@ public interface LispTypes {
   IElementType BIT_ARRAY = new LispTokenType("BIT_ARRAY");
   IElementType BLOCK_COMMENT = new LispTokenType("BLOCK_COMMENT");
   IElementType CHARACTER = new LispTokenType("CHARACTER");
-  IElementType COMMA = new LispTokenType("COMMA");
   IElementType DOT = new LispTokenType("DOT");
   IElementType EVAL_VALUE = new LispTokenType("EVAL_VALUE");
   IElementType FUNCTION = new LispTokenType("FUNCTION");
@@ -66,6 +65,8 @@ public interface LispTypes {
   IElementType TEST_SUCCESS = new LispTokenType("TEST_SUCCESS");
   IElementType UNDEFINED_SEQUENCE = new LispTokenType("UNDEFINED_SEQUENCE");
   IElementType UNINTERN = new LispTokenType("UNINTERN");
+  IElementType UNQUOTE = new LispTokenType("UNQUOTE");
+  IElementType UNQUOTE_SPLICE = new LispTokenType("UNQUOTE_SPLICE");
 
   class Factory {
     public static PsiElement createElement(ASTNode node) {

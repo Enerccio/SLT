@@ -18,7 +18,7 @@ public class BufferedString {
         this.completeReset = completeReset;
     }
 
-    public void append(String data) {
+    public synchronized void append(String data) {
         int len = data.length();
         chunks.add(data);
         size += len;
@@ -48,26 +48,26 @@ public class BufferedString {
         completeReset.accept(toString());
     }
 
-    public void clear() {
+    public synchronized void clear() {
         clearNoCall();
         completeReset.accept("");
     }
 
-    public void clearNoCall() {
+    public synchronized void clearNoCall() {
         chunks.clear();
         size = 0;
     }
 
     @Override
-    public String toString() {
+    public synchronized String toString() {
         return chunks.stream().filter(Objects::nonNull).collect(Collectors.joining(""));
     }
 
-    public int getMaxSize() {
+    public synchronized int getMaxSize() {
         return maxSize;
     }
 
-    public void setMaxSize(int maxSize) {
+    public synchronized void setMaxSize(int maxSize) {
         this.maxSize = maxSize;
     }
 }

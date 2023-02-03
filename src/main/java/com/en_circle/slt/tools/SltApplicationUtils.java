@@ -5,20 +5,21 @@ import com.en_circle.slt.plugin.services.lisp.LispEnvironmentService.LispEnviron
 import com.en_circle.slt.plugin.swank.SlimeRequest;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.ex.ApplicationUtil;
+import com.intellij.openapi.progress.ProcessCanceledException;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.ProgressIndicatorProvider;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.Computable;
 import org.awaitility.Awaitility;
 import org.awaitility.core.ConditionTimeoutException;
 import org.awaitility.pollinterval.FixedPollInterval;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -33,6 +34,9 @@ public class SltApplicationUtils {
         try {
             return getAsyncResult(project, request, startLisp);
         } catch (Exception e) {
+            if (e instanceof ProcessCanceledException)
+                return null;
+
             log.warn(e.getMessage());
             return null;
         }
@@ -58,10 +62,10 @@ public class SltApplicationUtils {
         }
 
         return ApplicationManager.getApplication().executeOnPooledThread(() -> {
-            BlockingQueue<X> pointer = new ArrayBlockingQueue<>(1);
+            AtomicReference<X> pointer = new AtomicReference<>(null);
             SlimeRequest r = request.apply(result -> {
                 try {
-                    pointer.put(result);
+                    pointer.set(result);
                 } catch (Exception ignored) {
 
                 }
@@ -72,11 +76,11 @@ public class SltApplicationUtils {
                         .atMost(2, TimeUnit.SECONDS)
                         .pollInterval(new FixedPollInterval(10, TimeUnit.MILLISECONDS))
                         .failFast(ProgressManager::checkCanceled)
-                        .until(() -> pointer.peek() != null);
+                        .until(() -> pointer.get() != null);
             } catch (ConditionTimeoutException exception) {
                 return null;
             }
-            return pointer.isEmpty() ? null : pointer.take();
+            return pointer.get();
         });
     }
 
@@ -97,4 +101,11 @@ public class SltApplicationUtils {
         return future.get();
     }
 
+    public static <T> T processAsync(Computable<T> supplier) {
+        try {
+            return ApplicationManager.getApplication().executeOnPooledThread(supplier::get).get();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
 }

@@ -6,6 +6,7 @@
 [![0.1.0](https://badgen.net/github/milestones/enerccio/SLT/1)](https://github.com/enerccio/SLT/milestone/1)
 [![0.2.0](https://badgen.net/github/milestones/enerccio/SLT/2)](https://github.com/enerccio/SLT/milestone/2)
 [![0.3.0](https://badgen.net/github/milestones/enerccio/SLT/4)](https://github.com/enerccio/SLT/milestone/4)
+[![0.3.0](https://badgen.net/github/milestones/enerccio/SLT/5)](https://github.com/enerccio/SLT/milestone/5)
 ![GitHub all releases](https://img.shields.io/github/downloads/Enerccio/SLT/total)
 ![GitHub last commit](https://img.shields.io/github/last-commit/Enerccio/SLT)
 ![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/Enerccio/SLT)
@@ -56,12 +57,14 @@ You can also open this as a project in Intellij Idea.
 * [x] Automatic indentation
 * [x] REPL
 * [x] Interactive debugging
+* [x] Argument help (Ctrl+P)
 * [ ] Inspection
   * [x] Basic inspection
   * [ ] Actions
   * [ ] Inspection eval
 * [ ] Walkable debugger without actions 
-* [ ] Breakpoints
+  * [ ] Breakpoints
+  * Currently impossible to do correctly with sbcl, investigating other options
 * [x] Documentation 
 * [x] Macro expand in documentation
   * Macro expand requires you to hover element twice for now
@@ -91,3 +94,5 @@ This project is licensed under [Apache License v2](LICENSE.txt).
 ### What does SLT even mean?
 
 SLT - Speech Language Therapy. Only cure for LISP!
+
+Also, backronym for Superior Lisp Tooling!

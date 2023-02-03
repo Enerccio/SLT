@@ -2,6 +2,7 @@ package com.en_circle.slt.plugin.ui.sdk;
 
 import com.en_circle.slt.plugin.SltBundle;
 import com.en_circle.slt.plugin.sdk.LispSdk;
+import com.en_circle.slt.plugin.ui.sdk.SdkDialogProvider.OnSave;
 import com.en_circle.slt.tools.SBCLUtils;
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.fileChooser.FileChooserDescriptor;
@@ -23,14 +24,13 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
-import javax.swing.border.Border;
 import javax.swing.event.CaretListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.util.Objects;
 
-public class SdkConfiguration extends DialogWrapper {
+public class SdkConfigurationSBCLProcess extends DialogWrapper {
 
     private final Disposable parentDisposable;
     private final LispSdk instance;
@@ -41,9 +41,8 @@ public class SdkConfiguration extends DialogWrapper {
     private FileTextField sbclExecutable;
     private FileTextField sbclCore;
     private FileTextField quicklispPath;
-    private Border baseBorder;
 
-    protected SdkConfiguration(@NotNull Component parent, LispSdk instance, String title, OnSave onSave) {
+    public SdkConfigurationSBCLProcess(@NotNull Component parent, LispSdk instance, String title, OnSave onSave) {
         super(parent, true);
 
         this.parentDisposable = Objects.requireNonNull(DialogWrapper.findInstanceFromFocus()).getDisposable();
@@ -91,20 +90,16 @@ public class SdkConfiguration extends DialogWrapper {
         quicklispPathPicker.addBrowseFolderListener(
                 SltBundle.message("slt.ui.settings.sdk.editor.quicklisp.select"), "", null, descriptor);
 
-        JPanel panel = new FormBuilder()
+        return new FormBuilder()
                 .addLabeledComponent(SltBundle.message("slt.ui.settings.sdk.editor.name"), name, 1, false)
-                .addLabeledComponent(SltBundle.message("slt.ui.settings.sdk.editor.executable"),
+                .addLabeledComponent(SltBundle.message("slt.ui.settings.sdk.editor.sbcl.process.executable"),
                         sbclExecutablePicker, 1, false)
-                .addLabeledComponent(SltBundle.message("slt.ui.settings.sdk.editor.core"),
+                .addLabeledComponent(SltBundle.message("slt.ui.settings.sdk.editor.sbcl.process.core"),
                         sbclCorePicker, 1, false)
                 .addLabeledComponent(SltBundle.message("slt.ui.settings.sdk.editor.quicklisp"),
                         quicklispPathPicker, 1, false)
                 .addComponentFillVertically(new JPanel(), 0)
                 .getPanel();
-
-        baseBorder = name.getBorder();
-
-        return panel;
     }
 
     private CaretListener createChangeListener() {
@@ -159,7 +154,7 @@ public class SdkConfiguration extends DialogWrapper {
         if (verified)
             verified = checkAndLoadSbclCore(executable, core, quicklisp);
         if (!verified) {
-            Messages.showErrorDialog(SltBundle.message("slt.ui.settings.sdk.editor.verifying.error"),
+            Messages.showErrorDialog(SltBundle.message("slt.ui.settings.sdk.editor.sbcl.process.verifying.error"),
                     SltBundle.message("slt.ui.settings.sdk.editor.verifying.error.title"));
         }
 
@@ -204,7 +199,7 @@ public class SdkConfiguration extends DialogWrapper {
     public class VerifyAction extends AbstractAction {
 
         public VerifyAction() {
-            super(SltBundle.message("slt.ui.settings.sdk.editor.verify"));
+            super(SltBundle.message("slt.ui.settings.sdk.editor.sbcl.process.verify"));
         }
 
         @Override
@@ -223,18 +218,12 @@ public class SdkConfiguration extends DialogWrapper {
         public void actionPerformed(ActionEvent e) {
             if (!isVerified) {
                 Messages.showInfoMessage(SltBundle.message("slt.ui.settings.sdk.editor.notverified.title"),
-                        SltBundle.message("slt.ui.settings.sdk.editor.notverified.message"));
+                        SltBundle.message("slt.ui.settings.sdk.editor.sbcl.process.notverified.message"));
                 return;
             }
 
             save();
         }
-    }
-
-    public interface OnSave {
-
-        void saveAction(LispSdk sdk);
-
     }
 
 }

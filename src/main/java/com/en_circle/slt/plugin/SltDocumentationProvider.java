@@ -4,7 +4,6 @@ import com.en_circle.slt.plugin.SymbolState.SymbolBinding;
 import com.en_circle.slt.plugin.lisp.LispParserUtil;
 import com.en_circle.slt.plugin.lisp.psi.LispList;
 import com.en_circle.slt.plugin.lisp.psi.LispSymbol;
-import com.en_circle.slt.plugin.lisp.psi.impl.LispPsiImplUtil;
 import com.en_circle.slt.plugin.services.lisp.LispEnvironmentService;
 import com.intellij.lang.documentation.AbstractDocumentationProvider;
 import com.intellij.openapi.util.text.HtmlBuilder;
@@ -20,12 +19,15 @@ public class SltDocumentationProvider extends AbstractDocumentationProvider {
     @Override
     public @Nullable @Nls String getQuickNavigateInfo(PsiElement element, PsiElement originalElement) {
         if (originalElement != null)
-            element = originalElement;
+            element = decideOnElement(element, originalElement);
 
-        String text = LispPsiImplUtil.getSExpressionHead(element);
-        if (text != null) {
+        if (!(element instanceof LispSymbol))
+            element = PsiTreeUtil.getParentOfType(element, LispSymbol.class);
+
+        if (element instanceof LispSymbol) {
+            String text = ((LispSymbol) element).getName();
             String packageName = LispParserUtil.getPackage(element);
-            SymbolState state = LispEnvironmentService.getInstance(element.getProject()).refreshSymbolFromServer(packageName, text, element);
+            SymbolState state = LispEnvironmentService.getInstance(element.getProject()).refreshSymbolFromServer(packageName, text);
             switch (state.binding) {
                 case NONE:
                     return SltBundle.message("slt.documentation.types.symbol") + " " + text;
@@ -53,17 +55,26 @@ public class SltDocumentationProvider extends AbstractDocumentationProvider {
     @Override
     public @Nullable @Nls String generateDoc(PsiElement element, @Nullable PsiElement originalElement) {
         if (originalElement != null)
-            element = originalElement;
+            element = decideOnElement(element, originalElement);
 
-        element = PsiTreeUtil.getParentOfType(element, LispSymbol.class);
+        if (!(element instanceof LispSymbol))
+            element = PsiTreeUtil.getParentOfType(element, LispSymbol.class);
 
         if (element != null) {
             String text = element.getText();
             String packageName = LispParserUtil.getPackage(element);
-            SymbolState state = LispEnvironmentService.getInstance(element.getProject()).refreshSymbolFromServer(packageName, text, element);
+            SymbolState state = LispEnvironmentService.getInstance(element.getProject()).refreshSymbolFromServer(packageName, text);
             return asHtml(state, packageName, element);
         }
         return null;
+    }
+
+    private PsiElement decideOnElement(PsiElement element, PsiElement originalElement) {
+        if (element == null)
+            return originalElement;
+        if (element instanceof LispSymbol)
+            return element;
+        return originalElement;
     }
 
     private String asHtml(SymbolState state, String packageName, PsiElement element) {

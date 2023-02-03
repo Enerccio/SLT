@@ -64,9 +64,9 @@ public class PackageSelectorComponent {
                 resolvePackages(parsed);
             }), false);
         } catch (Exception e) {
-            log.warn(SltBundle.message("slt.error.sbclstart"), e);
+            log.warn(SltBundle.message("slt.error.start"), e);
             Messages.showErrorDialog(ProjectManager.getInstance().getDefaultProject(),
-                    e.getMessage(), SltBundle.message("slt.ui.errors.sbcl.start"));
+                    e.getMessage(), SltBundle.message("slt.ui.errors.lisp.start"));
         }
     }
 

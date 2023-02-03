@@ -35,9 +35,9 @@ public class IndentationTests {
     public void testFormsCase() throws Exception {
         assertEquals(4, container.testIndentCL("(case XXX)"));
         assertEquals(2, container.testIndentCL("(case blah XXX)"));
-        assertEquals(3, container.testIndentCL("(case blah (XXX))"));
-        assertEquals(3, container.testIndentCL("(case blah (wot) (XXX))"));
-        assertEquals(3, container.testIndentCL("(case blah (foo XXX))"));
+        assertEquals(12, container.testIndentCL("(case blah (XXX))"));
+        assertEquals(18, container.testIndentCL("(case blah (wot) (XXX))"));
+        assertEquals(12, container.testIndentCL("(case blah (foo XXX))"));
         assertEquals(3, container.testIndentCL("""
                 (case
                     blah
@@ -67,11 +67,11 @@ public class IndentationTests {
     @Test
     public void testFormsCond() throws Exception {
         assertEquals(2, container.testIndentCL("(cond XXX)"));
-        assertEquals(4, container.testIndentCL("(cond (XXX))"));
-        assertEquals(4, container.testIndentCL("(cond (foo XXX))"));
+        assertEquals(8, container.testIndentCL("(cond (XXX))"));
+        assertEquals(10, container.testIndentCL("(cond (foo XXX))"));
         assertEquals(7+4, container.testIndentCL("(cond ((= 1 XXX)))"));
-        assertEquals(4, container.testIndentCL("(cond (foo bar) (XXX))"));
-        assertEquals(4, container.testIndentCL("(cond (foo bar) (baz XXX))"));
+        assertEquals(18, container.testIndentCL("(cond (foo bar) (XXX))"));
+        assertEquals(20, container.testIndentCL("(cond (foo bar) (baz XXX))"));
     }
 
     @Test

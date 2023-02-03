@@ -10,6 +10,8 @@ import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiWhiteSpace;
+import com.intellij.psi.util.PsiTreeUtil;
+import com.intellij.util.containers.Stack;
 
 import java.util.List;
 import java.util.function.Function;
@@ -138,5 +140,193 @@ public class LispParserUtil extends GeneratedParserUtilBase {
             return list;
         }
         return null;
+    }
+
+    public static QuoteState getQuoteState(PsiElement o) {
+        if (o instanceof LispList list) {
+            return getQuoteState(list);
+        } else {
+            QuoteState quoteState = QuoteState.NO_STATE;
+
+            LispSexpr parent = PsiTreeUtil.getParentOfType(o, LispSexpr.class);
+            if (parent == null) {
+                return quoteState;
+            }
+
+            LispList plist = PsiTreeUtil.getParentOfType(o, LispList.class);
+
+            if (plist == null) {
+                return quoteState;
+            }
+
+            quoteState = getQuoteState(plist);
+            if (o instanceof PsiWhiteSpace) {
+                return quoteState;
+            }
+            return getQuoteState(parent, quoteState);
+        }
+    }
+
+    public static QuoteState getQuoteState(LispList o) {
+        QuoteState quoteState = QuoteState.NO_STATE;
+        LispSexpr sexpr = PsiTreeUtil.getParentOfType(o, LispSexpr.class);
+        if (sexpr == null) {
+            return quoteState;
+        }
+        PsiElement parent = sexpr.getParent();
+        if (parent == null) {
+            return quoteState;
+        } else {
+            if (parent instanceof LispList list) {
+                QuoteState parentState = getQuoteState(list);
+                quoteState = combineQuoteStates(quoteState, parentState);
+            }
+        }
+
+        return getQuoteState(sexpr, quoteState);
+    }
+
+    private static QuoteState getQuoteState(LispSexpr self, QuoteState quoteState) {
+        LispSexpr superExpr = PsiTreeUtil.getParentOfType(self, LispSexpr.class);
+        if (superExpr != null) {
+            LispDatum datum = superExpr.getDatum();
+            if (datum != null) {
+                LispList plist = datum.getList();
+                if (plist != null) {
+                    LispSexpr first = plist.getSexprList().get(0);
+                    if (first != self) {
+                        if (first.getDatum() != null && first.getDatum().getCompoundSymbol() != null) {
+                            LispSymbol symbol = first.getDatum().getCompoundSymbol().getSymbol();
+                            QuoteState symbolState = getQuoteStateForSymbol(symbol.getName());
+                            if (symbolState != QuoteState.NO_STATE) {
+                                boolean checked = false;
+                                for (int i=1; i<plist.getSexprList().size(); i++) {
+                                    LispSexpr other = plist.getSexprList().get(i);
+                                    if (other.getDatum() != null) {
+                                        if (other == self) {
+                                            if (!checked) {
+                                                checked = true;
+                                            }
+                                        }
+                                    }
+                                }
+                                if (checked) {
+                                    quoteState = combineQuoteStates(symbolState, quoteState);
+                                } else {
+                                    quoteState = QuoteState.ERROR_STATE;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        for (LispEnhancement enhancement : self.getEnhancementList()) {
+            String text = enhancement.getText();
+            if (text.equals("`")) {
+                quoteState = combineQuoteStates(QuoteState.BACKQUOTE, quoteState);
+            } else if (text.equals(",")) {
+                quoteState = combineQuoteStates(QuoteState.UNQUOTE, quoteState);
+            } else if (text.equals(",@")) {
+                quoteState = combineQuoteStates(QuoteState.UNQUOTE_SPLICE, quoteState);
+            }
+        }
+        return quoteState;
+    }
+
+    private static QuoteState getQuoteStateForSymbol(String name) {
+        if (name == null)
+            return QuoteState.NO_STATE;
+
+        if (name.equalsIgnoreCase("quote"))
+            return QuoteState.QUOTE;
+        if (name.equalsIgnoreCase("unquote"))
+            return QuoteState.UNQUOTE;
+        if (name.equalsIgnoreCase("unquote-splice"))
+            return QuoteState.UNQUOTE_SPLICE;
+        if (name.equalsIgnoreCase("backquote"))
+            return QuoteState.BACKQUOTE;
+
+        return QuoteState.NO_STATE;
+    }
+
+    private static QuoteState combineQuoteStates(QuoteState quoteState, QuoteState parentState) {
+        if (parentState == QuoteState.ERROR_STATE)
+            return QuoteState.ERROR_STATE;
+        if (parentState == QuoteState.QUOTE)
+            return QuoteState.QUOTE;
+        if (parentState == QuoteState.BACKQUOTE) {
+            if (quoteState == QuoteState.NO_STATE)
+                return QuoteState.BACKQUOTE;
+            if (quoteState == QuoteState.UNQUOTE || quoteState == QuoteState.UNQUOTE_SPLICE)
+                return QuoteState.NO_STATE;
+        }
+        if (parentState == QuoteState.NO_STATE) {
+            if (quoteState == QuoteState.UNQUOTE || quoteState == QuoteState.UNQUOTE_SPLICE)
+                return QuoteState.ERROR_STATE;
+            if (quoteState == QuoteState.BACKQUOTE)
+                return QuoteState.BACKQUOTE;
+            if (quoteState == QuoteState.QUOTE)
+                return QuoteState.QUOTE;
+        }
+        if (quoteState == QuoteState.UNQUOTE || quoteState == QuoteState.UNQUOTE_SPLICE)
+            return QuoteState.NO_STATE;
+        return QuoteState.ERROR_STATE;
+    }
+
+    public static QuoteState getQuoteStateUnfinished(PsiElement o) {
+        assert (o.getParent() instanceof PsiFile);
+
+        Stack<PsiElement> elementStack = new Stack<>();
+        PsiElement e = o;
+        int parenthesis = 0;
+
+        while (e.getPrevSibling() != null && !(e.getPrevSibling() instanceof LispToplevel)) {
+            ASTNode node = e.getNode();
+            if (parenthesis == 0) {
+                if (node.getElementType() == LispTypes.RPAREN) {
+                    ++parenthesis;
+                } else {
+                    elementStack.push(e);
+                }
+            } else {
+                if (node.getElementType() == LispTypes.LPAREN) {
+                    --parenthesis;
+                }
+            }
+
+            e = e.getPrevSibling();
+        }
+
+        QuoteState quoteState = QuoteState.NO_STATE;
+        boolean firstElementCheck = false;
+        for (PsiElement element : elementStack) {
+            ASTNode node = element.getNode();
+            if (node.getElementType() == LispTypes.QUOTE) {
+                quoteState = combineQuoteStates(QuoteState.QUOTE, quoteState);
+            } else if (node.getElementType() == LispTypes.UNQUOTE) {
+                quoteState = combineQuoteStates(QuoteState.UNQUOTE, quoteState);
+            } else if (node.getElementType() == LispTypes.UNQUOTE_SPLICE) {
+                quoteState = combineQuoteStates(QuoteState.UNQUOTE_SPLICE, quoteState);
+            } else if (node.getElementType() == LispTypes.BACKQUOTE) {
+                quoteState = combineQuoteStates(QuoteState.BACKQUOTE, quoteState);
+            } else {
+                if (node.getElementType() == LispTypes.LPAREN) {
+                    firstElementCheck = true;
+                }
+
+                if (node.getElementType() == LispTypes.SYMBOL_TOKEN && firstElementCheck && node != o.getNode()) {
+                    firstElementCheck = false;
+                    QuoteState state = getQuoteStateForSymbol(node.getText());
+                    quoteState = combineQuoteStates(state, quoteState);
+                }
+            }
+        }
+        return quoteState;
+    }
+
+    public enum QuoteState {
+        BACKQUOTE, QUOTE, UNQUOTE, UNQUOTE_SPLICE, NO_STATE, ERROR_STATE
     }
 }

@@ -31,6 +31,7 @@ IElementType processBuffer(boolean unget) {
 
 %}
 
+%state UNQUOTE_STATE
 %state LINE_COMMENT
 %state STRING
 %state STRING_ESCAPE
@@ -61,7 +62,7 @@ TERMINATING_MACRO_CHAR=[\"'\(\),;`]
 <YYINITIAL> [;] { yybegin(LINE_COMMENT); }
 <YYINITIAL> [\"] { yybegin(STRING); }
 <YYINITIAL> [`] { yybegin(YYINITIAL); return LispTypes.BACKQUOTE;  }
-<YYINITIAL> [,] { yybegin(YYINITIAL); return LispTypes.COMMA;  }
+<YYINITIAL> [,] { yybegin(UNQUOTE_STATE); }
 <YYINITIAL> [#] { yybegin(SHARPSIGN); }
 
 <YYINITIAL> {WHITESPACE_CHARACTER}+ { yybegin(YYINITIAL); return TokenType.WHITE_SPACE; }
@@ -70,6 +71,12 @@ TERMINATING_MACRO_CHAR=[\"'\(\),;`]
 
 <YYINITIAL> <<EOF>> { return null; }
 <YYINITIAL> [^] { yybegin(YYINITIAL); return TokenType.ERROR_ELEMENT; }
+
+<UNQUOTE_STATE> {
+    [@] { yybegin(YYINITIAL); return LispTypes.UNQUOTE_SPLICE; }
+    <<EOF>> { yybegin(YYINITIAL); return LispTypes.UNQUOTE; }
+    [^] { yybegin(YYINITIAL); yypushback(1); return LispTypes.UNQUOTE; }
+}
 
 <LINE_COMMENT> {
     [\r\n] { yybegin(YYINITIAL); return LispTypes.LINE_COMMENT; }
