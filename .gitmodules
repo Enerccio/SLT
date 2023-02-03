@@ -1,0 +1,3 @@
+[submodule "SLT-Core"]
+	path = src/main/lisp
+	url = https://github.com/Enerccio/SLT-core/
