@@ -1,4 +1,8 @@
-(in-package :cl)
+(defpackage :slt
+    (:use :cl)
+    (:export +slt-interpret+))
+
+(in-package :slt)
 (defconstant +slt-interpret+ ~interpret~
   "Defines current slt interpret. For SBCL the value is :sbcl")
 

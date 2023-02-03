@@ -10,10 +10,7 @@ import com.en_circle.slt.plugin.lisp.psi.LispToplevel;
 import com.en_circle.slt.plugin.lisp.psi.LispTypes;
 import com.en_circle.slt.templates.Indentation;
 import com.intellij.openapi.project.Project;
-import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiFile;
-import com.intellij.psi.PsiFileFactory;
-import com.intellij.psi.PsiManager;
+import com.intellij.psi.*;
 import com.intellij.psi.util.PsiTreeUtil;
 import org.apache.commons.lang3.StringUtils;
 
@@ -202,7 +199,24 @@ public class SltIndentationContainer {
 
             try {
                 String formText = documentText.substring(toplevel.getTextOffset(), offset);
-                if (!wasAfter) {
+                boolean isUnfinished = false;
+                LispList list = PsiTreeUtil.getParentOfType(element, LispList.class);
+                if (list != null) {
+                    if (element.getNode().getElementType() == LispTypes.RPAREN) {
+                        list = PsiTreeUtil.getParentOfType(list, LispList.class);
+                    }
+                    if (list != null) {
+                        if (list.getNextSibling() instanceof PsiErrorElement) {
+                            isUnfinished = true;
+                            if (element.getNode().getElementType() == LispTypes.RPAREN) {
+                                if (numBraces > 0) {
+                                    --numBraces;
+                                }
+                            }
+                        }
+                    }
+                }
+                if (!wasAfter || isUnfinished) {
                     // insert fake element at the end, so we identify correct form
                     state.hasRealElement = false;
                     formText += " 0";

@@ -1,6 +1,7 @@
-(format T "SLT Interpret ~S~%" +slt-interpret+)
+(eval-when (:execute)
+  (format T "SLT Interpret ~S~%" slt:+slt-interpret+))
 
-(defun quit (&optional code)
+(defun portable-quit (&optional code)
   ;; This group from "clocc-port/ext.lisp"
   #+allegro (excl:exit code)
   #+clisp (#+lisp=cl ext:quit #-lisp=cl lisp:quit code)
@@ -22,14 +23,14 @@
         kcl scl openmcl mcl abcl ecl)
   (error 'not-implemented :proc (list 'quit code)))
 
-(case +slt-interpret+
+(case slt:+slt-interpret+
   (:sbcl (unless (string= "SBCL"
              (lisp-implementation-type))
            (format *error-output* "Invalid lisp instance. Maybe a configuration error? This is not SBCL!~%")
-           (quit 1)))
+           (portable-quit 1)))
   (otherwise
    (format *error-output* "Unsupported lisp instance. Maybe a configuration error?~%")
-   (quit 1)))
+   (portable-quit 1)))
 
 (load (merge-pathnames "swank/swank.lisp" *load-truename*))
 (load (merge-pathnames "slt/slt.lisp" *load-truename*))

@@ -1,10 +1,10 @@
 (defpackage :slt-core
-    (:use :cl :swank)
+    (:use :slt :cl :swank)
     (:export analyze-symbol analyze-symbols read-fix-packages list-package-names
              initialize-or-get-debug-context debug-context debug-frame-variable register-variable
              ))
 
-(when (eq +slt-interpret+ :sbcl)
+(when (eq slt:+slt-interpret+ :sbcl)
   (load (merge-pathnames "slt-sbcl.lisp" *load-truename*)))
 
 (in-package :slt-core)

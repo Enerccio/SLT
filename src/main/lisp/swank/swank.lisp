@@ -106,6 +106,13 @@ format suitable for Emacs."
     (when references
       (sort references #'string< :key (lambda (x) (first x))))))
 
+(defslimefun operator-arglist-list (name package)
+  (ignore-errors
+    (let ((args (arglist (parse-symbol name (guess-buffer-package package)))))
+      (cond ((eq args :not-available) nil)
+	    (t args)))))
+
 (export 'slt-eval)
 (export 'compile-string-region-slt)
 (export 'find-reference-prefix)
+(export 'operator-arglist-list)

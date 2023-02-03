@@ -6,7 +6,7 @@
 
     <vendor email="admin@en-circle.com" url="https://www.en-circle.com">En-circle</vendor>
 
-    <description>Slt is a language plugin bringing in the Common Lisp into Jetbrains IDE lineup. Requires SBCL and Quicklisp.</description>
+    <description>Slt is a language plugin bringing in the Common Lisp into Jetbrains IDE lineup.</description>
 
     <depends>com.intellij.modules.platform</depends>
 
@@ -24,7 +24,7 @@
         <projectService
                 serviceImplementation="com.en_circle.slt.plugin.sdk.LispProjectSdk" />
 
-        <projectConfigurable groupId="project"
+        <projectConfigurable groupId="language"
                              instance="com.en_circle.slt.plugin.ui.sdk.SdkSelector"/>
 
         <!-- Indentation Configuration -->
@@ -38,26 +38,25 @@
         <projectService
                 serviceImplementation="com.en_circle.slt.plugin.indentation.SltProjectIndentationSettings" />
 
-        <projectConfigurable groupId="project"
+        <projectConfigurable groupId="editor"
                                  instance="com.en_circle.slt.plugin.ui.indentation.SltProjectIndentationConfiguration"/>
-
-
-        <!-- Lisp Service -->
-        <projectService serviceImplementation="com.en_circle.slt.plugin.services.lisp.LispEnvironmentServiceImpl"
-                            serviceInterface="com.en_circle.slt.plugin.services.lisp.LispEnvironmentService" />
 
         <projectService serviceImplementation="com.en_circle.slt.plugin.highlights.BraceHighlightService" />
 
         <projectService serviceImplementation="com.en_circle.slt.plugin.ui.SltUIService" />
 
+        <!-- Lisp Service -->
+        <projectService serviceImplementation="com.en_circle.slt.plugin.services.lisp.LispEnvironmentServiceImpl"
+                            serviceInterface="com.en_circle.slt.plugin.services.lisp.LispEnvironmentService" />
+
         <!-- Templates -->
 
         <internalFileTemplate name="Common Lisp CL File.cl"/>
         <internalFileTemplate name="Common Lisp Lisp File.lisp"/>
-        <internalFileTemplate name="Asdf System.asdf"/>
+        <internalFileTemplate name="Asdf System.asd"/>
 
         <fileType
-                name="Common Lisp" language="Common Lisp" extensions="cl;lisp;asdf"
+                name="Common Lisp" language="Common Lisp" extensions="cl;lisp;asdf;asd"
                 fieldName="INSTANCE"
                 implementationClass="com.en_circle.slt.plugin.SltCommonLispFileType"/>
 
@@ -95,6 +94,8 @@
         <statusBarWidgetFactory id="Common Lisp" implementation="com.en_circle.slt.plugin.SltStatusBarWidgetFactory"/>
 
         <enterHandlerDelegate implementation="com.en_circle.slt.plugin.indentation.SltIndentator"/>
+
+        <codeInsight.parameterInfo language="Common Lisp" implementationClass="com.en_circle.slt.plugin.params.SltParameterInfoHandler" />
 
         <!-- Highlight annotators -->
         <externalAnnotator language="Common Lisp"
@@ -158,6 +159,10 @@
     </actions>
 
     <change-notes><![CDATA[
+<p>0.3.1 New features:</p>
+<p>- Thread list with actions<br />
+- Showing function parameters with ctrl+p</p>
+
 <p>0.3.0 New features:</p>
 
 <p>- Current package at editor cursor widget<br />

@@ -4,6 +4,7 @@ import com.en_circle.slt.plugin.SymbolState;
 import com.en_circle.slt.plugin.highlights.SltHighlighterColors;
 import com.en_circle.slt.plugin.highlights.annotators.SymbolAnnotator.AnnotationResult;
 import com.en_circle.slt.plugin.lisp.LispParserUtil;
+import com.en_circle.slt.plugin.lisp.LispParserUtil.QuoteState;
 import com.en_circle.slt.plugin.lisp.psi.LispSymbol;
 import com.en_circle.slt.plugin.lisp.psi.LispVisitor;
 import com.en_circle.slt.plugin.services.lisp.LispEnvironmentService;
@@ -58,10 +59,13 @@ public class SymbolAnnotator extends ExternalAnnotator<BatchedSymbolRefreshActio
 
             @Override
             public void visitSymbol(@NotNull LispSymbol element) {
-                String text = element.getText();
-                String packageName = LispParserUtil.getPackage(element);
-                SymbolState state = LispEnvironmentService.getInstance(element.getProject()).refreshSymbolFromServer(packageName, text);
-                setHighlight(element, text, holder, state);
+                QuoteState quoteState = LispParserUtil.getQuoteState(element);
+                if (quoteState == QuoteState.NO_STATE || quoteState == QuoteState.ERROR_STATE) {
+                    String text = element.getText();
+                    String packageName = LispParserUtil.getPackage(element);
+                    SymbolState state = LispEnvironmentService.getInstance(element.getProject()).refreshSymbolFromServer(packageName, text);
+                    setHighlight(element, text, holder, state);
+                }
             }
 
             @Override

@@ -6,15 +6,17 @@
 
 ### Changes
 
-## 0.3.1
+## 0.3.1 230203
 
 ### Added
 
 - Thread list with actions
+- Showing function parameters with ctrl+p
 
 ### Changes
 
 - SLT library is now formatted into multiple chunks
+- Grammar now properly reacts to user errors or unfinished forms
 
 ### Fixes
 
