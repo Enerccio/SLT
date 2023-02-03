@@ -49,7 +49,10 @@ tasks {
         from("src/main/lisp")
         archiveFileName.set("slt.zip")
         destinationDirectory.set(File("build/resources/main"))
-        include("**/*.*")
+        include("**/*.lisp")
+        include("**/*.cl")
+        include("**/*.asdf")
+        include("LICENSE.txt")
 
         doFirst {
             println("Zipping SLT to " + destinationDirectory.get())
