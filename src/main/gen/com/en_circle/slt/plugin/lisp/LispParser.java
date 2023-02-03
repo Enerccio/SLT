@@ -123,14 +123,15 @@ public class LispParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // REFERENCE_SET | TEST_SUCCESS | COMMA | BACKQUOTE | QUOTE | FUNCTION
+  // REFERENCE_SET | TEST_SUCCESS | UNQUOTE | UNQUOTE_SPLICE | BACKQUOTE | QUOTE | FUNCTION
   public static boolean enhancement(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "enhancement")) return false;
     boolean r;
     Marker m = enter_section_(b, l, _NONE_, ENHANCEMENT, "<enhancement>");
     r = consumeToken(b, REFERENCE_SET);
     if (!r) r = consumeToken(b, TEST_SUCCESS);
-    if (!r) r = consumeToken(b, COMMA);
+    if (!r) r = consumeToken(b, UNQUOTE);
+    if (!r) r = consumeToken(b, UNQUOTE_SPLICE);
     if (!r) r = consumeToken(b, BACKQUOTE);
     if (!r) r = consumeToken(b, QUOTE);
     if (!r) r = consumeToken(b, FUNCTION);

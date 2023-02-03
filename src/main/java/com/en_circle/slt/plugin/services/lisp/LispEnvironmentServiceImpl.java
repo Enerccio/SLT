@@ -21,6 +21,7 @@ import com.en_circle.slt.plugin.swank.SlimeListener.RequestResponseLogger;
 import com.en_circle.slt.plugin.swank.SlimeRequest;
 import com.en_circle.slt.plugin.swank.SwankClient;
 import com.intellij.codeInsight.daemon.DaemonCodeAnalyzer;
+import com.intellij.codeInsight.hints.ParameterHintsPassFactory;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
@@ -165,6 +166,7 @@ public class LispEnvironmentServiceImpl implements LispEnvironmentService {
                 listener.onPostStart();
             }
 
+            ParameterHintsPassFactory.forceHintsUpdateOnNextPass();
             DaemonCodeAnalyzer.getInstance(project).restart();
         } finally {
             starting = false;

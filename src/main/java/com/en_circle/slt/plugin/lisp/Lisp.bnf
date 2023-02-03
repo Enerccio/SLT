@@ -24,7 +24,7 @@ sexpr ::= (enhancement* datum) | comment
 
 comment ::= LINE_COMMENT | BLOCK_COMMENT
 
-enhancement ::= REFERENCE_SET | TEST_SUCCESS | COMMA | BACKQUOTE | QUOTE | FUNCTION
+enhancement ::= REFERENCE_SET | TEST_SUCCESS | UNQUOTE | UNQUOTE_SPLICE | BACKQUOTE | QUOTE | FUNCTION
 
 datum ::= tested | evaled | pathname | UNDEFINED_SEQUENCE | BIT_ARRAY | CHARACTER | REFERENCE_LABEL
             | number | real_pair
