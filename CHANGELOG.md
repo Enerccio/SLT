@@ -3,7 +3,7 @@
 ### Added
 
 - Thread list with actions
-- Argslist
+- Showing function parameters with ctrl+p
 
 ### Changes
 

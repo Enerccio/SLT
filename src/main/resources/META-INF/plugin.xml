@@ -6,7 +6,7 @@
 
     <vendor email="admin@en-circle.com" url="https://www.en-circle.com">En-circle</vendor>
 
-    <description>Slt is a language plugin bringing in the Common Lisp into Jetbrains IDE lineup. Requires SBCL and Quicklisp.</description>
+    <description>Slt is a language plugin bringing in the Common Lisp into Jetbrains IDE lineup.</description>
 
     <depends>com.intellij.modules.platform</depends>
 
@@ -159,6 +159,10 @@
     </actions>
 
     <change-notes><![CDATA[
+<p>0.3.1 New features:</p>
+<p>- Thread list with actions<br />
+- Showing function parameters with ctrl+p</p>
+
 <p>0.3.0 New features:</p>
 
 <p>- Current package at editor cursor widget<br />
