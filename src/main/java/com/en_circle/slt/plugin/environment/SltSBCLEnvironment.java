@@ -31,6 +31,11 @@ public class SltSBCLEnvironment extends SltLispEnvironmentProcess  {
     }
 
     @Override
+    public Environment getType() {
+        return Environment.SBCL_PROCESS;
+    }
+
+    @Override
     protected Object prepareProcessEnvironment(SltLispEnvironmentProcessConfiguration configuration) throws SltProcessException {
         SltSBCLEnvironmentConfiguration c = getConfiguration(configuration);
         SBCLEnvironment e = new SBCLEnvironment();

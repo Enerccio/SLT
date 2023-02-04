@@ -32,6 +32,11 @@ public class SltABCLEnvironment extends SltLispEnvironmentProcess {
     }
 
     @Override
+    public Environment getType() {
+        return Environment.ABCL_PROCESS;
+    }
+
+    @Override
     protected Object prepareProcessEnvironment(SltLispEnvironmentProcessConfiguration configuration) throws SltProcessException {
         SltABCLEnvironmentConfiguration c = getConfiguration(configuration);
         ABCLEnvironment e = new ABCLEnvironment();

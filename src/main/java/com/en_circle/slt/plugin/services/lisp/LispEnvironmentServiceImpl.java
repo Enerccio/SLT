@@ -51,6 +51,7 @@ public class LispEnvironmentServiceImpl implements LispEnvironmentService {
     private RequestResponseLogger logger;
     private DebugInterface debugInterface;
     private final List<LispEnvironmentListener> serverListeners = Collections.synchronizedList(new ArrayList<>());
+    private LispSltOverrides overrides;
     private volatile boolean starting = false;
 
     private final Project project;
@@ -108,16 +109,18 @@ public class LispEnvironmentServiceImpl implements LispEnvironmentService {
 
     @Override
     public void start() {
-        starting = true;
-        ApplicationManager.getApplication().invokeAndWait(this::ensureToolWindowIsOpen);
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
-            try {
-                doStart();
-            } catch (Exception e) {
-                log.warn(SltBundle.message("slt.error.start"), e);
-                ApplicationManager.getApplication().invokeLater(() ->
-                        Messages.showErrorDialog(project, e.getMessage(), SltBundle.message("slt.ui.errors.lisp.start")));
-            }
+            starting = true;
+            ApplicationManager.getApplication().invokeAndWait(this::ensureToolWindowIsOpen);
+            ApplicationManager.getApplication().executeOnPooledThread(() -> {
+                try {
+                    doStart();
+                } catch (Exception e) {
+                    log.warn(SltBundle.message("slt.error.start"), e);
+                    ApplicationManager.getApplication().invokeLater(() ->
+                            Messages.showErrorDialog(project, e.getMessage(), SltBundle.message("slt.ui.errors.lisp.start")));
+                }
+            });
         });
     }
 
@@ -168,6 +171,7 @@ public class LispEnvironmentServiceImpl implements LispEnvironmentService {
             }
             environment = environmentProvider.get();
             environment.start(configuration);
+            overrides = environment.getType().getDefinition().getOverrides();
 
             slimeListener = new SlimeListener(project, true, e -> {
                 for (LispEnvironmentListener listener : serverListeners) {
@@ -230,13 +234,13 @@ public class LispEnvironmentServiceImpl implements LispEnvironmentService {
 
     @Override
     public void sendToLisp(SlimeRequest request, boolean startServer, Runnable onFailureServerState) throws Exception {
-        if (environment == null || !environment.isActive()) {
-            if (startServer) {
-                ApplicationManager.getApplication().invokeLater(() -> {
+        ApplicationManager.getApplication().executeOnPooledThread(() -> {
+            if (environment == null || !environment.isActive()) {
+                if (startServer) {
                     starting = true;
-                    ApplicationManager.getApplication().invokeLater(() -> {
+                    ApplicationManager.getApplication().invokeAndWait(this::ensureToolWindowIsOpen);
+                    ApplicationManager.getApplication().executeOnPooledThread(() -> {
                         try {
-                            ensureToolWindowIsOpen();
                             if (!doStart()) {
                                 if (onFailureServerState != null)
                                     onFailureServerState.run();
@@ -246,17 +250,18 @@ public class LispEnvironmentServiceImpl implements LispEnvironmentService {
                             doSend(request);
                         } catch (Exception e) {
                             log.warn(SltBundle.message("slt.error.start"), e);
-                            Messages.showErrorDialog(project, e.getMessage(), SltBundle.message("slt.ui.errors.lisp.start"));
+                            ApplicationManager.getApplication().invokeLater(() ->
+                                    Messages.showErrorDialog(project, e.getMessage(), SltBundle.message("slt.ui.errors.lisp.start")));
                         }
                     });
-                });
+                } else {
+                    if (onFailureServerState != null)
+                        onFailureServerState.run();
+                }
             } else {
-                if (onFailureServerState != null)
-                    onFailureServerState.run();
+                doSend(request);
             }
-        } else {
-            doSend(request);
-        }
+        });
     }
 
     private void doSend(SlimeRequest request) {
@@ -318,6 +323,11 @@ public class LispEnvironmentServiceImpl implements LispEnvironmentService {
     @Override
     public Integer calculateOffset(PsiElement element, PsiFile file, boolean wasAfter, String text, int offset, String packageOverride) {
         return indentationContainer.calculateIndent(element, file, wasAfter, text, offset, packageOverride);
+    }
+
+    @Override
+    public LispSltOverrides getOverrides() {
+        return overrides;
     }
 
     @Override

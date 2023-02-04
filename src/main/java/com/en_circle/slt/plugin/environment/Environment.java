@@ -2,7 +2,10 @@ package com.en_circle.slt.plugin.environment;
 
 import com.en_circle.slt.plugin.SltBundle;
 import com.en_circle.slt.plugin.environment.SltLispEnvironmentConfiguration.Builder;
+import com.en_circle.slt.plugin.environment.abcl.ABCLOverrides;
+import com.en_circle.slt.plugin.environment.sbcl.SBCLOverrides;
 import com.en_circle.slt.plugin.sdk.LispSdk;
+import com.en_circle.slt.plugin.services.lisp.LispSltOverrides;
 import com.en_circle.slt.plugin.ui.sdk.SdkConfigurationABCLProcess;
 import com.en_circle.slt.plugin.ui.sdk.SdkConfigurationSBCLProcess;
 import com.en_circle.slt.plugin.ui.sdk.SdkDialogProvider;
@@ -46,6 +49,11 @@ public enum Environment {
         public SdkDialogProvider getDialogProvider() {
             return SdkConfigurationABCLProcess::new;
         }
+
+        @Override
+        public LispSltOverrides getOverrides() {
+            return new ABCLOverrides();
+        }
     }),
     SBCL_PROCESS(new EnvironmentDefinition() {
         @Override
@@ -78,6 +86,11 @@ public enum Environment {
         public SdkDialogProvider getDialogProvider() {
             return SdkConfigurationSBCLProcess::new;
         }
+
+        @Override
+        public LispSltOverrides getOverrides() {
+            return new SBCLOverrides();
+        }
     })
 
     ;
@@ -100,6 +113,7 @@ public enum Environment {
         public abstract <T extends SltLispEnvironmentConfiguration.Builder<T, R>, R extends SltLispEnvironmentConfiguration>
             SltLispEnvironmentConfiguration.Builder<T, R> buildConfiguration(LispSdk sdk, Project project);
         public abstract SdkDialogProvider getDialogProvider();
+        public abstract LispSltOverrides getOverrides();
 
     }
 

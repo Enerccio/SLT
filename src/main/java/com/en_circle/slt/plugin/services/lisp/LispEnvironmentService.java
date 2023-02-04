@@ -55,6 +55,8 @@ public interface LispEnvironmentService extends Disposable {
 
     Integer calculateOffset(PsiElement element, PsiFile file, boolean wasAfter, String text, int offset, String packageOverride);
 
+    LispSltOverrides getOverrides();
+
     enum LispEnvironmentState {
         STOPPED, READY, INITIALIZING
     }
