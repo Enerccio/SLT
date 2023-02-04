@@ -6,12 +6,11 @@
     (error (c)
       (format t "Error: ~A~%" c) NIL)))
 
-(defmethod source-location ((func (eql :ANONYMOUS-INTERPRETED-FUNCTION)))
+(defmethod source-location ((func T))
   NIL)
 
 (defun slime-location-from-source-annotation (sym it)
   (destructuring-bind (what path pos) it
-
     (let* ((isfunction
             ;; all of these are (defxxx forms, which is what :function locations look for in slime
             (and (consp what) (member (car what)
