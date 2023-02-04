@@ -12,6 +12,7 @@ import com.intellij.icons.AllIcons.Actions;
 import com.intellij.icons.AllIcons.General;
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.actionSystem.*;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Disposer;
 import com.intellij.openapi.wm.ToolWindow;
@@ -176,7 +177,7 @@ public class SltCoreWindow implements LispEnvironmentListener, Disposable {
 
         @Override
         public void actionPerformed(@NotNull AnActionEvent e) {
-            start();
+            ApplicationManager.getApplication().invokeLater(SltCoreWindow.this::start);
         }
 
         @Override

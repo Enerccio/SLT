@@ -90,7 +90,7 @@ public class SltProcessStreamGobbler extends Thread {
         }
 
         public boolean awaitFor(Process process) {
-            return awaitFor(process, null, 10L, TimeUnit.SECONDS);
+            return awaitFor(process, null, 60L, TimeUnit.SECONDS);
         }
 
         public boolean awaitFor(Process process, SltProcessStreamGobbler gobbler, long time, TimeUnit unit) {

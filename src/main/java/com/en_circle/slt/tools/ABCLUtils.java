@@ -2,7 +2,7 @@ package com.en_circle.slt.tools;
 
 import com.en_circle.slt.plugin.environment.SltProcessStreamGobbler;
 import com.en_circle.slt.plugin.environment.SltProcessStreamGobbler.WaitForOccurrence;
-import com.en_circle.slt.templates.VerifyTemplate;
+import com.en_circle.slt.templates.VerifyABCLTemplate;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.util.io.FileUtil;
 import org.apache.commons.io.FileUtils;
@@ -12,25 +12,28 @@ import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.StringTokenizer;
 import java.util.concurrent.TimeUnit;
 
-public class SBCLUtils {
+public class ABCLUtils {
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
-    public static boolean verifyAndInstallDependencies(String executable, String core, String quicklisp, ProgressIndicator pi) {
+    public static boolean verifyAndInstallDependencies(String jvm, String jvmArgs, String jar, String quicklisp, ProgressIndicator pi) {
         try {
             List<String> args = new ArrayList<>();
-            args.add(executable);
-            if (StringUtils.isNotBlank(core)) {
-                args.add("--core");
-                args.add(core);
+            args.add(jvm);
+            if (StringUtils.isNotBlank(jvmArgs)) {
+                StringTokenizer st = new StringTokenizer(jvmArgs);
+                while (st.hasMoreTokens())
+                    args.add(st.nextToken());
             }
-            args.add("--non-interactive");
+            args.add("-jar");
+            args.add(jar);
 
-            File tempTestFile = FileUtil.createTempFile("testSBCL", ".cl");
+            File tempTestFile = FileUtil.createTempFile("testABCL", ".cl");
             if (tempTestFile.exists())
                 tempTestFile.delete();
-            FileUtils.writeStringToFile(tempTestFile, new VerifyTemplate(quicklisp).render(), StandardCharsets.UTF_8);
+            FileUtils.writeStringToFile(tempTestFile, new VerifyABCLTemplate(quicklisp).render(), StandardCharsets.UTF_8);
             tempTestFile.deleteOnExit();
 
             args.add("--load");
@@ -47,10 +50,10 @@ public class SBCLUtils {
                 errorController.addUpdateListener(returnValue::append);
                 outputController.addUpdateListener(textValue::append);
                 WaitForOccurrence waiter = new WaitForOccurrence("SltVerified");
-                errorController.addUpdateListener(waiter);
+                outputController.addUpdateListener(waiter);
                 errorController.start();
                 outputController.start();
-                if (!waiter.awaitFor(null, errorController, 10, TimeUnit.MINUTES, pi::isCanceled)) {
+                if (!waiter.awaitFor(null, outputController, 10, TimeUnit.MINUTES, pi::isCanceled)) {
                     if (process.isAlive())
                         process.destroy();
 
@@ -64,7 +67,7 @@ public class SBCLUtils {
 
                 errorController.join();
                 outputController.join();
-                return returnValue.toString().contains("SltVerified");
+                return textValue.toString().contains("SltVerified");
             } finally {
                 tempTestFile.delete();
             }

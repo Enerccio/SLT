@@ -4,6 +4,7 @@ import com.en_circle.slt.plugin.environment.SltSBCLEnvironmentConfiguration;
 import com.en_circle.slt.plugin.swank.SlimeListener;
 import com.en_circle.slt.plugin.swank.SlimeListener.DebugInterface;
 import com.en_circle.slt.plugin.swank.SwankClient;
+import com.en_circle.slt.plugin.swank.SwankClient.SwankReply;
 import com.en_circle.slt.plugin.swank.SwankPacket;
 import com.en_circle.slt.plugin.swank.debug.SltDebugInfo;
 import org.awaitility.Awaitility;
@@ -20,7 +21,7 @@ public class SlimeTest {
             AtomicLong expected = new AtomicLong();
             SltLispEnvironment environment = new SltSBCLEnvironment();
             environment.start(new SltSBCLEnvironmentConfiguration.Builder().build());
-            SlimeListener listener = new SlimeListener(null, false, null, new DebugInterface() {
+            SlimeListener listener = new SlimeListener(null, false, Throwable::printStackTrace, null, new DebugInterface() {
                 @Override
                 public void onDebugCreate(SltDebugInfo info) {
 
@@ -37,9 +38,17 @@ public class SlimeTest {
 
                 }
             });
-            try (SwankClient client = new SwankClient("127.0.0.1", 4005, packet -> {
-                listener.onSwankMessage(packet);
-                expected.addAndGet(1);
+            try (SwankClient client = new SwankClient("127.0.0.1", 4005, new SwankReply() {
+                @Override
+                public void onSwankMessage(SwankPacket packet) {
+                    listener.onSwankMessage(packet);
+                    expected.addAndGet(1);
+                }
+
+                @Override
+                public void onReadError(Exception e) {
+                    e.printStackTrace();
+                }
             })) {
                 sent.addAndGet(1);
                 client.swankSend(SwankPacket.sltEval("(+ + 5)", new BigInteger("3")));

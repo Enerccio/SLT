@@ -43,6 +43,8 @@
 
         <projectService serviceImplementation="com.en_circle.slt.plugin.highlights.BraceHighlightService" />
 
+        <applicationService serviceImplementation="com.en_circle.slt.plugin.ui.SltGlobalUIService" />
+
         <projectService serviceImplementation="com.en_circle.slt.plugin.ui.SltUIService" />
 
         <!-- Lisp Service -->
@@ -150,12 +152,6 @@
                 class="com.en_circle.slt.plugin.actions.EvalFile">
             <add-to-group group-id="ProjectViewPopupMenuRunGroup" anchor="last"/>
         </action>
-
-        <!-- Removed until I can find how to put it in toolbar ... -->
-<!--        <action id="com.en_circle.slt.plugin.actions.toolbar.GlobalPackageSelectorAction"-->
-<!--                class="com.en_circle.slt.plugin.actions.toolbar.GlobalPackageSelectorAction">-->
-<!--            <add-to-group group-id="MainToolBar" anchor="first"/>-->
-<!--        </action>-->
     </actions>
 
     <change-notes><![CDATA[

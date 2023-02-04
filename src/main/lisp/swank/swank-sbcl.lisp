@@ -1,10 +1,3 @@
-(in-package sb-debug)
-
-(export 'frame-code-location)
-(export 'frame-call)
-(export 'ensure-printable-object)
-(export 'code-location-source-form)
-
 (in-package :swank/sbcl)
 
 (defun form-number-position (definition-source stream)
@@ -34,9 +27,20 @@
 
 (in-package :swank)
 
+(defslimefun backtrace (start end)
+  (loop for frame in (compute-backtrace start end)
+        for i from start collect
+        (list i (frame-to-string frame)
+                (format NIL "~A" (print-frame-call-place frame))
+                (frame-source-location i)
+                (let ((pkg (frame-package i)))
+                    (cond
+                        (pkg (package-name pkg))
+                        (T NIL))))))
+
 (defun print-frame-call-place (frame)
     (multiple-value-bind (name args info)
-            (SB-DEBUG:frame-call frame)
+            (sb-debug::frame-call frame)
         (declare (ignore args info))
-        (let ((name (SB-DEBUG:ensure-printable-object name)))
+        (let ((name (sb-debug::ensure-printable-object name)))
             name)))

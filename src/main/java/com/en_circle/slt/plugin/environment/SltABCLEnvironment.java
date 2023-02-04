@@ -15,8 +15,9 @@ import java.net.ServerSocket;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.StringTokenizer;
 
-public class SltSBCLEnvironment extends SltLispEnvironmentProcess  {
+public class SltABCLEnvironment extends SltLispEnvironmentProcess {
 
     private int port;
 
@@ -27,13 +28,13 @@ public class SltSBCLEnvironment extends SltLispEnvironmentProcess  {
 
     @Override
     public SltLispProcessInformation getInformation() {
-        return new SltSBCLLispProcessInformation();
+        return new SltABCLLispProcessInformation();
     }
 
     @Override
     protected Object prepareProcessEnvironment(SltLispEnvironmentProcessConfiguration configuration) throws SltProcessException {
-        SltSBCLEnvironmentConfiguration c = getConfiguration(configuration);
-        SBCLEnvironment e = new SBCLEnvironment();
+        SltABCLEnvironmentConfiguration c = getConfiguration(configuration);
+        ABCLEnvironment e = new ABCLEnvironment();
         try {
             e.port = getFreePort();
             if (e.port == 0) {
@@ -44,11 +45,10 @@ public class SltSBCLEnvironment extends SltLispEnvironmentProcess  {
                     "SLTinit", "");
 
             e.sltCore = SltLibrary.getLibraryInitFile();
-
             e.serverStartSetup = new File(tempDir, "startServer.cl");
             e.serverStartSetup.deleteOnExit();
             String sltCorePath = e.sltCore.getAbsolutePath();
-            String startScriptTemplate = new SBCLInitScriptTemplate(c, sltCorePath, e.port).render();
+            String startScriptTemplate = new ABCLInitScriptTemplate(c, sltCorePath, e.port).render();
             FileUtils.write(e.serverStartSetup, startScriptTemplate, StandardCharsets.UTF_8);
 
             tempDir.deleteOnExit();
@@ -60,24 +60,27 @@ public class SltSBCLEnvironment extends SltLispEnvironmentProcess  {
 
     @Override
     protected File getProcessWorkDirectory(SltLispEnvironmentProcessConfiguration configuration, Object environment) throws SltProcessException {
-        SltSBCLEnvironmentConfiguration c = getConfiguration(configuration);
-        SBCLEnvironment e = getEnvironment(environment);
+        SltABCLEnvironmentConfiguration c = getConfiguration(configuration);
+        ABCLEnvironment e = getEnvironment(environment);
 
         return e.serverStartSetup.getParentFile();
     }
 
     @Override
     protected String[] getProcessCommand(SltLispEnvironmentProcessConfiguration configuration, Object environment) throws SltProcessException {
-        SltSBCLEnvironmentConfiguration c = getConfiguration(configuration);
-        SBCLEnvironment e = getEnvironment(environment);
+        SltABCLEnvironmentConfiguration c = getConfiguration(configuration);
+        ABCLEnvironment e = getEnvironment(environment);
         this.port = e.port;
 
         List<String> parameters = new ArrayList<>();
-        parameters.add(c.getExecutablePath());
-        if (StringUtils.isNotBlank(c.getCorePath())) {
-            parameters.add("--core");
-            parameters.add(c.getCorePath());
+        parameters.add(c.getJvmPath());
+        if (StringUtils.isNotBlank(c.getJvmArgs())) {
+            StringTokenizer st = new StringTokenizer(c.getJvmArgs());
+            while (st.hasMoreTokens())
+                parameters.add(st.nextToken());
         }
+        parameters.add("-jar");
+        parameters.add(c.getAbclJar());
         parameters.add("--load");
         parameters.add(e.serverStartSetup.getName());
 
@@ -86,25 +89,25 @@ public class SltSBCLEnvironment extends SltLispEnvironmentProcess  {
 
     @Override
     protected ProcessInitializationWaiter waitForFullInitialization(SltLispEnvironmentProcessConfiguration configuration, Object environment) throws SltProcessException {
-        SltSBCLEnvironmentConfiguration c = getConfiguration(configuration);
-        SBCLEnvironment e = getEnvironment(environment);
+        SltABCLEnvironmentConfiguration c = getConfiguration(configuration);
+        ABCLEnvironment e = getEnvironment(environment);
 
         WaitForOccurrence wait = new WaitForOccurrence("Swank started at port");
-        errorController.addUpdateListener(wait);
+        outputController.addUpdateListener(wait);
 
         return wait;
     }
 
-    private SltSBCLEnvironmentConfiguration getConfiguration(SltLispEnvironmentProcessConfiguration configuration) throws SltProcessException {
-        if (!(configuration instanceof SltSBCLEnvironmentConfiguration))
-            throw new SltProcessException("Configuration must be SltSBCLEnvironmentConfiguration");
-        return (SltSBCLEnvironmentConfiguration) configuration;
+    private SltABCLEnvironmentConfiguration getConfiguration(SltLispEnvironmentProcessConfiguration configuration) throws SltProcessException {
+        if (!(configuration instanceof SltABCLEnvironmentConfiguration))
+            throw new SltProcessException("Configuration must be SltABCLEnvironmentConfiguration");
+        return (SltABCLEnvironmentConfiguration) configuration;
     }
 
-    private SBCLEnvironment getEnvironment(Object environment) {
-        assert (environment instanceof SBCLEnvironment);
+    private ABCLEnvironment getEnvironment(Object environment) {
+        assert (environment instanceof ABCLEnvironment);
 
-        return (SBCLEnvironment) environment;
+        return (ABCLEnvironment) environment;
     }
 
     private int getFreePort() {
@@ -118,16 +121,7 @@ public class SltSBCLEnvironment extends SltLispEnvironmentProcess  {
         return freePort;
     }
 
-
-    private class SltSBCLLispProcessInformation implements SltLispProcessInformation {
-
-        @Override
-        public String getPid() {
-            return "" + process.pid();
-        }
-    }
-
-    private static class SBCLEnvironment {
+    private static class ABCLEnvironment {
 
         File sltCore;
         File serverStartSetup;
@@ -135,9 +129,17 @@ public class SltSBCLEnvironment extends SltLispEnvironmentProcess  {
 
     }
 
-    private static class SBCLInitScriptTemplate extends Template {
+    private class SltABCLLispProcessInformation implements SltLispProcessInformation {
 
-        public SBCLInitScriptTemplate(SltSBCLEnvironmentConfiguration configuration, String sltCoreScript, int port) {
+        @Override
+        public String getPid() {
+            return "" + process.pid();
+        }
+    }
+
+    private static class ABCLInitScriptTemplate extends Template {
+
+        public ABCLInitScriptTemplate(SltABCLEnvironmentConfiguration configuration, String sltCoreScript, int port) {
             String quicklispPath = configuration.getQuicklispStartScript();
             if (quicklispPath.contains("\\")) {
                 quicklispPath = StringUtils.replace(quicklispPath, "\\", "\\\\");
@@ -153,7 +155,7 @@ public class SltSBCLEnvironment extends SltLispEnvironmentProcess  {
             add("port", "" + port);
             add("cwd", cwd);
             add("corefile", sltCoreScript);
-            add("interpret", LispInterpret.SBCL.symbolName);
+            add("interpret", LispInterpret.ABCL.symbolName);
         }
 
         @Override
@@ -161,4 +163,5 @@ public class SltSBCLEnvironment extends SltLispEnvironmentProcess  {
             return "initscript.cl";
         }
     }
+
 }

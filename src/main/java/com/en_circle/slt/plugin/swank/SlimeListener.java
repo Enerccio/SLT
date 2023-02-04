@@ -15,6 +15,7 @@ import com.intellij.psi.PsiFileFactory;
 
 import java.math.BigInteger;
 import java.util.*;
+import java.util.function.Consumer;
 
 public class SlimeListener implements SwankClient.SwankReply {
 
@@ -29,12 +30,14 @@ public class SlimeListener implements SwankClient.SwankReply {
     private final Project project;
     private final boolean fromUi;
     private final Map<BigInteger, SlimeRequest> requests = Collections.synchronizedMap(new HashMap<>());
+    private final Consumer<Exception> onReadFailure;
     private final RequestResponseLogger logger;
     private final DebugInterface debugInterface;
 
-    public SlimeListener(Project project, boolean fromUi, RequestResponseLogger logger, DebugInterface debugInterface) {
+    public SlimeListener(Project project, boolean fromUi, Consumer<Exception> onReadFailure, RequestResponseLogger logger, DebugInterface debugInterface) {
         this.project = project;
         this.fromUi = fromUi;
+        this.onReadFailure = onReadFailure;
         this.logger = logger;
         this.debugInterface = debugInterface;
     }
@@ -59,6 +62,11 @@ public class SlimeListener implements SwankClient.SwankReply {
         } else {
             resolve(data);
         }
+    }
+
+    @Override
+    public void onReadError(Exception e) {
+
     }
 
     private void resolve(String data) {

@@ -1,10 +1,11 @@
 (load (merge-pathnames "swank-backend.lisp" *load-truename*))
+
 (when (eq +slt-interpret+ :sbcl)
-  (load (merge-pathnames "swank-sbcl.lisp" *load-truename*)))
-
-(in-package swank/source-file-cache)
-
-(setf *SOURCE-SNIPPET-SIZE* 0)
+  (load (merge-pathnames "swank-sbcl.lisp" *load-truename*))
+  (in-package swank/source-file-cache)
+  (setf *source-snippet-size* 0))
+(when (eq +slt-interpret+ :abcl)
+  (load (merge-pathnames "swank-abcl.lisp" *load-truename*)))
 
 (in-package :swank)
 
@@ -42,17 +43,6 @@ format suitable for Emacs."
                                             :msg "<<error printing restart>>")
                     (princ restart stream)))
                 (swank-backend:arglist (slot-value restart 'function))))))
-
-(defslimefun backtrace (start end)
-  (loop for frame in (compute-backtrace start end)
-        for i from start collect
-        (list i (frame-to-string frame)
-                (format NIL "~S" (print-frame-call-place frame))
-                (frame-source-location i)
-                (let ((pkg (frame-package i)))
-                    (cond
-                        (pkg (package-name pkg))
-                        (T NIL))))))
 
 (defslimefun compile-string-region-slt (string buffer offset filename package)
     (with-buffer-syntax ()

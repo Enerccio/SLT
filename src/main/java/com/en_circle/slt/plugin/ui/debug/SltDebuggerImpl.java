@@ -113,7 +113,11 @@ public class SltDebuggerImpl implements SltDebugger, Disposable {
         splitter.setFirstComponent(splitter2);
 
         JPanel actionsPanel = new JPanel();
-        actionsPanel.setLayout(new BoxLayout(actionsPanel, BoxLayout.Y_AXIS));
+        GridBagConstraints cons = new GridBagConstraints();
+        cons.fill = GridBagConstraints.HORIZONTAL;
+        cons.weightx = 1;
+        cons.gridx = 0;
+        actionsPanel.setLayout(new GridBagLayout());
 
         for (SltDebugAction action : debugInfo.getActions()) {
             JLabel label = new JLabel(getText(action.getActionName()));
@@ -142,17 +146,21 @@ public class SltDebuggerImpl implements SltDebugger, Disposable {
             actionInfo.add(labelPanel);
             actionInfo.add(new JScrollPane(textArea));
 
-            actionsPanel.add(actionInfo);
+            actionsPanel.add(actionInfo, cons);
         }
 
         JBScrollPane pane = new JBScrollPane(actionsPanel);
         JPanel actionsPanelDecorator = new JPanel(new BorderLayout());
         actionsPanelDecorator.setBorder(BorderFactory.createTitledBorder(SltBundle.message("slt.ui.debugger.actions")));
-        actionsPanelDecorator.add(pane, BorderLayout.CENTER);
+        actionsPanelDecorator.add(pane, BorderLayout.NORTH);
         splitter2.setFirstComponent(actionsPanelDecorator);
 
         JPanel stackframes = new JPanel();
-        stackframes.setLayout(new BoxLayout(stackframes, BoxLayout.Y_AXIS));
+        cons = new GridBagConstraints();
+        cons.fill = GridBagConstraints.HORIZONTAL;
+        cons.weightx = 1;
+        cons.gridx = 0;
+        stackframes.setLayout(new GridBagLayout());
         for (SltDebugStackTraceElement element : debugInfo.getStacktrace()) {
             JLabel label = new JLabel(element.getLine());
             label.setCursor(new Cursor(Cursor.HAND_CURSOR));
@@ -165,14 +173,14 @@ public class SltDebuggerImpl implements SltDebugger, Disposable {
             JPanel p = new JPanel(new BorderLayout());
             p.setBackground(SltUIConstants.DEBUG_FRAMES_COLOR);
             p.add(label, BorderLayout.CENTER);
-            stackframes.add(p);
+            stackframes.add(p, cons);
             this.stackframes.add(p);
         }
 
         JPanel stackframesContainer = new JPanel(new BorderLayout());
         stackframesContainer.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(),
                 SltBundle.message("slt.ui.debugger.frames")));
-        stackframesContainer.add(ScrollPaneFactory.createScrollPane(stackframes), BorderLayout.CENTER);
+        stackframesContainer.add(ScrollPaneFactory.createScrollPane(stackframes), BorderLayout.NORTH);
         splitter2.setSecondComponent(stackframesContainer);
 
         singleFrameComponent = new JPanel(new BorderLayout());
@@ -235,17 +243,19 @@ public class SltDebuggerImpl implements SltDebugger, Disposable {
                 p.setBackground(SltUIConstants.DEBUG_FRAMES_COLOR);
             }
         }
-        if (element.isFile() && element.getPosition() >= 0) {
+        if (element.isFile()) {
             Project project = parent.getProject();
             ProjectFileIndex index = ProjectFileIndex.getInstance(project);
             VirtualFile vf = LocalFileSystem.getInstance().findFileByIoFile(new File(element.getLocation()));
             if (vf != null) {
                 if (index.isInSource(vf)) {
                     FileEditorManager.getInstance(project)
-                            .openTextEditor(new OpenFileDescriptor(project, vf, element.getPosition()), true);
+                            .openTextEditor(new OpenFileDescriptor(project, vf,
+                                    element.getPosition() >= 0 ? element.getPosition() : -1), true);
                 } else {
                     FileEditorManager.getInstance(project)
-                            .openEditor(new OpenFileDescriptor(project, vf, element.getPosition()), true);
+                            .openEditor(new OpenFileDescriptor(project, vf,
+                                    element.getPosition() >= 0 ? element.getPosition() : -1), true);
                 }
             }
         }

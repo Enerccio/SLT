@@ -13,11 +13,16 @@ public class LispSdk implements PersistentStateComponent<LispSdk> {
 
     // use getter!
     public Environment environment;
+    public String quickLispPath;
 
     // SBCL Process used
     public String sbclExecutable;
     public String sbclCorePath;
-    public String quickLispPath;
+
+    // ABCL Process used
+    public String abclJvm;
+    public String abclJvmArgs;
+    public String abclJar;
 
     public Environment getEnvironment() {
         if (environment == null) {

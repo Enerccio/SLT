@@ -29,12 +29,14 @@ import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ToolWindowManager;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
+import com.intellij.util.ExceptionUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Supplier;
 
 public class LispEnvironmentServiceImpl implements LispEnvironmentService {
@@ -107,13 +109,14 @@ public class LispEnvironmentServiceImpl implements LispEnvironmentService {
     @Override
     public void start() {
         starting = true;
-        ApplicationManager.getApplication().invokeLater(() -> {
+        ApplicationManager.getApplication().invokeAndWait(this::ensureToolWindowIsOpen);
+        ApplicationManager.getApplication().executeOnPooledThread(() -> {
             try {
-                ensureToolWindowIsOpen();
                 doStart();
             } catch (Exception e) {
                 log.warn(SltBundle.message("slt.error.start"), e);
-                Messages.showErrorDialog(project, e.getMessage(), SltBundle.message("slt.ui.errors.lisp.start"));
+                ApplicationManager.getApplication().invokeLater(() ->
+                        Messages.showErrorDialog(project, e.getMessage(), SltBundle.message("slt.ui.errors.lisp.start")));
             }
         });
     }
@@ -138,12 +141,19 @@ public class LispEnvironmentServiceImpl implements LispEnvironmentService {
     private boolean doStart() throws Exception {
         try {
             if (configurationBuilder == null) {
-                if (!configured()) {
-                    log.warn(SltBundle.message("slt.error.start"));
-                    Messages.showErrorDialog(project,
-                            SltBundle.message("slt.ui.errors.lisp.start.noconf"),
-                            SltBundle.message("slt.ui.errors.lisp.start"));
-                    return false;
+                AtomicBoolean state = new AtomicBoolean(false);
+                ApplicationManager.getApplication().invokeAndWait(() -> {
+                    if (!configured()) {
+                        log.warn(SltBundle.message("slt.error.start"));
+                        Messages.showErrorDialog(project,
+                                SltBundle.message("slt.ui.errors.lisp.start.noconf"),
+                                SltBundle.message("slt.ui.errors.lisp.start"));
+                        return;
+                    }
+                    state.set(true);
+                });
+                if (!state.get()) {
+                    return state.get();
                 }
             }
 
@@ -159,15 +169,22 @@ public class LispEnvironmentServiceImpl implements LispEnvironmentService {
             environment = environmentProvider.get();
             environment.start(configuration);
 
-            slimeListener = new SlimeListener(project, true, logger, debugInterface);
+            slimeListener = new SlimeListener(project, true, e -> {
+                for (LispEnvironmentListener listener : serverListeners) {
+                    String text = ExceptionUtil.getThrowableText(e);
+                    listener.onOutputChanged(SltOutput.STDERR, text);
+                }
+            }, logger, debugInterface);
             client = new SwankClient("127.0.0.1", environment.getSwankPort(), slimeListener);
 
             for (LispEnvironmentListener listener : serverListeners) {
                 listener.onPostStart();
             }
 
-            ParameterHintsPassFactory.forceHintsUpdateOnNextPass();
-            DaemonCodeAnalyzer.getInstance(project).restart();
+            ApplicationManager.getApplication().invokeLaterOnWriteThread(() -> {
+                ParameterHintsPassFactory.forceHintsUpdateOnNextPass();
+                DaemonCodeAnalyzer.getInstance(project).restart();
+            });
         } finally {
             starting = false;
         }

@@ -2,4 +2,4 @@
 (ql:quickload :swank)
 (ql:quickload :eclector)
 
-(format *error-output* "SltVerified")
+(format *error-output* "SltVerified~%")

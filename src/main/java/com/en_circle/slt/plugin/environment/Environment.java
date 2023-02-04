@@ -3,6 +3,7 @@ package com.en_circle.slt.plugin.environment;
 import com.en_circle.slt.plugin.SltBundle;
 import com.en_circle.slt.plugin.environment.SltLispEnvironmentConfiguration.Builder;
 import com.en_circle.slt.plugin.sdk.LispSdk;
+import com.en_circle.slt.plugin.ui.sdk.SdkConfigurationABCLProcess;
 import com.en_circle.slt.plugin.ui.sdk.SdkConfigurationSBCLProcess;
 import com.en_circle.slt.plugin.ui.sdk.SdkDialogProvider;
 import com.en_circle.slt.tools.platform.DownloadLispAction;
@@ -13,6 +14,39 @@ import java.util.function.Supplier;
 
 public enum Environment {
 
+    ABCL_PROCESS(new EnvironmentDefinition() {
+        @Override
+        public String getName() {
+            return SltBundle.message("slt.environment.abcl");
+        }
+
+        @Override
+        public Class<? extends DownloadLispAction> getDownloadActionDef() {
+            return null;
+        }
+
+        @Override
+        public Supplier<SltLispEnvironment> getEnvironmentCreator() {
+            return SltABCLEnvironment::new;
+        }
+
+        @SuppressWarnings("unchecked")
+        @Override
+        public <T extends Builder<T, R>, R extends SltLispEnvironmentConfiguration> Builder<T, R>
+                    buildConfiguration(LispSdk sdk, Project project) {
+            return (Builder<T, R>) new SltABCLEnvironmentConfiguration.Builder()
+                    .setJvm(sdk.abclJvm)
+                    .setJvmArgs(sdk.abclJvmArgs)
+                    .setAbclJar(sdk.abclJar)
+                    .setQuicklispStartScriptPath(sdk.quickLispPath)
+                    .setProjectDirectory(project.getBasePath());
+        }
+
+        @Override
+        public SdkDialogProvider getDialogProvider() {
+            return SdkConfigurationABCLProcess::new;
+        }
+    }),
     SBCL_PROCESS(new EnvironmentDefinition() {
         @Override
         public String getName() {
