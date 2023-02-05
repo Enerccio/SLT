@@ -2,6 +2,7 @@ package com.en_circle.slt.plugin.ui.debug;
 
 import com.en_circle.slt.plugin.SltBundle;
 import com.en_circle.slt.plugin.SltUIConstants;
+import com.en_circle.slt.plugin.environment.LispFeatures;
 import com.en_circle.slt.plugin.lisp.lisp.LispContainer;
 import com.en_circle.slt.plugin.lisp.lisp.LispElement;
 import com.en_circle.slt.plugin.services.lisp.LispEnvironmentService;
@@ -170,7 +171,8 @@ public class SltInspector {
         public void update(@NotNull AnActionEvent e) {
             super.update(e);
 
-            e.getPresentation().setEnabled(LispEnvironmentService.getInstance(project).getState() == LispEnvironmentState.READY);
+            e.getPresentation().setEnabled(LispEnvironmentService.getInstance(project).getState() == LispEnvironmentState.READY &&
+                    LispEnvironmentService.getInstance(project).hasFeature(LispFeatures.INSPECTOR_HISTORY));
         }
     }
 
@@ -196,7 +198,8 @@ public class SltInspector {
         public void update(@NotNull AnActionEvent e) {
             super.update(e);
 
-            e.getPresentation().setEnabled(LispEnvironmentService.getInstance(project).getState() ==LispEnvironmentState.READY);
+            e.getPresentation().setEnabled(LispEnvironmentService.getInstance(project).getState() ==LispEnvironmentState.READY &&
+                    LispEnvironmentService.getInstance(project).hasFeature(LispFeatures.INSPECTOR_HISTORY));
         }
     }
 

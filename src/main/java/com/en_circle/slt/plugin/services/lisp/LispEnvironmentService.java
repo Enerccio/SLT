@@ -1,6 +1,7 @@
 package com.en_circle.slt.plugin.services.lisp;
 
 import com.en_circle.slt.plugin.SymbolState;
+import com.en_circle.slt.plugin.environment.LispFeatures;
 import com.en_circle.slt.plugin.environment.SltLispEnvironment;
 import com.en_circle.slt.plugin.environment.SltLispEnvironment.SltLispOutputChangedListener;
 import com.en_circle.slt.plugin.lisp.lisp.LispElement;
@@ -56,6 +57,9 @@ public interface LispEnvironmentService extends Disposable {
     Integer calculateOffset(PsiElement element, PsiFile file, boolean wasAfter, String text, int offset, String packageOverride);
 
     LispSltOverrides getOverrides();
+
+    boolean hasFeature(LispFeatures xrefs);
+
 
     enum LispEnvironmentState {
         STOPPED, READY, INITIALIZING

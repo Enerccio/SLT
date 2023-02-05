@@ -21,7 +21,7 @@ This plugin is providing support for Common Lisp for JetBrains IDEs.
 Using modified SLIME/Swank protocol to commmunicate with SBCL providing 
 IDE capabilities for Common Lisp.
 
-# (Somewhat)Detailed Installation and Usage Guide
+# (Somewhat) Detailed Installation and Usage Guide
 
 https://github.com/Enerccio/SLT/wiki/User-Guide
 
@@ -83,7 +83,7 @@ You can also open this as a project in Intellij Idea.
 this is implemented manually.
   * [x] Download SBCL and quicklisp for user
 * [x] Automatic download of lisp interpret and quicklisp
-* [ ] Different lisp interpreter support 
+* [x] Different lisp interpreter support 
 * [ ] Remote connections to interpreters
 * [ ] Rewrite everything into ABCL just for purity’s sake lol
 

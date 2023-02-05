@@ -1,10 +1,12 @@
 package com.en_circle.slt.plugin.contributors;
 
+import com.en_circle.slt.plugin.environment.LispFeatures;
 import com.en_circle.slt.plugin.lisp.LispSymbolPresentation;
 import com.en_circle.slt.plugin.lisp.lisp.LispContainer;
 import com.en_circle.slt.plugin.lisp.lisp.LispElement;
 import com.en_circle.slt.plugin.lisp.lisp.LispString;
 import com.en_circle.slt.plugin.lisp.psi.LispSymbol;
+import com.en_circle.slt.plugin.services.lisp.LispEnvironmentService;
 import com.en_circle.slt.plugin.swank.components.SourceLocation;
 import com.en_circle.slt.plugin.swank.requests.CompleteSearch;
 import com.en_circle.slt.plugin.swank.requests.CompleteSearch.SearchFilter;
@@ -39,13 +41,15 @@ public class SltSymbolContributor implements ChooseByNameContributor {
 
     @Override
     public String @NotNull [] getNames(Project project, boolean includeNonProjectItems) {
-        String[] names;
-        try {
-            names = SltApplicationUtils.getAsyncResultCheckCancellation(project,
-                    finishRequest -> CompleteSearch.search("", getFilter(), form ->
-                            finishRequest.accept(getNames(form, includeNonProjectItems, project))), false);
-        } catch (Exception e) {
-            return new String[0];
+        String[] names = null;
+        if (LispEnvironmentService.getInstance(project).hasFeature(LispFeatures.SEARCH)) {
+            try {
+                names = SltApplicationUtils.getAsyncResultCheckCancellation(project,
+                        finishRequest -> CompleteSearch.search("", getFilter(), form ->
+                                finishRequest.accept(getNames(form, includeNonProjectItems, project))), false);
+            } catch (Exception e) {
+                return new String[0];
+            }
         }
 
         if (names == null) {

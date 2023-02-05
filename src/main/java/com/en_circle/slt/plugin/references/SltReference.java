@@ -1,6 +1,7 @@
 package com.en_circle.slt.plugin.references;
 
 import com.en_circle.slt.plugin.SymbolState;
+import com.en_circle.slt.plugin.environment.LispFeatures;
 import com.en_circle.slt.plugin.lisp.LispParserUtil;
 import com.en_circle.slt.plugin.lisp.lisp.LispContainer;
 import com.en_circle.slt.plugin.lisp.lisp.LispElement;
@@ -8,6 +9,7 @@ import com.en_circle.slt.plugin.lisp.lisp.LispUtils;
 import com.en_circle.slt.plugin.lisp.psi.LispSymbol;
 import com.en_circle.slt.plugin.lisp.psi.LispToplevel;
 import com.en_circle.slt.plugin.services.lisp.LispEnvironmentService;
+import com.en_circle.slt.plugin.services.lisp.LispEnvironmentService.LispEnvironmentState;
 import com.en_circle.slt.plugin.swank.components.SourceLocation;
 import com.en_circle.slt.plugin.swank.requests.Xrefs;
 import com.en_circle.slt.plugin.swank.requests.Xrefs.XrefType;
@@ -40,11 +42,15 @@ public class SltReference extends PsiPolyVariantReferenceBase<LispSymbol> {
 
     @Override
     public ResolveResult @NotNull [] multiResolve(boolean incompleteCode) {
-        PsiElement element = getElement();
         return cache.resolve(this);
     }
 
     ResolveResult[] resolveInner(boolean incompleteCode) {
+        if (LispEnvironmentService.getInstance(myElement.getProject()).getState() != LispEnvironmentState.READY)
+            return new ResolveResult[0];
+        if (!LispEnvironmentService.getInstance(myElement.getProject()).hasFeature(LispFeatures.XREFS))
+            return new ResolveResult[0];
+
         PsiManager manager = PsiManager.getInstance(myElement.getProject());
 
         String symbolName = myElement.getName();

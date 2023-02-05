@@ -2,6 +2,7 @@ package com.en_circle.slt.plugin.services.lisp;
 
 import com.en_circle.slt.plugin.SltBundle;
 import com.en_circle.slt.plugin.SymbolState;
+import com.en_circle.slt.plugin.environment.LispFeatures;
 import com.en_circle.slt.plugin.environment.SltLispEnvironment;
 import com.en_circle.slt.plugin.environment.SltLispEnvironment.SltOutput;
 import com.en_circle.slt.plugin.environment.SltLispEnvironmentConfiguration;
@@ -208,6 +209,7 @@ public class LispEnvironmentServiceImpl implements LispEnvironmentService {
         try {
             client.close();
         } finally {
+            overrides = null;
             indentationContainer.clear();
             indentationContainer.clear();
             symbolCache.clear();
@@ -328,6 +330,14 @@ public class LispEnvironmentServiceImpl implements LispEnvironmentService {
     @Override
     public LispSltOverrides getOverrides() {
         return overrides;
+    }
+
+    @Override
+    public boolean hasFeature(LispFeatures feature) {
+        if (environment != null) {
+            return environment.getType().getDefinition().hasFeature(feature);
+        }
+        return false;
     }
 
     @Override

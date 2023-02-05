@@ -33,7 +33,7 @@ public class EvalFile extends EvalActionBase {
             VirtualFile vf = event.getData(CommonDataKeys.VIRTUAL_FILE);
             if (vf != null) {
                 if (vf.getFileType().equals(SltCommonLispFileType.INSTANCE)) {
-                    event.getPresentation().setEnabledAndVisible(true);
+                    event.getPresentation().setEnabledAndVisible(isEnabledInLisp(event.getProject()));
                 }
             }
         }

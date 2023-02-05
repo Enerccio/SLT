@@ -2,9 +2,14 @@
 
 ### Added
 
+- Support for multiple lisp interprets
+- ABCL Support
+
 ### Fixes
 
 ### Changes
+
+- Feature list for each interpret changes availability of functions in IDE
 
 ## 0.3.1 230203
 

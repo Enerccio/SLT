@@ -2,6 +2,7 @@ package com.en_circle.slt.plugin.actions;
 
 import com.en_circle.slt.plugin.SltBundle;
 import com.en_circle.slt.plugin.SltCommonLispFileType;
+import com.en_circle.slt.plugin.environment.LispFeatures;
 import com.en_circle.slt.plugin.services.lisp.LispEnvironmentService;
 import com.en_circle.slt.plugin.swank.requests.Eval;
 import com.en_circle.slt.plugin.swank.requests.EvalFromVirtualFile;
@@ -34,7 +35,7 @@ public abstract class EvalActionBase extends AnAction {
         if (editor != null && event.getProject() != null) {
             PsiFile file = PsiDocumentManager.getInstance(Objects.requireNonNull(editor.getProject())).getPsiFile(editor.getDocument());
             if (file != null && SltCommonLispFileType.INSTANCE.equals(file.getFileType())) {
-                event.getPresentation().setEnabledAndVisible(true);
+                event.getPresentation().setEnabledAndVisible(isEnabledInLisp(event.getProject()));
             }
         }
     }
@@ -66,6 +67,10 @@ public abstract class EvalActionBase extends AnAction {
             log.warn(SltBundle.message("slt.error.start"), e);
             Messages.showErrorDialog(project, e.getMessage(), SltBundle.message("slt.ui.errors.lisp.start"));
         }
+    }
+
+    protected boolean isEnabledInLisp(Project project) {
+        return LispEnvironmentService.getInstance(project).hasFeature(LispFeatures.REPL);
     }
 
     @Override
