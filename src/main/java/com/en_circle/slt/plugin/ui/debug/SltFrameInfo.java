@@ -82,9 +82,11 @@ public class SltFrameInfo {
         locals.setText(SltBundle.message("slt.ui.debugger.frame.locals"));
         tabs.addTab(locals);
 
-        SltFrameConsole frameConsole = new SltFrameConsole(project, threadId, frameId, this::reloadLocals, module);
-        TabInfo consoleTab = frameConsole.create();
-        tabs.addTab(consoleTab);
+        if (LispEnvironmentService.getInstance(project).hasFeature(LispFeatures.FRAME_EVAL)) {
+            SltFrameConsole frameConsole = new SltFrameConsole(project, threadId, frameId, this::reloadLocals, module);
+            TabInfo consoleTab = frameConsole.create();
+            tabs.addTab(consoleTab);
+        }
 
         inspector = new SltInspector(project, threadId);
         inspectorTab = new TabInfo(new JBScrollPane(inspector.getContent()));

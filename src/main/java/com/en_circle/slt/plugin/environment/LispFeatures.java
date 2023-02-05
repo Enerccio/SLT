@@ -5,6 +5,7 @@ public enum LispFeatures {
     REPL,
     DOCUMENTATION,
     MACROEXPAND,
+    FRAME_EVAL,
     INSPECTOR,
     INSPECTOR_HISTORY,
     AUTOCOMPLETE,

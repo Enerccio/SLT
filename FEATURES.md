@@ -14,6 +14,7 @@ This is a list of features that are supported.
 | Documentation     | ✅    | ✅    |
 | Macroexpand       | ✅    | ✅    |
 | Debugger          | ✅    | ✅    |
+| Frame Eval        | ✅    | ❎    |
 | Stepping Debugger | ❎    | ❎    |
 | References        | ✅    | ❎    |
 | Inspector         | ✅¹   | ✅²   |
