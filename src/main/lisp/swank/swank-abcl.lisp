@@ -47,6 +47,21 @@
                         ,<position>
                         (:align t))))))))
 
+(defimplementation swank-compile-string (string &key buffer position filename
+                                                line column policy)
+  (declare (ignore filename line column policy))
+  (let ((jvm::*resignal-compiler-warnings* t)
+        (*abcl-signaled-conditions* nil))
+    (handler-bind ((warning #'handle-compiler-warning))
+      (let ((*buffer-name* buffer)
+            (*buffer-start-position* position)
+            (*buffer-string* string)
+            (sys::*source* (pathname buffer))
+            (sys::*source-position* position))
+        (funcall (compile nil (read-from-string
+                               (format nil "(~S () ~A)" 'lambda string))))
+        t))))
+
 (in-package :swank)
 
 (defslimefun backtrace (start end)

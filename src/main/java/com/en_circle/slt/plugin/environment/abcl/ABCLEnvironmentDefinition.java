@@ -20,12 +20,10 @@ public class ABCLEnvironmentDefinition extends EnvironmentDefinition {
 
     public ABCLEnvironmentDefinition() {
         features.add(LispFeatures.REPL);
-        features.add(LispFeatures.EVALUATION);
         features.add(LispFeatures.DOCUMENTATION);
         features.add(LispFeatures.MACROEXPAND);
         features.add(LispFeatures.INSPECTOR);
         features.add(LispFeatures.AUTOCOMPLETE);
-        features.add(LispFeatures.SEARCH);
     }
 
     @Override

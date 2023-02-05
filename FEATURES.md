@@ -18,7 +18,7 @@ This is a list of features that are supported.
 | References        | ✅    | ❎    |
 | Inspector         | ✅¹   | ✅²   |
 | Autocomplete      | ✅    | ✅    |
-| Find References   | ✅    | ✅    |
+| Find References   | ✅    | ❎    |
 
 1 - Only read-only inspector available
 

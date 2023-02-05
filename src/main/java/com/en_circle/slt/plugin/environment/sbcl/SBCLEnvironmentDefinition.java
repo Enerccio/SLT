@@ -21,7 +21,6 @@ public class SBCLEnvironmentDefinition extends EnvironmentDefinition {
 
     public SBCLEnvironmentDefinition() {
         features.add(LispFeatures.REPL);
-        features.add(LispFeatures.EVALUATION);
         features.add(LispFeatures.DOCUMENTATION);
         features.add(LispFeatures.MACROEXPAND);
         features.add(LispFeatures.INSPECTOR);
