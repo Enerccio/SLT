@@ -2,6 +2,7 @@
     (:use :slt :cl :swank)
     (:export analyze-symbol analyze-symbols read-fix-packages list-package-names
              initialize-or-get-debug-context debug-context debug-frame-variable register-variable
+             install-breakpoint uninstall-breakpoint
              ))
 
 (when (eq slt:+slt-interpret+ :sbcl)

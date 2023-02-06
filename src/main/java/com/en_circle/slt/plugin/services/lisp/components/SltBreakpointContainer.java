@@ -3,7 +3,6 @@ package com.en_circle.slt.plugin.services.lisp.components;
 import com.en_circle.slt.plugin.environment.SltLispEnvironment.SltOutput;
 import com.en_circle.slt.plugin.services.lisp.LispEnvironmentService;
 import com.en_circle.slt.plugin.services.lisp.LispEnvironmentService.LispEnvironmentListener;
-import com.en_circle.slt.plugin.services.lisp.components.SltBreakpoint.SltBreakpointType;
 import com.en_circle.slt.plugin.swank.SlimeRequest;
 import com.en_circle.slt.plugin.swank.requests.Eval;
 import com.en_circle.slt.plugin.ui.debug.SltBreakpointProperties;
@@ -52,13 +51,7 @@ public class SltBreakpointContainer implements LispEnvironmentListener {
 
     private SltBreakpoint getBreakpoint(XBreakpoint<SltBreakpointProperties> nativeBreakpoint) {
         SltBreakpointProperties p = nativeBreakpoint.getProperties();
-        SltBreakpoint breakpoint = new SltBreakpoint(getBreakpointSymbol(p.packageName, p.symbolName));
-        if (p.fletType != null) {
-            breakpoint.setParentBindType(p.fletType);
-            breakpoint.setParentSymbol(getBreakpointSymbol(p.ppackageName, p.psymbolName));
-            breakpoint.setType(SltBreakpointType.INNER);
-        }
-        return breakpoint;
+        return new SltBreakpoint(getBreakpointSymbol(p.packageName, p.symbolName));
     }
 
     public void onUpdate(XBreakpoint<SltBreakpointProperties> nativeBreakpoint) {
@@ -112,11 +105,6 @@ public class SltBreakpointContainer implements LispEnvironmentListener {
             case STANDARD -> {
                 return Eval.eval("(slt-core:install-breakpoint '" + breakpoint.getSymbol() + ")", r -> installResult(r, breakpoint));
             }
-            case INNER -> {
-                return Eval.eval("(slt-core:install-inner-breakpoint '" + breakpoint.getSymbol()
-                        + " '" + breakpoint.getParentSymbol() + " '" + breakpoint.getParentBindType()
-                        + ")", r -> installResult(r, breakpoint));
-            }
             case METHOD -> {
                 // TODO
                 return null;
@@ -144,11 +132,6 @@ public class SltBreakpointContainer implements LispEnvironmentListener {
         switch (breakpoint.getType()) {
             case STANDARD -> {
                 return Eval.eval("(slt-core:uninstall-breakpoint '" + breakpoint.getSymbol() + ")", r -> uninstallResult(r, breakpoint));
-            }
-            case INNER -> {
-                return Eval.eval("(slt-core:uninstall-inner-breakpoint '" + breakpoint.getSymbol()
-                        + " '" + breakpoint.getParentSymbol() + " '" + breakpoint.getParentBindType()
-                        + ")", r -> uninstallResult(r, breakpoint));
             }
             case METHOD -> {
                 // TODO

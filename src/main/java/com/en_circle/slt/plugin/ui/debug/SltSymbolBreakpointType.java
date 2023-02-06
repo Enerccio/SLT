@@ -90,31 +90,17 @@ public class SltSymbolBreakpointType extends XLineBreakpointType<SltBreakpointPr
                                                 if (sexprs.size() > 1) {
                                                     addIfSymbol(sexprs.get(1), infoList, offset, endoffset, SymbolType.MACRO, head.getName());
                                                 }
-                                            } else if ("defmethod".equalsIgnoreCase(head.getName())) {
-                                                // TODO: handle method special stuff to get tracing working correctly and not just on defgeneric level
-                                                if (sexprs.size() > 1) {
-                                                    addIfSymbol(sexprs.get(1), infoList, offset, endoffset, SymbolType.METHOD, head.getName());
-                                                    if (sexprs.size() > 2) {
-                                                        addIfSymbol(sexprs.get(2), infoList, offset, endoffset, SymbolType.METHOD, head.getName());
-                                                    }
-                                                }
-                                            } else if ("flet".equalsIgnoreCase(head.getName()) ||
-                                                    "labels".equalsIgnoreCase(head.getName())) {
-                                                // macrolet not supported in SBCL :(
-                                                if (sexprs.size() > 1) {
-                                                    if (sexprs.get(1).getDatum() != null && Objects.requireNonNull(sexprs.get(1).getDatum()).getList() != null) {
-                                                        LispList funcdefList = Objects.requireNonNull(Objects.requireNonNull(sexprs.get(1).getDatum()).getList());
-                                                        for (LispSexpr sexpr : funcdefList.getSexprList()) {
-                                                            if (sexpr.getDatum() != null && sexpr.getDatum().getList() != null) {
-                                                                LispList definition = sexpr.getDatum().getList();
-                                                                if (definition.getSexprList().size() > 0) {
-                                                                    addIfSymbol(definition.getSexprList().get(0), infoList, offset, endoffset, SymbolType.FUNCTION, head.getName());
-                                                                }
-                                                            }
-                                                        }
-                                                    }
-                                                }
                                             }
+                                            // TODO
+//                                            } else if ("defmethod".equalsIgnoreCase(head.getName())) {
+//                                                // TODO: handle method special stuff to get tracing working correctly and not just on defgeneric level
+//                                                if (sexprs.size() > 1) {
+//                                                    addIfSymbol(sexprs.get(1), infoList, offset, endoffset, SymbolType.METHOD, head.getName());
+//                                                    if (sexprs.size() > 2) {
+//                                                        addIfSymbol(sexprs.get(2), infoList, offset, endoffset, SymbolType.METHOD, head.getName());
+//                                                    }
+//                                                }
+//                                            }
 
                                             // TODO: add defclass accessor/setter/getter into the mix!
                                         }
@@ -140,38 +126,7 @@ public class SltSymbolBreakpointType extends XLineBreakpointType<SltBreakpointPr
                 if (soffset >= offset && soffset <= endoffset) {
                     String packageName = LispParserUtil.getPackage(symbol);
                     SltBreakpointInfo info = new SltBreakpointInfo(symbol, packageName, symbolType);
-                    if ("flet".equalsIgnoreCase(headName) || "labels".equalsIgnoreCase(headName)) {
-                        info.fletType = headName.toLowerCase();
-                        LispList list = PsiTreeUtil.getParentOfType(sexpr, LispList.class);
-                        do {
-                            if (list != null) {
-                                List<LispSexpr> sexprs = list.getSexprList();
-                                if (sexprs.size() > 0) {
-                                    if (sexprs.get(0).getDatum() != null &&
-                                            Objects.requireNonNull(sexprs.get(0).getDatum()).getCompoundSymbol() != null) {
-                                        LispSymbol head = Objects.requireNonNull(Objects.requireNonNull(sexprs.get(0).getDatum()).getCompoundSymbol()).getSymbol();
-
-                                        if ("defun".equalsIgnoreCase(head.getName())) {
-                                            if (sexprs.size() > 1) {
-                                                LispSexpr psym = sexprs.get(1);
-                                                if (psym.getDatum() != null) {
-                                                    if (psym.getDatum().getCompoundSymbol() != null) {
-                                                        LispSymbol parentSymbol = psym.getDatum().getCompoundSymbol().getSymbol();
-                                                        info.ppackageName = info.packageName;
-                                                        info.pelement = parentSymbol;
-                                                        infoList.add(info);
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                            list = PsiTreeUtil.getParentOfType(list, LispList.class);
-                        } while (list != null);
-                    } else {
-                        infoList.add(info);
-                    }
+                    infoList.add(info);
                 }
             }
         }
@@ -207,9 +162,6 @@ public class SltSymbolBreakpointType extends XLineBreakpointType<SltBreakpointPr
         private final LispSymbol element;
         private final String packageName;
         private final SymbolType symbolType;
-        private String fletType;
-        private LispSymbol pelement;
-        private String ppackageName;
 
         private SltBreakpointInfo(@NotNull LispSymbol element, String packageName, SymbolType symbolType) {
             this.element = element;
@@ -243,9 +195,6 @@ public class SltSymbolBreakpointType extends XLineBreakpointType<SltBreakpointPr
             properties.symbolName = element.getName();
             properties.packageName = packageName;
             properties.symbolType = symbolType;
-            properties.psymbolName = pelement == null ? null : pelement.getName();
-            properties.ppackageName = ppackageName;
-            properties.fletType = fletType;
             properties.file = element.getContainingFile().getVirtualFile().getUrl();
             properties.offset = element.getTextOffset();
 

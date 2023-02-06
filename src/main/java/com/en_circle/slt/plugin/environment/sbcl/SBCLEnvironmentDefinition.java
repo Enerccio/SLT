@@ -25,6 +25,7 @@ public class SBCLEnvironmentDefinition extends EnvironmentDefinition {
         features.add(LispFeatures.MACROEXPAND);
         features.add(LispFeatures.FRAME_EVAL);
         features.add(LispFeatures.DEBUGGER_ACTION_ARGLIST);
+        features.add(LispFeatures.BREAKPOINTS);
         features.add(LispFeatures.INSPECTOR);
         features.add(LispFeatures.INSPECTOR_HISTORY);
         features.add(LispFeatures.AUTOCOMPLETE);

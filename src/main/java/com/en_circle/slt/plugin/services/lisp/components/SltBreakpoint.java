@@ -12,13 +12,9 @@ import java.util.Set;
 
 public class SltBreakpoint implements Comparable<SltBreakpoint> {
     private static final Comparator<SltBreakpoint> COMPARATOR =
-            Comparator.comparing(SltBreakpoint::getSymbol)
-                    .thenComparing(SltBreakpoint::getParentSymbol, Comparator.nullsFirst(String::compareTo))
-                    .thenComparing(SltBreakpoint::getParentBindType, Comparator.nullsFirst(String::compareTo));
+            Comparator.comparing(SltBreakpoint::getSymbol);
 
     private String symbol;
-    private String parentSymbol;
-    private String parentBindType;
     private SltBreakpointType type = SltBreakpointType.STANDARD;
 
     private boolean installed;
@@ -57,22 +53,6 @@ public class SltBreakpoint implements Comparable<SltBreakpoint> {
         this.symbol = symbol;
     }
 
-    public String getParentSymbol() {
-        return parentSymbol;
-    }
-
-    public void setParentSymbol(String parentSymbol) {
-        this.parentSymbol = parentSymbol;
-    }
-
-    public String getParentBindType() {
-        return parentBindType;
-    }
-
-    public void setParentBindType(String parentBindType) {
-        this.parentBindType = parentBindType;
-    }
-
     @Override
     public String toString() {
         return "Breakpoint(" + symbol + ")";
@@ -86,17 +66,12 @@ public class SltBreakpoint implements Comparable<SltBreakpoint> {
         SltBreakpoint that = (SltBreakpoint) o;
 
         if (!Objects.equals(symbol, that.symbol)) return false;
-        if (!Objects.equals(parentSymbol, that.parentSymbol)) return false;
-        if (!Objects.equals(parentBindType, that.parentBindType))
-            return false;
         return type == that.type;
     }
 
     @Override
     public int hashCode() {
         int result = symbol != null ? symbol.hashCode() : 0;
-        result = 31 * result + (parentSymbol != null ? parentSymbol.hashCode() : 0);
-        result = 31 * result + (parentBindType != null ? parentBindType.hashCode() : 0);
         result = 31 * result + (type != null ? type.hashCode() : 0);
         return result;
     }
@@ -117,7 +92,7 @@ public class SltBreakpoint implements Comparable<SltBreakpoint> {
 
     public enum SltBreakpointType {
 
-        STANDARD, INNER, METHOD
+        STANDARD, METHOD
 
     }
 }
