@@ -186,11 +186,6 @@ public class SltCoreWindow implements LispEnvironmentListener, Disposable {
         }
 
         @Override
-        public @NotNull ActionUpdateThread getActionUpdateThread() {
-            return ActionUpdateThread.EDT;
-        }
-
-        @Override
         public void update(@NotNull AnActionEvent e) {
             super.update(e);
 
