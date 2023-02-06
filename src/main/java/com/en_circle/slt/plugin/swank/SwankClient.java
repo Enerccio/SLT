@@ -86,20 +86,22 @@ public class SwankClient implements AutoCloseable, Runnable {
                 SwankPacket packet = SwankPacket.fromInput(is);
                 callback.onSwankMessage(packet);
             } catch (ConnectException | InterruptedException e) {
-                e.printStackTrace();
+                callback.onReadError(e);
                 return;
             } catch (IOException e) {
                 if (e instanceof EOFException) {
                     return;
                 }
             } catch (Exception e) {
-                e.printStackTrace();
+                callback.onReadError(e);
             }
         }
     }
 
     public interface SwankReply {
         void onSwankMessage(SwankPacket packet);
+
+        void onReadError(Exception e);
     }
 
 }

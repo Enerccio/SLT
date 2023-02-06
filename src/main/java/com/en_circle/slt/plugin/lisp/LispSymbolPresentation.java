@@ -29,7 +29,7 @@ public class LispSymbolPresentation implements ItemPresentation {
 
     private SymbolState refreshState() {
         return LispEnvironmentService.getInstance(symbol.getProject())
-                .refreshSymbolFromServer(packageName, symbol.getName(), symbol);
+                .refreshSymbolFromServer(packageName, symbol.getName());
     }
 
     @Override

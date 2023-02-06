@@ -2,6 +2,7 @@ package com.en_circle.slt.plugin.ui.debug;
 
 import com.en_circle.slt.plugin.SltBundle;
 import com.en_circle.slt.plugin.SltUIConstants;
+import com.en_circle.slt.plugin.environment.LispFeatures;
 import com.en_circle.slt.plugin.lisp.lisp.LispContainer;
 import com.en_circle.slt.plugin.lisp.lisp.LispElement;
 import com.en_circle.slt.plugin.services.lisp.LispEnvironmentService;
@@ -21,6 +22,7 @@ import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.util.text.HtmlBuilder;
 import com.intellij.openapi.util.text.HtmlChunk;
 import com.intellij.ui.components.JBScrollPane;
+import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -71,15 +73,16 @@ public class SltInspector {
                     .sendToLisp(InspectFrameVar.inspectVariable(BigInteger.valueOf(local.ix), frame, threadId,
                             result -> ApplicationManager.getApplication().invokeLater(() -> processResult(result))));
         } catch (Exception e) {
-            log.warn(SltBundle.message("slt.error.sbclstart"), e);
-            Messages.showErrorDialog(project, e.getMessage(), SltBundle.message("slt.ui.errors.sbcl.start"));
+            log.warn(SltBundle.message("slt.error.start"), e);
+            Messages.showErrorDialog(project, e.getMessage(), SltBundle.message("slt.ui.errors.lisp.start"));
         }
     }
 
     private void processResult(LispElement result) {
         SltInspectedObject parsedResult = null;
         try {
-            parsedResult = new SltInspectedObject((LispContainer) result);
+            parsedResult = LispEnvironmentService.getInstance(project).getOverrides()
+                    .parseInspectedObject((LispContainer) result);
         } catch (Exception ignored) {
             // in case we get garbage we show error
         }
@@ -104,10 +107,18 @@ public class SltInspector {
             if (element.getId() == null) {
                 String[] parts = text.split(Pattern.quote("\n"));
                 for (int i=0; i<parts.length; i++) {
-                    contentBuilder.append(parts[i]);
+                    if (element.isTitled()) {
+                        contentBuilder.append(HtmlChunk.br());
+                        contentBuilder.append(HtmlChunk.tag("b").addText(parts[i]));
+                    } else {
+                        contentBuilder.append(parts[i]);
+                    }
                     if (i < parts.length-1) {
                         contentBuilder.append(HtmlChunk.br());
                     }
+                }
+                if (parts.length == 0 && StringUtils.isNotBlank(text)) {
+                    contentBuilder.append(HtmlChunk.br());
                 }
             } else {
                 contentBuilder.append(HtmlChunk.link(mkLink(inspectedObject, element), text)
@@ -137,8 +148,8 @@ public class SltInspector {
                     .sendToLisp(InspectNth.inspectVariable(ix, threadId, result ->
                             ApplicationManager.getApplication().invokeLater(() -> processResult(result))));
         } catch (Exception e) {
-            log.warn(SltBundle.message("slt.error.sbclstart"), e);
-            Messages.showErrorDialog(project, e.getMessage(), SltBundle.message("slt.ui.errors.sbcl.start"));
+            log.warn(SltBundle.message("slt.error.start"), e);
+            Messages.showErrorDialog(project, e.getMessage(), SltBundle.message("slt.ui.errors.lisp.start"));
         }
     }
 
@@ -155,8 +166,8 @@ public class SltInspector {
                         .sendToLisp(InspectorAction.action(ActionType.GO_BACK, threadId, result ->
                                 ApplicationManager.getApplication().invokeLater(() -> processResult(result))));
             } catch (Exception e) {
-                log.warn(SltBundle.message("slt.error.sbclstart"), e);
-                Messages.showErrorDialog(project, e.getMessage(), SltBundle.message("slt.ui.errors.sbcl.start"));
+                log.warn(SltBundle.message("slt.error.start"), e);
+                Messages.showErrorDialog(project, e.getMessage(), SltBundle.message("slt.ui.errors.lisp.start"));
             }
         }
 
@@ -169,7 +180,8 @@ public class SltInspector {
         public void update(@NotNull AnActionEvent e) {
             super.update(e);
 
-            e.getPresentation().setEnabled(LispEnvironmentService.getInstance(project).getState() == LispEnvironmentState.READY);
+            e.getPresentation().setEnabled(LispEnvironmentService.getInstance(project).getState() == LispEnvironmentState.READY &&
+                    LispEnvironmentService.getInstance(project).hasFeature(LispFeatures.INSPECTOR_HISTORY));
         }
     }
 
@@ -186,8 +198,8 @@ public class SltInspector {
                         .sendToLisp(InspectorAction.action(ActionType.GO_FORWARD, threadId, result ->
                                 ApplicationManager.getApplication().invokeLater(() -> processResult(result))));
             } catch (Exception e) {
-                log.warn(SltBundle.message("slt.error.sbclstart"), e);
-                Messages.showErrorDialog(project, e.getMessage(), SltBundle.message("slt.ui.errors.sbcl.start"));
+                log.warn(SltBundle.message("slt.error.start"), e);
+                Messages.showErrorDialog(project, e.getMessage(), SltBundle.message("slt.ui.errors.lisp.start"));
             }
         }
 
@@ -200,7 +212,8 @@ public class SltInspector {
         public void update(@NotNull AnActionEvent e) {
             super.update(e);
 
-            e.getPresentation().setEnabled(LispEnvironmentService.getInstance(project).getState() ==LispEnvironmentState.READY);
+            e.getPresentation().setEnabled(LispEnvironmentService.getInstance(project).getState() ==LispEnvironmentState.READY &&
+                    LispEnvironmentService.getInstance(project).hasFeature(LispFeatures.INSPECTOR_HISTORY));
         }
     }
 
@@ -217,8 +230,8 @@ public class SltInspector {
                         .sendToLisp(InspectorAction.action(ActionType.REFRESH, threadId, result ->
                                 ApplicationManager.getApplication().invokeLater(() -> processResult(result))));
             } catch (Exception e) {
-                log.warn(SltBundle.message("slt.error.sbclstart"), e);
-                Messages.showErrorDialog(project, e.getMessage(), SltBundle.message("slt.ui.errors.sbcl.start"));
+                log.warn(SltBundle.message("slt.error.start"), e);
+                Messages.showErrorDialog(project, e.getMessage(), SltBundle.message("slt.ui.errors.lisp.start"));
             }
         }
 

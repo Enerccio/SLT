@@ -296,6 +296,31 @@ public class SwankPacket {
         return new SwankPacket(formatted);
     }
 
+    public static SwankPacket dumpThreads(BigInteger continuation) {
+        String formatted = String.format("(:emacs-rex (swank:list-threads) \":CL-USER\" T %s)", continuation);
+        return new SwankPacket(formatted);
+    }
+
+    public static SwankPacket breakThread(BigInteger thread, BigInteger continuation) {
+        String formatted = String.format("(:emacs-rex (swank:debug-nth-thread %s) \":CL-USER\" T %s)", thread, continuation);
+        return new SwankPacket(formatted);
+    }
+
+    public static SwankPacket killThread(BigInteger thread, BigInteger continuation) {
+        String formatted = String.format("(:emacs-rex (swank:kill-nth-thread %s) \":CL-USER\" T %s)", thread, continuation);
+        return new SwankPacket(formatted);
+    }
+
+    public static SwankPacket argslist(String symbol, String packageName, BigInteger continuation) {
+        symbol = StringUtils.replace(symbol, "\\", "\\\\");
+        symbol = StringUtils.replace(symbol, "\"", "\\\"");
+        packageName = StringUtils.replace(packageName, "\\", "\\\\");
+        packageName = StringUtils.replace(packageName, "\"", "\\\"");
+
+        String formatted = String.format("(:emacs-rex (swank:operator-arglist \"%s\" \"%s\") \":CL-USER\" T %s)", symbol, packageName, continuation);
+        return new SwankPacket(formatted);
+    }
+
     private int length;
     private String expressionSource;
 

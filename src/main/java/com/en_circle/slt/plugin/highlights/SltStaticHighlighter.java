@@ -25,7 +25,8 @@ public class SltStaticHighlighter extends SyntaxHighlighterBase {
         SyntaxHighlighterBase.fillMap(colors, SltHighlighterColors.SUGAR,
                 LispTypes.FUNCTION, LispTypes.UNINTERN, LispTypes.REFERENCE_SET, LispTypes.REFERENCE_LABEL,
                 LispTypes.TEST_SUCCESS, LispTypes.TEST_FALURE, LispTypes.EVAL_VALUE, LispTypes.ARRAY_START,
-                LispTypes.PATHNAME_INDICATOR, LispTypes.STRUCTURE_TOKEN);
+                LispTypes.PATHNAME_INDICATOR, LispTypes.STRUCTURE_TOKEN, LispTypes.UNQUOTE, LispTypes.UNQUOTE_SPLICE,
+                LispTypes.BACKQUOTE, LispTypes.QUOTE);
     }
 
     @Override
@@ -37,4 +38,5 @@ public class SltStaticHighlighter extends SyntaxHighlighterBase {
     public TextAttributesKey @NotNull [] getTokenHighlights(IElementType tokenType) {
         return SyntaxHighlighterBase.pack(colors.get(tokenType));
     }
+
 }

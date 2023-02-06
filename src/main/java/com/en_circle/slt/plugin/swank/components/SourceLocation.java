@@ -13,8 +13,9 @@ public class SourceLocation {
 
     }
 
-    public SourceLocation(LispContainer src) {
+    public SourceLocation(LispElement srcElement) {
         try {
+            LispContainer src = (LispContainer) srcElement;
             if (src.getItems().get(0).equals(new LispSymbol(":location"))) {
                 for (int i=1; i<src.getItems().size(); i++) {
                     LispContainer trait = (LispContainer) src.getItems().get(i);

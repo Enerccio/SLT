@@ -2,9 +2,36 @@
 
 ### Added
 
+- Support for multiple lisp interprets
+- ABCL Support
+- CCL Support
+
 ### Fixes
 
-## 0.3.0 - 230108
+- Fixed parser issue with dot 
+
+### Changes
+
+- Feature list for each interpret changes availability of functions in IDE
+
+## 0.3.1 230203
+
+### Added
+
+- Thread list with actions
+- Showing function parameters with ctrl+p
+
+### Changes
+
+- SLT library is now formatted into multiple chunks
+- Grammar now properly reacts to user errors or unfinished forms
+
+### Fixes
+
+- Fixed tests 
+- Speed optimizations
+
+## 0.3.0 230108
 
 ### Added
 

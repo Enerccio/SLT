@@ -7,20 +7,21 @@ import com.en_circle.slt.plugin.services.lisp.LispEnvironmentService;
 import com.en_circle.slt.plugin.services.lisp.LispEnvironmentService.LispEnvironmentState;
 import com.en_circle.slt.plugin.swank.components.SourceLocation;
 import com.en_circle.slt.plugin.swank.requests.EvalAndGrab;
+import com.en_circle.slt.tools.SltApplicationUtils;
 import com.google.common.collect.Lists;
-import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.psi.PsiElement;
-import com.intellij.util.FileContentUtilCore;
+import com.intellij.util.Consumer;
+import com.intellij.util.concurrency.FutureResult;
 import org.apache.commons.lang3.StringUtils;
 
-import java.lang.ref.WeakReference;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class SltLispEnvironmentSymbolCache extends Thread {
+
+    // TODO: Rewrite with events, if possible
 
     private final Map<String, SymbolState> symbolInformation = Collections.synchronizedMap(new HashMap<>());
     private final List<SymbolState> symbolRefreshQueue = Collections.synchronizedList(new ArrayList<>());
@@ -32,7 +33,7 @@ public class SltLispEnvironmentSymbolCache extends Thread {
         this.project = project;
 
         setDaemon(true);
-        setName("SBCL Symbol Cache Thread");
+        setName("SLT Symbol Cache Thread");
     }
 
     @Override
@@ -66,12 +67,9 @@ public class SltLispEnvironmentSymbolCache extends Thread {
         active = false;
     }
 
-    public SymbolState refreshSymbolFromServer(String packageName, String symbolName, PsiElement element) {
+    public SymbolState refreshSymbolFromServer(String packageName, String symbolName) {
         SymbolState state = getOrCreateBinding(packageName, symbolName);
         SymbolState undefinedSymbol = getOrCreateBinding(null, symbolName);
-        if (element != null) {
-            state.containerFiles.add(new WeakReference<>(element.getContainingFile().getVirtualFile()));
-        }
         SymbolBinding currentBinding = state.binding;
         if (currentBinding == SymbolBinding.NONE) {
             symbolRefreshQueue.add(state);
@@ -83,6 +81,26 @@ public class SltLispEnvironmentSymbolCache extends Thread {
         }
 
         return state;
+    }
+
+    private void refreshBatchedSymbols(BatchedSymbolRefreshAction action, Consumer<Boolean> onFinish) {
+        HashSet<SymbolState> duplicityState = new HashSet<>();
+        List<SymbolState> withoutDuplicity = action.states.stream()
+                .filter(s -> {
+                    boolean isDuplicit = duplicityState.contains(s);
+                    duplicityState.add(s);
+                    return !isDuplicit;
+                }).filter(this::removeBad).collect(Collectors.toList());
+
+        try {
+            if (LispEnvironmentService.getInstance(project).getState() == LispEnvironmentState.READY) {
+                refreshSymbolsBatched(withoutDuplicity, onFinish);
+            } else {
+                onFinish.consume(true);
+            }
+        } catch (Exception e) {
+            onFinish.consume(false);
+        }
     }
 
     private SymbolState getOrCreateBinding(String packageName, String symbolName) {
@@ -135,6 +153,10 @@ public class SltLispEnvironmentSymbolCache extends Thread {
     }
 
     private void refreshSymbolsBatched(List<SymbolState> refreshStates) throws Exception {
+        refreshSymbolsBatched(refreshStates, null);
+    }
+
+    private void refreshSymbolsBatched(List<SymbolState> refreshStates, Consumer<Boolean> requestFinished) throws Exception {
         String request = "(" +
                 refreshStates.stream().map(x -> x.name.toUpperCase() + " ").collect(Collectors.joining()) + ")";
         request = StringUtils.replace(request, "\"", "\\\"");
@@ -144,7 +166,6 @@ public class SltLispEnvironmentSymbolCache extends Thread {
                         "(slt-core:analyze-symbols (slt-core:read-fix-packages \"%s\"))",
                         request),
                 LispEnvironmentService.getInstance(project).getGlobalPackage(), true, (result, stdout, parsed) -> {
-                    Set<VirtualFile> toRefresh = new HashSet<>();
                     if (parsed.size() == 1 && parsed.get(0).getType() == LispElementType.CONTAINER) {
                         int ix = 0;
                         LispContainer data = (LispContainer) parsed.get(0);
@@ -160,89 +181,96 @@ public class SltLispEnvironmentSymbolCache extends Thread {
                             SymbolState state = refreshStates.get(ix++);
                             if (state != null) {
                                 String symValue = ((LispSymbol) list.getItems().get(1)).getValue().toUpperCase();
-                                boolean changed = false;
                                 state.timestamp = System.currentTimeMillis();
                                 switch (symValue) {
                                     case ":CLASS":
-                                        changed |= state.binding != SymbolBinding.CLASS;
                                         state.binding = SymbolBinding.CLASS;
                                         break;
                                     case ":METHOD":
-                                        changed |= state.binding != SymbolBinding.METHOD;
                                         state.binding = SymbolBinding.METHOD;
                                         break;
                                     case ":SPECIAL-FORM":
-                                        changed |= state.binding != SymbolBinding.SPECIAL_FORM;
                                         state.binding = SymbolBinding.SPECIAL_FORM;
                                         break;
                                     case ":MACRO":
-                                        changed |= state.binding != SymbolBinding.MACRO;
                                         state.binding = SymbolBinding.MACRO;
                                         break;
                                     case ":FUNCTION":
-                                        changed |= state.binding != SymbolBinding.FUNCTION;
                                         state.binding = SymbolBinding.FUNCTION;
                                         break;
                                     case ":CONSTANT":
-                                        changed |= state.binding != SymbolBinding.CONSTANT;
                                         state.binding = SymbolBinding.CONSTANT;
                                         break;
                                     case ":KEYWORD":
-                                        changed |= state.binding != SymbolBinding.KEYWORD;
                                         state.binding = SymbolBinding.KEYWORD;
                                         break;
                                     case ":SPECIAL":
-                                        changed |= state.binding != SymbolBinding.SPECIAL_VARIABLE;
                                         state.binding = SymbolBinding.SPECIAL_VARIABLE;
                                         break;
                                     default:
-                                        changed |= state.binding != SymbolBinding.NONE;
                                         state.binding = SymbolBinding.NONE;
                                         break;
                                 }
-                                boolean hasDoc = state.documentation != null;
                                 state.documentation = null;
                                 if (list.getItems().get(2) instanceof LispString) {
                                     state.documentation = ((LispString) list.getItems().get(2)).getValue();
-                                    if (!hasDoc) {
-                                        changed = true;
-                                    }
                                 }
 
                                 if (list.getItems().get(3) instanceof LispContainer) {
                                     SourceLocation location = new SourceLocation((LispContainer) list.getItems().get(3));
                                     if (!state.location.equals(location)) {
                                         state.location = location;
-                                        changed = true;
                                     }
-                                }
-
-                                if (changed) {
-                                    for (WeakReference<VirtualFile> wvf : state.containerFiles) {
-                                        VirtualFile vf = wvf.get();
-                                        if (vf != null) {
-                                            toRefresh.add(vf);
-                                        }
-                                    }
-                                    state.containerFiles.clear();
                                 }
                             }
                         }
                     }
 
-                    if (!toRefresh.isEmpty()) {
-                        ApplicationManager.getApplication().invokeLater(() -> {
-                            for (VirtualFile vf : toRefresh) {
-                                FileContentUtilCore.reparseFiles(vf);
-                            }
-                        });
+                    if (requestFinished != null) {
+                        requestFinished.consume(true);
                     }
-                }), false);
+                }), false, () -> {
+            if (requestFinished != null) {
+                requestFinished.consume(false);
+            }
+        });
     }
 
     public void clear() {
         symbolInformation.clear();
         symbolRefreshQueue.clear();
     }
+
+    public BatchedSymbolRefreshAction createNewBatch() {
+        return new BatchedSymbolRefreshAction();
+    }
+
+    public class BatchedSymbolRefreshAction {
+
+        private final List<SymbolState> states = new ArrayList<>();
+
+        public BatchedSymbolRefreshAction() {
+
+        }
+
+        public boolean getResult() {
+            return SltApplicationUtils.processAsync(() -> {
+                FutureResult<Boolean> waitForResult = new FutureResult<>();
+                refreshBatchedSymbols(this, waitForResult::set);
+                try {
+                    return waitForResult.get(200, TimeUnit.SECONDS);
+                } catch (Exception e) {
+                    return false;
+                }
+            });
+        }
+
+        public void add(String name, String packageName) {
+            states.add(getOrCreateBinding(packageName, name));
+            states.add(getOrCreateBinding(null, name));
+        }
+
+    }
+
 
 }

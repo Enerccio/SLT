@@ -2,6 +2,7 @@ package com.en_circle.slt.plugin.ui.debug;
 
 import com.en_circle.slt.plugin.SltBundle;
 import com.en_circle.slt.plugin.SltUIConstants;
+import com.en_circle.slt.plugin.environment.LispFeatures;
 import com.en_circle.slt.plugin.lisp.lisp.*;
 import com.en_circle.slt.plugin.services.lisp.LispEnvironmentService;
 import com.en_circle.slt.plugin.swank.requests.FrameLocalsAndCatchTags;
@@ -56,32 +57,36 @@ public class SltFrameInfo {
     private void create() {
         tabs = new JBTabsImpl(project);
 
-        localsTable = new JBTable(new FrameTableModel(new ArrayList<>()));
+        localsTable = new JBTable(new FrameListTableModel(new ArrayList<>()));
         localsTable.setFillsViewportHeight(true);
         localsTable.setFocusable(false);
         localsTable.setRowSelectionAllowed(false);
-        localsTable.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                int row = localsTable.rowAtPoint(e.getPoint());
-                if (row >= 0) {
-                    int column = localsTable.columnAtPoint(e.getPoint());
-                    if (column == 0) {
-                        FrameTableModel model = (FrameTableModel) localsTable.getModel();
-                        openInspector(model.locals.get(row));
+        if (LispEnvironmentService.getInstance(project).hasFeature(LispFeatures.INSPECTOR)) {
+            localsTable.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseClicked(MouseEvent e) {
+                    int row = localsTable.rowAtPoint(e.getPoint());
+                    if (row >= 0) {
+                        int column = localsTable.columnAtPoint(e.getPoint());
+                        if (column == 0) {
+                            FrameListTableModel model = (FrameListTableModel) localsTable.getModel();
+                            openInspector(model.locals.get(row));
+                        }
                     }
                 }
-            }
-        });
+            });
+        }
         resetRenderer();
 
         TabInfo locals = new TabInfo(new JBScrollPane(localsTable));
         locals.setText(SltBundle.message("slt.ui.debugger.frame.locals"));
         tabs.addTab(locals);
 
-        SltFrameConsole frameConsole = new SltFrameConsole(project, threadId, frameId, this::reloadLocals, module);
-        TabInfo consoleTab = frameConsole.create();
-        tabs.addTab(consoleTab);
+        if (LispEnvironmentService.getInstance(project).hasFeature(LispFeatures.FRAME_EVAL)) {
+            SltFrameConsole frameConsole = new SltFrameConsole(project, threadId, frameId, this::reloadLocals, module);
+            TabInfo consoleTab = frameConsole.create();
+            tabs.addTab(consoleTab);
+        }
 
         inspector = new SltInspector(project, threadId);
         inspectorTab = new TabInfo(new JBScrollPane(inspector.getContent()));
@@ -97,11 +102,13 @@ public class SltFrameInfo {
             public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
                 super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
 
-                Map<TextAttribute, Object> attributes = new HashMap<>(getFont().getAttributes());
-                attributes.put(TextAttribute.UNDERLINE, TextAttribute.UNDERLINE_ON);
-                setFont(getFont().deriveFont(attributes));
-                setForeground(SltUIConstants.HYPERLINK_COLOR);
-                setCursor(new Cursor(Cursor.HAND_CURSOR));
+                if (LispEnvironmentService.getInstance(project).hasFeature(LispFeatures.INSPECTOR)) {
+                    Map<TextAttribute, Object> attributes = new HashMap<>(getFont().getAttributes());
+                    attributes.put(TextAttribute.UNDERLINE, TextAttribute.UNDERLINE_ON);
+                    setFont(getFont().deriveFont(attributes));
+                    setForeground(SltUIConstants.HYPERLINK_COLOR);
+                    setCursor(new Cursor(Cursor.HAND_CURSOR));
+                }
 
                 return this;
             }
@@ -121,8 +128,8 @@ public class SltFrameInfo {
                 });
             }), false);
         } catch (Exception e) {
-            log.warn(SltBundle.message("slt.error.sbclstart"), e);
-            Messages.showErrorDialog(project, e.getMessage(), SltBundle.message("slt.ui.errors.sbcl.start"));
+            log.warn(SltBundle.message("slt.error.start"), e);
+            Messages.showErrorDialog(project, e.getMessage(), SltBundle.message("slt.ui.errors.lisp.start"));
         }
     }
 
@@ -152,10 +159,10 @@ public class SltFrameInfo {
                     parsedLocals.add(l);
                 }
             }
-            localsTable.setModel(new FrameTableModel(parsedLocals));
+            localsTable.setModel(new FrameListTableModel(parsedLocals));
             resetRenderer();
         } else {
-            localsTable.setModel(new FrameTableModel(new ArrayList<>()));
+            localsTable.setModel(new FrameListTableModel(new ArrayList<>()));
             resetRenderer();
         }
     }
@@ -168,11 +175,11 @@ public class SltFrameInfo {
 
     }
 
-    private static class FrameTableModel extends AbstractTableModel {
+    private static class FrameListTableModel extends AbstractTableModel {
 
         private final List<Local> locals;
 
-        private FrameTableModel(List<Local> locals) {
+        private FrameListTableModel(List<Local> locals) {
             this.locals = locals;
         }
 

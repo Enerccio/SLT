@@ -2,6 +2,7 @@ package com.en_circle.slt.plugin.autocomplete;
 
 import com.en_circle.slt.plugin.SymbolState;
 import com.en_circle.slt.plugin.SymbolState.SymbolBinding;
+import com.en_circle.slt.plugin.environment.LispFeatures;
 import com.en_circle.slt.plugin.lisp.LispParserUtil;
 import com.en_circle.slt.plugin.lisp.lisp.LispContainer;
 import com.en_circle.slt.plugin.lisp.lisp.LispElement;
@@ -28,7 +29,8 @@ public class HeadCompletionProvider extends CompletionProvider<CompletionParamet
         Project project = parameters.getEditor().getProject();
         assert project != null;
 
-        if (LispEnvironmentService.getInstance(project).getState() == LispEnvironmentState.READY) {
+        if (LispEnvironmentService.getInstance(project).getState() == LispEnvironmentState.READY &&
+                LispEnvironmentService.getInstance(project).hasFeature(LispFeatures.AUTOCOMPLETE)) {
             String startedSymbol = result.getPrefixMatcher().getPrefix();
             String packageName = LispParserUtil.getPackage(parameters.getOriginalFile(), parameters.getOffset());
             List<LookupElementBuilder> builderList = SltApplicationUtils.getAsyncResultNoThrow(project, finishRequest -> SimpleCompletion
@@ -40,7 +42,7 @@ public class HeadCompletionProvider extends CompletionProvider<CompletionParamet
                                     for (LispElement element : innerList.getItems()) {
                                         if (element instanceof LispString str) {
                                             SymbolState state = LispEnvironmentService.getInstance(project)
-                                                    .refreshSymbolFromServer(null, str.getValue(), null);
+                                                    .refreshSymbolFromServer(null, str.getValue());
                                             LookupElementBuilder builder = LookupElementBuilder.create(str.getValue());
                                             if (state.binding == SymbolBinding.MACRO) {
                                                 builder = builder.withIcon(Nodes.Template);

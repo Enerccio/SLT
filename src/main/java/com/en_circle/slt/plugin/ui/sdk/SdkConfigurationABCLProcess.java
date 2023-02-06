@@ -2,7 +2,9 @@ package com.en_circle.slt.plugin.ui.sdk;
 
 import com.en_circle.slt.plugin.SltBundle;
 import com.en_circle.slt.plugin.sdk.LispSdk;
-import com.en_circle.slt.tools.SBCLUtils;
+import com.en_circle.slt.plugin.ui.SltGlobalUIService;
+import com.en_circle.slt.plugin.ui.sdk.SdkDialogProvider.OnSave;
+import com.en_circle.slt.tools.ABCLUtils;
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.fileChooser.FileChooserDescriptor;
 import com.intellij.openapi.fileChooser.FileChooserFactory;
@@ -23,14 +25,12 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
-import javax.swing.border.Border;
 import javax.swing.event.CaretListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.io.File;
-import java.util.Objects;
 
-public class SdkConfiguration extends DialogWrapper {
+public class SdkConfigurationABCLProcess extends DialogWrapper {
 
     private final Disposable parentDisposable;
     private final LispSdk instance;
@@ -38,15 +38,15 @@ public class SdkConfiguration extends DialogWrapper {
     private boolean isVerified = false;
 
     private JBTextField name;
-    private FileTextField sbclExecutable;
-    private FileTextField sbclCore;
+    private FileTextField jvmExecutable;
+    private JBTextField jvmArguments;
+    private FileTextField jar;
     private FileTextField quicklispPath;
-    private Border baseBorder;
 
-    protected SdkConfiguration(@NotNull Component parent, LispSdk instance, String title, OnSave onSave) {
+    public SdkConfigurationABCLProcess(@NotNull Component parent, LispSdk instance, String title, OnSave onSave) {
         super(parent, true);
 
-        this.parentDisposable = Objects.requireNonNull(DialogWrapper.findInstanceFromFocus()).getDisposable();
+        this.parentDisposable = SltGlobalUIService.getInstance();
         this.instance = instance;
         this.onSave = onSave;
 
@@ -61,50 +61,53 @@ public class SdkConfiguration extends DialogWrapper {
         name.addCaretListener(createChangeListener());
         name.setText(instance.userName);
         if (StringUtils.isBlank(instance.userName)) {
-            name.setText(SltBundle.message("slt.ui.settings.sdk.editor.name.default"));
+            name.setText(SltBundle.message("slt.ui.settings.sdk.editor.name.abcl.default"));
         }
 
         FileChooserDescriptor descriptor = new FileChooserDescriptor(true, false, false,
                         false, false, false);
+        FileChooserDescriptor descriptorJar = new FileChooserDescriptor(true, false, true,
+                true, false, false);
 
-        sbclExecutable = FileChooserFactory.getInstance()
+        jvmExecutable = FileChooserFactory.getInstance()
                 .createFileTextField(descriptor, true, parentDisposable);
-        sbclExecutable.getField().addCaretListener(createChangeListener());
-        sbclExecutable.getField().setText(instance.sbclExecutable);
-        sbclCore = FileChooserFactory.getInstance()
-                .createFileTextField(descriptor, true, parentDisposable);
-        sbclCore.getField().addCaretListener(createChangeListener());
-        sbclCore.getField().setText(instance.sbclCorePath);
+        jvmExecutable.getField().addCaretListener(createChangeListener());
+        jvmExecutable.getField().setText(instance.abclJvm);
+        jvmArguments = new JBTextField();
+        jvmArguments.addCaretListener(createChangeListener());
+        jvmArguments.setText(instance.abclJvmArgs);
+        jar = FileChooserFactory.getInstance()
+                .createFileTextField(descriptorJar, true, parentDisposable);
+        jar.getField().addCaretListener(createChangeListener());
+        jar.getField().setText(instance.abclJar);
         quicklispPath = FileChooserFactory.getInstance()
                 .createFileTextField(descriptor, true, parentDisposable);
         quicklispPath.getField().addCaretListener(createChangeListener());
         quicklispPath.getField().setText(instance.quickLispPath);
 
-        TextFieldWithBrowseButton sbclExecutablePicker = new TextFieldWithBrowseButton(sbclExecutable.getField());
-        sbclExecutablePicker.addBrowseFolderListener(
-                SltBundle.message("slt.ui.settings.sdk.editor.executable.select"), "", null, descriptor);
-        TextFieldWithBrowseButton sbclCorePicker = new TextFieldWithBrowseButton(sbclCore.getField());
-        sbclCorePicker.addBrowseFolderListener(
-                SltBundle.message("slt.ui.settings.sdk.editor.core.select"), "", null, descriptor);
+        TextFieldWithBrowseButton abclExecutablePicker = new TextFieldWithBrowseButton(jvmExecutable.getField());
+        abclExecutablePicker.addBrowseFolderListener(
+                SltBundle.message("slt.ui.settings.sdk.editor.jvm.select"), "", null, descriptor);
+        TextFieldWithBrowseButton abclJarPicker = new TextFieldWithBrowseButton(jar.getField());
+        abclJarPicker.addBrowseFolderListener(
+                SltBundle.message("slt.ui.settings.sdk.editor.abcl.select"), "", null, descriptorJar);
         TextFieldWithBrowseButton quicklispPathPicker = new TextFieldWithBrowseButton(quicklispPath.getField());
         //noinspection DialogTitleCapitalization
         quicklispPathPicker.addBrowseFolderListener(
                 SltBundle.message("slt.ui.settings.sdk.editor.quicklisp.select"), "", null, descriptor);
 
-        JPanel panel = new FormBuilder()
+        return new FormBuilder()
                 .addLabeledComponent(SltBundle.message("slt.ui.settings.sdk.editor.name"), name, 1, false)
-                .addLabeledComponent(SltBundle.message("slt.ui.settings.sdk.editor.executable"),
-                        sbclExecutablePicker, 1, false)
-                .addLabeledComponent(SltBundle.message("slt.ui.settings.sdk.editor.core"),
-                        sbclCorePicker, 1, false)
+                .addLabeledComponent(SltBundle.message("slt.ui.settings.sdk.editor.abcl.jvm.executable"),
+                        abclExecutablePicker, 1, false)
+                .addLabeledComponent(SltBundle.message("slt.ui.settings.sdk.editor.abcl.jvm.args"),
+                        jvmArguments, 1, false)
+                .addLabeledComponent(SltBundle.message("slt.ui.settings.sdk.editor.abcl.jar"),
+                        abclJarPicker, 1, false)
                 .addLabeledComponent(SltBundle.message("slt.ui.settings.sdk.editor.quicklisp"),
                         quicklispPathPicker, 1, false)
                 .addComponentFillVertically(new JPanel(), 0)
                 .getPanel();
-
-        baseBorder = name.getBorder();
-
-        return panel;
     }
 
     private CaretListener createChangeListener() {
@@ -113,8 +116,8 @@ public class SdkConfiguration extends DialogWrapper {
 
     private void verifySdk() {
         name.putClientProperty("JComponent.outline", null);
-        sbclExecutable.getField().putClientProperty("JComponent.outline", null);
-        sbclCore.getField().putClientProperty("JComponent.outline", null);
+        jvmExecutable.getField().putClientProperty("JComponent.outline", null);
+        jar.getField().putClientProperty("JComponent.outline", null);
         quicklispPath.getField().putClientProperty("JComponent.outline", null);
 
         boolean verified = true;
@@ -124,18 +127,20 @@ public class SdkConfiguration extends DialogWrapper {
             name.putClientProperty("JComponent.outline", "error");
         }
 
-        String executable = sbclExecutable.getField().getText();
-        if (StringUtils.isBlank(executable)) {
+        String jvm = jvmExecutable.getField().getText();
+        if (StringUtils.isBlank(jvm)) {
             verified = false;
-            sbclExecutable.getField().putClientProperty("JComponent.outline", "error");
+            jvmExecutable.getField().putClientProperty("JComponent.outline", "error");
         }
 
-        String core = sbclCore.getField().getText();
-        if (StringUtils.isNotBlank(core)) {
-            File file = new File(core);
+        String jvmArgs = jvmArguments.getText();
+
+        String jar = this.jar.getField().getText();
+        if (StringUtils.isNotBlank(jar)) {
+            File file = new File(jar);
             if (!file.exists()) {
                 verified = false;
-                sbclCore.getField().putClientProperty("JComponent.outline", "error");
+                this.jar.getField().putClientProperty("JComponent.outline", "error");
             }
         }
 
@@ -152,27 +157,27 @@ public class SdkConfiguration extends DialogWrapper {
         }
 
         name.repaint();
-        sbclExecutable.getField().repaint();
-        sbclCore.getField().repaint();
+        jvmExecutable.getField().repaint();
+        this.jar.getField().repaint();
         quicklispPath.getField().repaint();
 
         if (verified)
-            verified = checkAndLoadSbclCore(executable, core, quicklisp);
+            verified = checkAndLoadAbclCore(jvm, jvmArgs, jar, quicklisp);
         if (!verified) {
-            Messages.showErrorDialog(SltBundle.message("slt.ui.settings.sdk.editor.verifying.error"),
+            Messages.showErrorDialog(SltBundle.message("slt.ui.settings.sdk.editor.abcl.process.verifying.error"),
                     SltBundle.message("slt.ui.settings.sdk.editor.verifying.error.title"));
         }
 
         isVerified = verified;
     }
 
-    private boolean checkAndLoadSbclCore(String executable, String core, String quicklisp) {
+    private boolean checkAndLoadAbclCore(String jvm, String jvmArgs, String jar, String quicklisp) {
         ProgressWindow verifyWindow = new ProgressWindow(true, false, null,
                 getRootPane(), SltBundle.message("slt.ui.settings.sdk.editor.verifying.cancel"));
-        verifyWindow.setTitle(SltBundle.message("slt.ui.settings.sdk.editor.verifying"));
+        verifyWindow.setTitle(SltBundle.message("slt.ui.settings.sdk.editor.verifying.abcl"));
         Disposer.register(parentDisposable, verifyWindow);
 
-        ProgressResult<Boolean> result = new ProgressRunner<>(pi -> verifySbcl(pi, executable, core, quicklisp))
+        ProgressResult<Boolean> result = new ProgressRunner<>(pi -> verifyAbcl(pi, jvm, jvmArgs, jar, quicklisp))
                 .sync()
                 .onThread(ThreadToUse.POOLED)
                 .withProgress(verifyWindow)
@@ -181,14 +186,15 @@ public class SdkConfiguration extends DialogWrapper {
         return Boolean.TRUE.equals(result.getResult());
     }
 
-    private boolean verifySbcl(ProgressIndicator pi, String executable, String core, String quicklisp) {
-        return SBCLUtils.verifyAndInstallDependencies(executable, core, quicklisp, pi);
+    private boolean verifyAbcl(ProgressIndicator pi, String jvm, String jvmArgs, String jar, String quicklisp) {
+        return ABCLUtils.verifyAndInstallDependencies(jvm, jvmArgs, jar, quicklisp, pi);
     }
 
     private void save() {
         instance.userName = name.getText();
-        instance.sbclExecutable = sbclExecutable.getField().getText();
-        instance.sbclCorePath = sbclCore.getField().getText();
+        instance.abclJvm = jvmExecutable.getField().getText();
+        instance.abclJvmArgs = jvmArguments.getText();
+        instance.abclJar = jar.getField().getText();
         instance.quickLispPath = quicklispPath.getField().getText();
         onSave.saveAction(instance);
         close(0);
@@ -204,7 +210,7 @@ public class SdkConfiguration extends DialogWrapper {
     public class VerifyAction extends AbstractAction {
 
         public VerifyAction() {
-            super(SltBundle.message("slt.ui.settings.sdk.editor.verify"));
+            super(SltBundle.message("slt.ui.settings.sdk.editor.abcl.process.verify"));
         }
 
         @Override
@@ -223,18 +229,12 @@ public class SdkConfiguration extends DialogWrapper {
         public void actionPerformed(ActionEvent e) {
             if (!isVerified) {
                 Messages.showInfoMessage(SltBundle.message("slt.ui.settings.sdk.editor.notverified.title"),
-                        SltBundle.message("slt.ui.settings.sdk.editor.notverified.message"));
+                        SltBundle.message("slt.ui.settings.sdk.editor.abcl.process.notverified.message"));
                 return;
             }
 
             save();
         }
-    }
-
-    public interface OnSave {
-
-        void saveAction(LispSdk sdk);
-
     }
 
 }

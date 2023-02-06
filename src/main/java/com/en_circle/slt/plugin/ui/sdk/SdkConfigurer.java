@@ -1,9 +1,10 @@
 package com.en_circle.slt.plugin.ui.sdk;
 
 import com.en_circle.slt.plugin.SltBundle;
+import com.en_circle.slt.plugin.environment.Environment;
 import com.en_circle.slt.plugin.sdk.LispSdk;
 import com.en_circle.slt.plugin.sdk.SdkList;
-import com.en_circle.slt.tools.platform.DownloadSBCLAction;
+import com.en_circle.slt.tools.platform.PlatformAction;
 import com.en_circle.slt.tools.platform.PlatformActionsContainer;
 import com.intellij.icons.AllIcons.Actions;
 import com.intellij.icons.AllIcons.General;
@@ -11,7 +12,9 @@ import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.options.Configurable;
 import com.intellij.openapi.options.ConfigurationException;
+import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.ui.Messages;
+import com.intellij.openapi.ui.SelectFromListDialog;
 import com.intellij.openapi.util.NlsContexts.ConfigurableName;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.table.JBTable;
@@ -99,11 +102,19 @@ public class SdkConfigurer implements Configurable {
         LispSdk newSdk = new LispSdk();
         newSdk.uuid = UUID.randomUUID().toString();
 
-        SdkConfiguration configuration = new SdkConfiguration(root, newSdk, SltBundle.message("slt.ui.settings.sdk.editor.title.new"),
+
+        Environment environment = selectEnvironment();
+        if (environment == null) {
+            return;
+        }
+
+        DialogWrapper configuration = environment.getDefinition().getDialogProvider().createSdkConfiguration(
+                root, newSdk, SltBundle.message("slt.ui.settings.sdk.editor.title.new"),
                 sdk -> {
-            definedSdks.add(sdk);
-            SdkListModel model = new SdkListModel(definedSdks);
-            table.setModel(model);
+                    sdk.environment = environment;
+                    definedSdks.add(sdk);
+                    SdkListModel model = new SdkListModel(definedSdks);
+                    table.setModel(model);
         });
         configuration.show();
     }
@@ -113,13 +124,16 @@ public class SdkConfigurer implements Configurable {
         LispSdk copy = new LispSdk();
         copy.loadState(sdk);
 
-        SdkConfiguration configuration = new SdkConfiguration(root, copy, SltBundle.message("slt.ui.settings.sdk.editor.title.edit"),
+        Environment environment = copy.environment;
+        DialogWrapper configuration = environment.getDefinition().getDialogProvider().createSdkConfiguration(
+                root, copy, SltBundle.message("slt.ui.settings.sdk.editor.title.edit"),
                 sdkModified -> {
-            int ix = definedSdks.indexOf(sdk);
-            definedSdks.remove(ix);
-            definedSdks.add(ix, sdkModified);
-            SdkListModel model = new SdkListModel(definedSdks);
-            table.setModel(model);
+                    sdkModified.environment = environment;
+                    int ix = definedSdks.indexOf(sdk);
+                    definedSdks.remove(ix);
+                    definedSdks.add(ix, sdkModified);
+                    SdkListModel model = new SdkListModel(definedSdks);
+                    table.setModel(model);
         });
         configuration.show();
     }
@@ -134,10 +148,23 @@ public class SdkConfigurer implements Configurable {
 
     @SuppressWarnings("IncorrectParentDisposable")
     private void downloadSdk() {
-        Objects.requireNonNull(PlatformActionsContainer.getAction(DownloadSBCLAction.class))
+        List<Environment> downloadable = new ArrayList<>();
+        for (Environment environment : Environment.values()) {
+            if (environment.getDefinition().getDownloadActionDef() != null) {
+                downloadable.add(environment);
+            }
+        }
+
+        Environment environment = selectEnvironment(downloadable.toArray(new Environment[0]));
+        if (environment == null) {
+            return;
+        }
+
+        Objects.requireNonNull(PlatformActionsContainer.getAction(environment.getDefinition().getDownloadActionDef()))
                 .downloadSdk(ApplicationManager.getApplication(), root,
                 sdk -> {
             if (sdk != null) {
+                sdk.environment = environment;
                 definedSdks.add(sdk);
                 SdkListModel model = new SdkListModel(definedSdks);
                 table.setModel(model);
@@ -146,6 +173,26 @@ public class SdkConfigurer implements Configurable {
                         SltBundle.message("slt.ui.settings.sdk.download.failed.title"));
             }
         });
+    }
+
+    private Environment selectEnvironment() {
+        return selectEnvironment(Environment.values());
+    }
+
+    private Environment selectEnvironment(Environment[] environments) {
+
+        SelectFromListDialog selectFromListDialog = new SelectFromListDialog(null,
+                environments, e -> ((Environment)e).getDefinition().getName(),
+                SltBundle.message("slt.ui.settings.sdk.select"),
+                ListSelectionModel.SINGLE_SELECTION);
+        selectFromListDialog.setSize(450, 250);
+        if (selectFromListDialog.showAndGet()) {
+            Object[] selection = selectFromListDialog.getSelection();
+            if (selection.length > 0) {
+                return (Environment) selection[0];
+            }
+        }
+        return null;
     }
 
     private class EditSdkAction extends AnAction {
@@ -202,7 +249,18 @@ public class SdkConfigurer implements Configurable {
 
         @Override
         public void update(@NotNull AnActionEvent e) {
-            e.getPresentation().setEnabled(PlatformActionsContainer.hasAction(DownloadSBCLAction.class));
+            boolean enable = false;
+            for (Environment environment : Environment.values()) {
+                Class<? extends PlatformAction> actionDef = environment.getDefinition().getDownloadActionDef();
+                if (actionDef != null) {
+                    if (PlatformActionsContainer.hasAction(actionDef)) {
+                        enable = true;
+                        break;
+                    }
+                }
+            }
+
+            e.getPresentation().setEnabled(enable);
         }
 
         @Override
@@ -257,7 +315,7 @@ public class SdkConfigurer implements Configurable {
         public Object getValueAt(int rowIndex, int columnIndex) {
             return switch (columnIndex) {
                 case 0 -> items.get(rowIndex).userName;
-                case 1 -> items.get(rowIndex).sbclExecutable;
+                case 1 -> items.get(rowIndex).getEnvironment().getDefinition().getName();
                 case 2 -> items.get(rowIndex).quickLispPath;
                 default -> null;
             };
@@ -267,7 +325,7 @@ public class SdkConfigurer implements Configurable {
         public String getColumnName(int column) {
             return switch (column) {
                 case 0 -> SltBundle.message("slt.ui.settings.sdk.table.column.name");
-                case 1 -> SltBundle.message("slt.ui.settings.sdk.table.column.executable");
+                case 1 -> SltBundle.message("slt.ui.settings.sdk.table.column.type");
                 case 2 -> SltBundle.message("slt.ui.settings.sdk.table.column.quicklisp");
                 default -> null;
             };

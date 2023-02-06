@@ -1,7 +1,7 @@
 package com.en_circle.slt.plugin.ui;
 
 import com.en_circle.slt.plugin.SltBundle;
-import com.en_circle.slt.plugin.SltCommonLispFileType;
+import com.en_circle.slt.plugin.environment.LispFeatures;
 import com.en_circle.slt.plugin.environment.SltLispEnvironment.SltOutput;
 import com.en_circle.slt.plugin.services.lisp.LispEnvironmentService;
 import com.en_circle.slt.plugin.services.lisp.LispEnvironmentService.LispEnvironmentListener;
@@ -11,16 +11,12 @@ import com.en_circle.slt.plugin.ui.console.SltREPL;
 import com.intellij.icons.AllIcons;
 import com.intellij.icons.AllIcons.Actions;
 import com.intellij.icons.AllIcons.General;
+import com.intellij.openapi.Disposable;
 import com.intellij.openapi.actionSystem.*;
-import com.intellij.openapi.application.ApplicationManager;
-import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.openapi.util.Disposer;
 import com.intellij.openapi.wm.ToolWindow;
-import com.intellij.psi.PsiFile;
-import com.intellij.psi.PsiManager;
 import com.intellij.ui.tabs.impl.JBTabsImpl;
-import com.intellij.util.FileContentUtil;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
@@ -29,7 +25,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class SltCoreWindow implements LispEnvironmentListener {
+public class SltCoreWindow implements LispEnvironmentListener, Disposable {
 
     private final Project project;
     private final JTextField process;
@@ -43,9 +39,17 @@ public class SltCoreWindow implements LispEnvironmentListener {
         LispEnvironmentService.getInstance(project).addServerListener(this);
 
         content = new JPanel(new BorderLayout());
-        components.add(new SltOutputHandlerComponent(this, SltOutput.STDOUT));
-        components.add(new SltOutputHandlerComponent(this, SltOutput.STDERR));
-        SltGeneralLog generalLog = new SltGeneralLog();
+        SltOutputHandlerComponent outputHandlerComponent = new SltOutputHandlerComponent(project, SltOutput.STDOUT);
+        components.add(outputHandlerComponent);
+        Disposer.register(this, outputHandlerComponent);
+
+        outputHandlerComponent = new SltOutputHandlerComponent(project, SltOutput.STDERR);
+        components.add(outputHandlerComponent);
+        Disposer.register(this, outputHandlerComponent);
+
+        SltGeneralLog generalLog = new SltGeneralLog(project);
+        Disposer.register(this, generalLog);
+
         components.add(generalLog);
         LispEnvironmentService.getInstance(project).setRequestResponseLogger(generalLog);
 
@@ -72,14 +76,14 @@ public class SltCoreWindow implements LispEnvironmentListener {
 
     private void createSbclControls() {
         DefaultActionGroup controlGroup = new DefaultActionGroup();
-        controlGroup.add(new StartSbclAction());
+        controlGroup.add(new StartLispAction());
         controlGroup.add(new StopSbclAction());
         controlGroup.addSeparator();
         controlGroup.add(new ConsoleWindowAction());
 
         JPanel west = new JPanel(new BorderLayout());
         ActionToolbar toolbar = ActionManager.getInstance()
-                .createActionToolbar("SltProcessWindowSbclEvent", controlGroup, false);
+                .createActionToolbar("SltProcessWindowEvent", controlGroup, false);
         toolbar.setTargetComponent(content);
         west.add(toolbar.getComponent(), BorderLayout.NORTH);
         content.add(west, BorderLayout.WEST);
@@ -87,16 +91,6 @@ public class SltCoreWindow implements LispEnvironmentListener {
 
     public void start() {
         LispEnvironmentService.getInstance(project).start();
-
-        PsiManager psiManager = PsiManager.getInstance(project);
-        List<VirtualFile> toReparse = new ArrayList<>();
-        for (VirtualFile vf : FileEditorManager.getInstance(project).getOpenFiles()) {
-            PsiFile psiFile = psiManager.findFile(vf);
-            if (psiFile != null && psiFile.getFileType().equals(SltCommonLispFileType.INSTANCE)) {
-                toReparse.add(vf);
-            }
-        }
-        FileContentUtil.reparseFiles(project, toReparse, false);
     }
 
     public void stop() {
@@ -170,15 +164,25 @@ public class SltCoreWindow implements LispEnvironmentListener {
         return project;
     }
 
-    private class StartSbclAction extends AnAction {
+    @Override
+    public void dispose() {
 
-        private StartSbclAction() {
+    }
+
+    private class StartLispAction extends AnAction {
+
+        private StartLispAction() {
             super(SltBundle.message("slt.ui.process.startinstance"), "", AllIcons.RunConfigurations.TestState.Run);
         }
 
         @Override
         public void actionPerformed(@NotNull AnActionEvent e) {
-            ApplicationManager.getApplication().invokeLater(SltCoreWindow.this::start);
+           start();
+        }
+
+        @Override
+        public @NotNull ActionUpdateThread getActionUpdateThread() {
+            return ActionUpdateThread.EDT;
         }
 
         @Override
@@ -221,7 +225,7 @@ public class SltCoreWindow implements LispEnvironmentListener {
     private class ConsoleWindowAction extends AnAction {
 
         private ConsoleWindowAction() {
-            super(SltBundle.message("slt.ui.process.openrepl.sbcl"), "", General.Add);
+            super(SltBundle.message("slt.ui.process.openrepl"), "", General.Add);
         }
 
         @Override
@@ -238,7 +242,8 @@ public class SltCoreWindow implements LispEnvironmentListener {
         public void update(@NotNull AnActionEvent e) {
             super.update(e);
 
-            e.getPresentation().setEnabled(LispEnvironmentService.getInstance(project).getState() == LispEnvironmentState.READY);
+            e.getPresentation().setEnabled(LispEnvironmentService.getInstance(project).getState() == LispEnvironmentState.READY &&
+                    LispEnvironmentService.getInstance(project).hasFeature(LispFeatures.REPL));
         }
     }
 

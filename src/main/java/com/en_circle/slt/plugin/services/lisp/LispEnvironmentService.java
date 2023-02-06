@@ -1,11 +1,13 @@
 package com.en_circle.slt.plugin.services.lisp;
 
 import com.en_circle.slt.plugin.SymbolState;
+import com.en_circle.slt.plugin.environment.LispFeatures;
 import com.en_circle.slt.plugin.environment.SltLispEnvironment;
 import com.en_circle.slt.plugin.environment.SltLispEnvironment.SltLispOutputChangedListener;
 import com.en_circle.slt.plugin.lisp.lisp.LispElement;
 import com.en_circle.slt.plugin.lisp.psi.LispList;
 import com.en_circle.slt.plugin.services.lisp.components.SltBreakpoint;
+import com.en_circle.slt.plugin.services.lisp.components.SltLispEnvironmentSymbolCache.BatchedSymbolRefreshAction;
 import com.en_circle.slt.plugin.swank.SlimeListener.DebugInterface;
 import com.en_circle.slt.plugin.swank.SlimeListener.RequestResponseLogger;
 import com.en_circle.slt.plugin.swank.SlimeRequest;
@@ -41,9 +43,13 @@ public interface LispEnvironmentService extends Disposable {
 
     void sendToLisp(SlimeRequest request, boolean startServer) throws Exception;
 
+    void sendToLisp(SlimeRequest request, boolean startServer, Runnable onFailureServerState) throws Exception;
+
     String getGlobalPackage();
 
-    SymbolState refreshSymbolFromServer(String packageName, String symbolName, PsiElement element);
+    SymbolState refreshSymbolFromServer(String packageName, String symbolName);
+
+    BatchedSymbolRefreshAction refreshSymbolsFromServer();
 
     LispEnvironmentState getState();
 
@@ -62,6 +68,10 @@ public interface LispEnvironmentService extends Disposable {
     void nativeBreakpointUpdated(XBreakpoint<SltBreakpointProperties> nativeBreakpoint);
 
     Collection<SltBreakpoint> getAllBreakpoints();
+
+    LispSltOverrides getOverrides();
+
+    boolean hasFeature(LispFeatures feature);
 
     enum LispEnvironmentState {
         STOPPED, READY, INITIALIZING

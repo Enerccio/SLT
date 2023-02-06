@@ -1,12 +1,8 @@
 package com.en_circle.slt.plugin;
 
 import com.en_circle.slt.plugin.swank.components.SourceLocation;
-import com.intellij.openapi.vfs.VirtualFile;
 
-import java.lang.ref.WeakReference;
-import java.util.HashSet;
 import java.util.Objects;
-import java.util.Set;
 
 public class SymbolState {
 
@@ -17,7 +13,6 @@ public class SymbolState {
 
     public SymbolBinding binding = SymbolBinding.NONE;
     public String documentation;
-    public Set<WeakReference<VirtualFile>> containerFiles = new HashSet<>();
     public SourceLocation location = new SourceLocation();
 
     public SymbolState(String name, String packageName, String symbolName) {

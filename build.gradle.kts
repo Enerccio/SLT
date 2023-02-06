@@ -14,9 +14,11 @@ dependencies {
     implementation("org.awaitility:awaitility:4.2.0")
     implementation("org.watertemplate:watertemplate-engine:1.2.2")
     implementation("com.google.guava:guava:31.1-jre")
+    implementation("org.rauschig:jarchivelib:1.2.0")
+    implementation("org.abcl:abcl:1.8.0")
 
-    testImplementation("org.junit.jupiter:junit-jupiter-api:5.8.1")
-    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.8.1")
+    testImplementation("org.junit.jupiter:junit-jupiter-api:5.9.2")
+    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.9.2")
 }
 
 sourceSets {
@@ -42,7 +44,36 @@ intellij {
     /* Plugin Dependencies */))
 }
 
+
 tasks {
+    val sltZip = task("sltZip", Zip::class) {
+        from("src/main/lisp")
+        archiveFileName.set("slt.zip")
+        destinationDirectory.set(File("build/resources/main"))
+        include("**/*.lisp")
+        include("**/*.cl")
+        include("**/*.asdf")
+        include("LICENSE.txt")
+
+        doFirst {
+            println("Zipping SLT to " + destinationDirectory.get())
+        }
+        eachFile{
+            println("Zipping $this")
+        }
+        doLast {
+            println("Done Zipping SLT")
+        }
+
+        outputs.upToDateWhen {
+            false
+        }
+    }
+    sltZip.mustRunAfter(processResources)
+    jar {
+        dependsOn(sltZip)
+    }
+
     // Set the JVM compatibility versions
     withType<JavaCompile> {
         sourceCompatibility = "17"
@@ -68,3 +99,4 @@ tasks {
         token.set(System.getenv("PUBLISH_TOKEN"))
     }
 }
+

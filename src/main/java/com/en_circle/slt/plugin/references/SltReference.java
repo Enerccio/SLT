@@ -1,6 +1,7 @@
 package com.en_circle.slt.plugin.references;
 
 import com.en_circle.slt.plugin.SymbolState;
+import com.en_circle.slt.plugin.environment.LispFeatures;
 import com.en_circle.slt.plugin.lisp.LispParserUtil;
 import com.en_circle.slt.plugin.lisp.lisp.LispContainer;
 import com.en_circle.slt.plugin.lisp.lisp.LispElement;
@@ -8,16 +9,18 @@ import com.en_circle.slt.plugin.lisp.lisp.LispUtils;
 import com.en_circle.slt.plugin.lisp.psi.LispSymbol;
 import com.en_circle.slt.plugin.lisp.psi.LispToplevel;
 import com.en_circle.slt.plugin.services.lisp.LispEnvironmentService;
+import com.en_circle.slt.plugin.services.lisp.LispEnvironmentService.LispEnvironmentState;
 import com.en_circle.slt.plugin.swank.components.SourceLocation;
 import com.en_circle.slt.plugin.swank.requests.Xrefs;
 import com.en_circle.slt.plugin.swank.requests.Xrefs.XrefType;
-import com.en_circle.slt.tools.LocationUtils;
 import com.en_circle.slt.tools.SltApplicationUtils;
 import com.intellij.lang.ASTNode;
 import com.intellij.lang.FileASTNode;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.*;
+import com.intellij.psi.util.CachedValueProvider;
+import com.intellij.psi.util.CachedValuesManager;
 import com.intellij.psi.util.PsiTreeUtil;
 import org.jetbrains.annotations.NotNull;
 
@@ -39,27 +42,40 @@ public class SltReference extends PsiPolyVariantReferenceBase<LispSymbol> {
 
     @Override
     public ResolveResult @NotNull [] multiResolve(boolean incompleteCode) {
-        PsiElement element = getElement();
         return cache.resolve(this);
     }
 
     ResolveResult[] resolveInner(boolean incompleteCode) {
+        if (LispEnvironmentService.getInstance(myElement.getProject()).getState() != LispEnvironmentState.READY)
+            return new ResolveResult[0];
+        if (!LispEnvironmentService.getInstance(myElement.getProject()).hasFeature(LispFeatures.XREFS))
+            return new ResolveResult[0];
+
         PsiManager manager = PsiManager.getInstance(myElement.getProject());
 
         String symbolName = myElement.getName();
         String packageName = LispParserUtil.getPackage(myElement);
-        SymbolState state = LispEnvironmentService.getInstance(myElement.getProject()).refreshSymbolFromServer(packageName, symbolName, myElement);
+        SymbolState state = LispEnvironmentService.getInstance(myElement.getProject()).refreshSymbolFromServer(packageName, symbolName);
         SourceLocation location = state.location;
         LispToplevel topLevel = PsiTreeUtil.getParentOfType(myElement, LispToplevel.class);
 
         if (location.isFile()) {
             VirtualFile vf = LocalFileSystem.getInstance().findFileByIoFile(new File(location.getLocation()));
             if (vf != null) {
-                PsiFile file = PsiManager.getInstance(myElement.getProject()).findFile(vf);
+                CachedValuesManager cachedValuesManager = CachedValuesManager.getManager(myElement.getProject());
+                PsiFile file = cachedValuesManager.createCachedValue(() -> {
+                    PsiFile f = PsiManager.getInstance(myElement.getProject()).findFile(vf);
+                    if (f != null) {
+                        FileASTNode node = f.getNode();
+                        node.getFirstChildNode();
+                    }
+                    return CachedValueProvider.Result.create(f, vf);
+                }).getValue();
                 if (file != null) {
                     FileASTNode node = file.getNode();
                     if (node != null) {
                         ASTNode reference = node.findLeafElementAt(location.getPosition());
+
                         if (reference != null) {
                             PsiElement referenceElement = reference.getPsi();
                             if (referenceElement != null) {
@@ -93,6 +109,11 @@ public class SltReference extends PsiPolyVariantReferenceBase<LispSymbol> {
                     return new ResolveResult[] { new PsiElementResolveResult(symbol) };
                 }
             }
+        }
+
+        if (referenceElement instanceof LispSymbol) {
+            // default just move to this even if it is a different symbol
+            return new ResolveResult[] { new PsiElementResolveResult(referenceElement) };
         }
         return new ResolveResult[0];
     }
@@ -173,8 +194,18 @@ public class SltReference extends PsiPolyVariantReferenceBase<LispSymbol> {
     }
 
     private ResolveResult convertLocationToReference(SourceLocation location, String name) {
-        return LocationUtils.convertFromLocationToSymbol(myElement.getProject(), location, name,
-                PsiElementResolveResult::new);
+        if (!location.isPrecise())
+            return null;
+        VirtualFile vf = LocalFileSystem.getInstance().findFileByIoFile(new File(location.getLocation()));
+        if (vf == null)
+            return null;
+        PsiFile f = PsiManager.getInstance(myElement.getProject()).findFile(vf);
+        if (f == null)
+            return null;
+        PsiElement element = f.findElementAt(location.getPosition());
+        if (element == null)
+            return null;
+        return new PsiElementResolveResult(element);
     }
 
     @Override

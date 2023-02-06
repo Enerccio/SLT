@@ -18,7 +18,7 @@ public class SltDebugStackTraceElement {
         this.line = LispUtils.unescape(text);
         text = source.getItems().get(1).toString();
         this.detailedCall = LispUtils.unescape(text);
-        this.location = new SourceLocation((LispContainer) source.getItems().get(3));
+        this.location = new SourceLocation(source.getItems().get(3));
         LispElement packageInfo = source.getItems().get(4);
         if (packageInfo instanceof LispString) {
             framePackage = ((LispString) packageInfo).getValue();

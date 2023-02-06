@@ -24,12 +24,12 @@ sexpr ::= (enhancement* datum) | comment
 
 comment ::= LINE_COMMENT | BLOCK_COMMENT
 
-enhancement ::= REFERENCE_SET | TEST_SUCCESS | COMMA | BACKQUOTE | QUOTE | FUNCTION
+enhancement ::= REFERENCE_SET | TEST_SUCCESS | UNQUOTE | UNQUOTE_SPLICE | BACKQUOTE | QUOTE | FUNCTION
 
 datum ::= tested | evaled | pathname | UNDEFINED_SEQUENCE | BIT_ARRAY | CHARACTER | REFERENCE_LABEL
             | number | real_pair
             | compound_symbol
-            | string | vector | array | structure | list | pair
+            | string | vector | array | structure | pair | list
 
 tested ::= (TEST_SUCCESS | TEST_FALURE) sexpr
 
@@ -43,7 +43,8 @@ array ::= ARRAY_START list
 
 structure ::= STRUCTURE_TOKEN list
 
-list ::= LPAREN sexpr* RPAREN
+list ::= LPAREN sexpr* RPAREN { pin = 2 recoverWhile=list_recovery }
+private list_recovery ::= !(RPAREN | sexpr)
 
 pair ::= LPAREN sexpr+ DOT sexpr RPAREN
 
