@@ -1,3 +1,8 @@
+(in-package :swank/backend)
+
+(defun get-restart-function-args (restart)
+  (swank-backend:arglist (system::restart-function restart)))
+
 (in-package :swank/abcl)
 
 (defimplementation find-source-location (obj)

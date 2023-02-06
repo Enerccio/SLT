@@ -1,3 +1,8 @@
+(in-package :swank/backend)
+
+(defun get-restart-function-args (restart)
+  NIL)
+
 (in-package :swank/ccl)
 
 (in-package :swank)

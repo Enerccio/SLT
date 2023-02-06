@@ -22,6 +22,7 @@ import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.util.text.HtmlBuilder;
 import com.intellij.openapi.util.text.HtmlChunk;
 import com.intellij.ui.components.JBScrollPane;
+import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -115,6 +116,9 @@ public class SltInspector {
                     if (i < parts.length-1) {
                         contentBuilder.append(HtmlChunk.br());
                     }
+                }
+                if (parts.length == 0 && StringUtils.isNotBlank(text)) {
+                    contentBuilder.append(HtmlChunk.br());
                 }
             } else {
                 contentBuilder.append(HtmlChunk.link(mkLink(inspectedObject, element), text)

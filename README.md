@@ -18,7 +18,7 @@
 **THIS PLUGIN IS EXPERIMENTAL and can crash at any time! Please report all bugs!**
 
 This plugin is providing support for Common Lisp for JetBrains IDEs. 
-Using modified SLIME/Swank protocol to commmunicate with SBCL providing 
+Using modified SLIME/Swank protocol to communicate with lisp runtime providing 
 IDE capabilities for Common Lisp.
 
 # (Somewhat) Detailed Installation and Usage Guide

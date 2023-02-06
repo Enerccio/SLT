@@ -44,7 +44,7 @@ format suitable for Emacs."
                                             :stream stream
                                             :msg "<<error printing restart>>")
                     (princ restart stream)))
-                (swank-backend:arglist (slot-value restart 'function))))))
+                (swank-backend::get-restart-function-args restart)))))
 
 (defslimefun compile-string-region-slt (string buffer offset filename package)
     (with-buffer-syntax ()

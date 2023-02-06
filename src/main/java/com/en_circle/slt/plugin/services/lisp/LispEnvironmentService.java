@@ -58,7 +58,7 @@ public interface LispEnvironmentService extends Disposable {
 
     LispSltOverrides getOverrides();
 
-    boolean hasFeature(LispFeatures xrefs);
+    boolean hasFeature(LispFeatures feature);
 
 
     enum LispEnvironmentState {

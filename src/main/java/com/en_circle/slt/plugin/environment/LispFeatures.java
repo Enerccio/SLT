@@ -7,6 +7,7 @@ public enum LispFeatures {
     MACROEXPAND,
     FRAME_EVAL,
     INSPECTOR,
+    DEBUGGER_ACTION_ARGLIST,
     INSPECTOR_HISTORY,
     AUTOCOMPLETE,
     SEARCH,

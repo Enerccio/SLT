@@ -1,3 +1,8 @@
+(in-package :swank/backend)
+
+(defun get-restart-function-args (restart)
+  (swank-backend:arglist (sb-kernel::restart-function restart)))
+
 (in-package :swank/sbcl)
 
 (defun form-number-position (definition-source stream)
