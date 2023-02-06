@@ -97,7 +97,7 @@ public class LispParser implements PsiParser, LightPsiParser {
   // tested | evaled | pathname | UNDEFINED_SEQUENCE | BIT_ARRAY | CHARACTER | REFERENCE_LABEL
   //             | number | real_pair
   //             | compound_symbol
-  //             | string | vector | array | structure | list | pair
+  //             | string | vector | array | structure | pair | list
   public static boolean datum(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "datum")) return false;
     boolean r;
@@ -116,8 +116,8 @@ public class LispParser implements PsiParser, LightPsiParser {
     if (!r) r = vector(b, l + 1);
     if (!r) r = array(b, l + 1);
     if (!r) r = structure(b, l + 1);
-    if (!r) r = list(b, l + 1);
     if (!r) r = pair(b, l + 1);
+    if (!r) r = list(b, l + 1);
     exit_section_(b, l, m, r, false, null);
     return r;
   }
@@ -290,6 +290,27 @@ public class LispParser implements PsiParser, LightPsiParser {
       if (!empty_element_parsed_guard_(b, "pair_1", c)) break;
     }
     exit_section_(b, m, null, r);
+    return r;
+  }
+
+  /* ********************************************************** */
+  // !(DOT | RPAREN | sexpr)
+  static boolean pair_recovery(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "pair_recovery")) return false;
+    boolean r;
+    Marker m = enter_section_(b, l, _NOT_);
+    r = !pair_recovery_0(b, l + 1);
+    exit_section_(b, l, m, r, false, null);
+    return r;
+  }
+
+  // DOT | RPAREN | sexpr
+  private static boolean pair_recovery_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "pair_recovery_0")) return false;
+    boolean r;
+    r = consumeToken(b, DOT);
+    if (!r) r = consumeToken(b, RPAREN);
+    if (!r) r = sexpr(b, l + 1);
     return r;
   }
 

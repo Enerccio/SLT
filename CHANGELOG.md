@@ -8,6 +8,8 @@
 
 ### Fixes
 
+- Fixed parser issue with dot 
+
 ### Changes
 
 - Feature list for each interpret changes availability of functions in IDE

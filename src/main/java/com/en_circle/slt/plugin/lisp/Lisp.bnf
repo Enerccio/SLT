@@ -29,7 +29,7 @@ enhancement ::= REFERENCE_SET | TEST_SUCCESS | UNQUOTE | UNQUOTE_SPLICE | BACKQU
 datum ::= tested | evaled | pathname | UNDEFINED_SEQUENCE | BIT_ARRAY | CHARACTER | REFERENCE_LABEL
             | number | real_pair
             | compound_symbol
-            | string | vector | array | structure | list | pair
+            | string | vector | array | structure | pair | list
 
 tested ::= (TEST_SUCCESS | TEST_FALURE) sexpr
 

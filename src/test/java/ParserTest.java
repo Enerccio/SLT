@@ -12,9 +12,7 @@ public class ParserTest {
 
     public static void main(String[] args) {
         String data = """
-                (defun
-                    buble
-                    (a b c) 0
+                (a .
                 """;
 
         LispCoreProjectEnvironment projectEnvironment = new LispCoreProjectEnvironment();
