@@ -79,7 +79,7 @@ public class SltGeneralLog implements SltComponent, RequestResponseLogger, Dispo
     @Override
     public void logRequest(String request) {
         request = StringUtils.truncate(request, 0, 4069);
-        consoleView.print("\n\n" + request, ConsoleViewContentType.LOG_INFO_OUTPUT);
+        consoleView.print("\n\n" + request, ConsoleViewContentType.LOG_ERROR_OUTPUT);
     }
 
     @Override

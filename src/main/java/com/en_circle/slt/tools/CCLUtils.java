@@ -15,18 +15,18 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
-public class SBCLUtils {
+public class CCLUtils {
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
-    public static boolean verifyAndInstallDependencies(String executable, String core, String quicklisp, ProgressIndicator pi) {
+    public static boolean verifyAndInstallDependencies(String executable, String memoryImage, String quicklisp, ProgressIndicator pi) {
         try {
             List<String> args = new ArrayList<>();
             args.add(executable);
-            if (StringUtils.isNotBlank(core)) {
-                args.add("--core");
-                args.add(core);
+            if (StringUtils.isNotBlank(memoryImage)) {
+                args.add("-I");
+                args.add(memoryImage);
             }
-            args.add("--non-interactive");
+            args.add("-b");
 
             File tempTestFile = FileUtil.createTempFile("testSBCL", ".cl");
             if (tempTestFile.exists())
@@ -34,15 +34,15 @@ public class SBCLUtils {
             FileUtils.writeStringToFile(tempTestFile, new VerifyTemplate(quicklisp).render(), StandardCharsets.UTF_8);
             tempTestFile.deleteOnExit();
 
-            args.add("--load");
+            args.add("-l");
             args.add(tempTestFile.getAbsolutePath());
 
             try {
                 ProcessBuilder processBuilder = new ProcessBuilder(args.toArray(new String[0]));
                 Process process = processBuilder.start();
 
-                StringBuilder displayValue = new StringBuilder();
                 StringBuilder errorValue = new StringBuilder();
+                StringBuilder displayValue = new StringBuilder();
                 StringBuilder outputValue = new StringBuilder();
                 SltProcessStreamGobbler errorController = new SltProcessStreamGobbler(process.getErrorStream());
                 SltProcessStreamGobbler outputController = new SltProcessStreamGobbler(process.getInputStream());
@@ -50,7 +50,7 @@ public class SBCLUtils {
                 outputController.addUpdateListener(outputValue::append);
                 WaitForOccurrence waiter = new WaitForOccurrence("SltVerified");
                 errorController.addUpdateListener(waiter);
-                errorController.addUpdateListener(data -> {
+                outputController.addUpdateListener(data -> {
                     displayValue.append(data);
                     String str = displayValue.toString();
                     if (str.contains("\n")) {

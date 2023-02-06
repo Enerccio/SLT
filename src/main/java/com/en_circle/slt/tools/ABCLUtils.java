@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Pattern;
 
 public class ABCLUtils {
 
@@ -43,14 +44,30 @@ public class ABCLUtils {
                 ProcessBuilder processBuilder = new ProcessBuilder(args.toArray(new String[0]));
                 Process process = processBuilder.start();
 
-                StringBuilder returnValue = new StringBuilder();
-                StringBuilder textValue = new StringBuilder();
+                StringBuilder displayValue = new StringBuilder();
+                StringBuilder errorValue = new StringBuilder();
+                StringBuilder outputValue = new StringBuilder();
                 SltProcessStreamGobbler errorController = new SltProcessStreamGobbler(process.getErrorStream());
                 SltProcessStreamGobbler outputController = new SltProcessStreamGobbler(process.getInputStream());
-                errorController.addUpdateListener(returnValue::append);
-                outputController.addUpdateListener(textValue::append);
+                errorController.addUpdateListener(errorValue::append);
+                outputController.addUpdateListener(outputValue::append);
                 WaitForOccurrence waiter = new WaitForOccurrence("SltVerified");
                 outputController.addUpdateListener(waiter);
+                outputController.addUpdateListener(data -> {
+                    displayValue.append(data);
+                    String str = displayValue.toString();
+                    if (str.contains("\n")) {
+                        String[] lines = str.split(Pattern.quote("\n"));
+                        for (String line : lines) {
+                            if (StringUtils.isNotBlank(line))
+                                pi.setText(line);
+                        }
+                        if (StringUtils.isNotBlank(lines[lines.length-1])) {
+                            displayValue.setLength(0);
+                            displayValue.append(lines[lines.length-1]);
+                        }
+                    }
+                });
                 errorController.start();
                 outputController.start();
                 if (!waiter.awaitFor(null, outputController, 10, TimeUnit.MINUTES, pi::isCanceled)) {
@@ -67,7 +84,7 @@ public class ABCLUtils {
 
                 errorController.join();
                 outputController.join();
-                return textValue.toString().contains("SltVerified");
+                return outputValue.toString().contains("SltVerified");
             } finally {
                 tempTestFile.delete();
             }

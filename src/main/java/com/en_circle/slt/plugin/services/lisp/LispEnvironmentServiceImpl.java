@@ -72,6 +72,8 @@ public class LispEnvironmentServiceImpl implements LispEnvironmentService {
     @Override
     public void resetConfiguration() {
         this.configurationBuilder = null;
+        this.environmentProvider = null;
+        this.configuration = null;
     }
 
     public boolean configured() {
@@ -172,24 +174,26 @@ public class LispEnvironmentServiceImpl implements LispEnvironmentService {
             }
             environment = environmentProvider.get();
             environment.start(configuration);
-            overrides = environment.getType().getDefinition().getOverrides();
+            if (environment != null) {
+                overrides = environment.getType().getDefinition().getOverrides();
 
-            slimeListener = new SlimeListener(project, true, e -> {
+                slimeListener = new SlimeListener(project, true, e -> {
+                    for (LispEnvironmentListener listener : serverListeners) {
+                        String text = ExceptionUtil.getThrowableText(e);
+                        listener.onOutputChanged(SltOutput.STDERR, text);
+                    }
+                }, logger, debugInterface);
+                client = new SwankClient("127.0.0.1", environment.getSwankPort(), slimeListener);
+
                 for (LispEnvironmentListener listener : serverListeners) {
-                    String text = ExceptionUtil.getThrowableText(e);
-                    listener.onOutputChanged(SltOutput.STDERR, text);
+                    listener.onPostStart();
                 }
-            }, logger, debugInterface);
-            client = new SwankClient("127.0.0.1", environment.getSwankPort(), slimeListener);
 
-            for (LispEnvironmentListener listener : serverListeners) {
-                listener.onPostStart();
+                ApplicationManager.getApplication().invokeLaterOnWriteThread(() -> {
+                    ParameterHintsPassFactory.forceHintsUpdateOnNextPass();
+                    DaemonCodeAnalyzer.getInstance(project).restart();
+                });
             }
-
-            ApplicationManager.getApplication().invokeLaterOnWriteThread(() -> {
-                ParameterHintsPassFactory.forceHintsUpdateOnNextPass();
-                DaemonCodeAnalyzer.getInstance(project).restart();
-            });
         } finally {
             starting = false;
         }
@@ -207,7 +211,8 @@ public class LispEnvironmentServiceImpl implements LispEnvironmentService {
             listener.onPreStop();
         }
         try {
-            client.close();
+            if (client != null)
+                client.close();
         } finally {
             overrides = null;
             indentationContainer.clear();
@@ -218,6 +223,11 @@ public class LispEnvironmentServiceImpl implements LispEnvironmentService {
                 environment = null;
             }
         }
+
+        ApplicationManager.getApplication().invokeLaterOnWriteThread(() -> {
+            ParameterHintsPassFactory.forceHintsUpdateOnNextPass();
+            DaemonCodeAnalyzer.getInstance(project).restart();
+        });
 
         for (LispEnvironmentListener listener : serverListeners) {
             listener.onPostStop();

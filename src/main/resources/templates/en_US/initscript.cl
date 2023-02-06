@@ -10,7 +10,7 @@
 (ql:quickload :swank)
 (ql:quickload :eclector)
 
-(setf *default-pathname-defaults* (truename "~cwd~"))
+(setf *default-pathname-defaults* #P"~cwd~")
 
 (load "~corefile~")
 

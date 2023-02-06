@@ -8,6 +8,8 @@
   (load (merge-pathnames "slt-sbcl.lisp" *load-truename*)))
 (when (eq slt:+slt-interpret+ :abcl)
   (load (merge-pathnames "slt-abcl.lisp" *load-truename*)))
+(when (eq slt:+slt-interpret+ :ccl)
+  (load (merge-pathnames "slt-ccl.lisp" *load-truename*)))
 
 (in-package :slt-core)
 

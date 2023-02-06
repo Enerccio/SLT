@@ -2,6 +2,7 @@
   (format T "SLT Interpret ~S~%" slt:+slt-interpret+))
 
 (defun portable-quit (&optional code)
+  (declare (ignorable code))
   ;; This group from "clocc-port/ext.lisp"
   #+allegro (excl:exit code)
   #+clisp (#+lisp=cl ext:quit #-lisp=cl lisp:quit code)
@@ -31,6 +32,10 @@
   (:abcl (unless (string= "Armed Bear Common Lisp"
                (lisp-implementation-type))
              (format *error-output* "Invalid lisp instance. Maybe a configuration error? This is not ABCL!~%")
+             (portable-quit 1)))
+  (:ccl (unless (string= "Clozure Common Lisp"
+               (lisp-implementation-type))
+             (format *error-output* "Invalid lisp instance. Maybe a configuration error? This is not Clozure Common Lisp!~%")
              (portable-quit 1)))
   (otherwise
    (format *error-output* "Unsupported lisp instance. Maybe a configuration error?~%")

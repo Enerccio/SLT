@@ -1,11 +1,13 @@
 (load (merge-pathnames "swank-backend.lisp" *load-truename*))
 
-(when (eq +slt-interpret+ :sbcl)
+(when (eq slt:+slt-interpret+ :sbcl)
   (load (merge-pathnames "swank-sbcl.lisp" *load-truename*))
   (in-package swank/source-file-cache)
   (setf *source-snippet-size* 0))
-(when (eq +slt-interpret+ :abcl)
+(when (eq slt:+slt-interpret+ :abcl)
   (load (merge-pathnames "swank-abcl.lisp" *load-truename*)))
+(when (eq slt:+slt-interpret+ :ccl)
+  (load (merge-pathnames "swank-ccl.lisp" *load-truename*)))
 
 (in-package :swank)
 
@@ -67,6 +69,7 @@ format suitable for Emacs."
                             collect data-pair)))
 
 (defun find-reference-class-filter (symbol package)
+    (declare (ignorable package))
     (find-class symbol NIL))
 
 (defun get-reference-prefix (prefix type)

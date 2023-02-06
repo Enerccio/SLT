@@ -120,6 +120,8 @@ public class SdkSelector implements Configurable {
                 LispEnvironmentService.getInstance(project).stop();
                 LispEnvironmentService.getInstance(project).start();
             }
+        } else {
+            LispEnvironmentService.getInstance(project).resetConfiguration();
         }
     }
 

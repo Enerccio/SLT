@@ -7,20 +7,24 @@ This is a list of features that are supported.
 | ❓      | Not implemented but might be in future |
 | ❎      | Is not supported                       |
 
-| Features / Lisp   | SBCL | ABCL |
-|-------------------|------|------|
-| REPL              | ✅️   | ✅️   |
-| Buffer Evaluation | ✅️   | ✅️   |
-| Documentation     | ✅    | ✅    |
-| Macroexpand       | ✅    | ✅    |
-| Debugger          | ✅    | ✅    |
-| Frame Eval        | ✅    | ❎    |
-| Stepping Debugger | ❎    | ❎    |
-| References        | ✅    | ❎    |
-| Inspector         | ✅¹   | ✅²   |
-| Autocomplete      | ✅    | ✅    |
-| Find References   | ✅    | ❎    |
+Unsupported and will not be supported implementations:
 
-1 - Only read-only inspector available
+* CLISP - does not work, maybe with threads, but single threaded it's useless and crashes on debug attempt
 
-2 - Only read-only inspector available, also no history support
+| Features / Lisp   | SBCL | ABCL | CCL |
+|-------------------|------|------|-----|
+| REPL              | ✅️   | ✅️   | ✅️  |
+| Buffer Evaluation | ✅️   | ✅️   | ✅️  |
+| Documentation     | ✅    | ✅    | ✅️  |
+| Macroexpand       | ✅    | ✅    | ✅️  |
+| Debugger          | ✅    | ✅    | ️   |
+| Frame Eval        | ✅    | ❎    | ️   |
+| Stepping Debugger | ❎    | ❎    | ️   |
+| References        | ✅    | ❎    | ✅️  |
+| Inspector         | ✅¹   | ✅²   | ️   |
+| Autocomplete      | ✅    | ✅    |     |
+| Find References   | ✅    | ❎    | ️   |
+
+¹Only read-only inspector available
+
+²Only read-only inspector available, also no history support

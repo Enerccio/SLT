@@ -3,7 +3,8 @@ package com.en_circle.slt.plugin.environment;
 public enum LispInterpret {
 
     ABCL(":abcl"),
-    SBCL(":sbcl")
+    SBCL(":sbcl"),
+    CCL(":ccl"),
 
     ;
 
