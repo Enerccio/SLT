@@ -10,6 +10,7 @@ import com.intellij.openapi.util.text.HtmlBuilder;
 import com.intellij.openapi.util.text.HtmlChunk;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.util.PsiTreeUtil;
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.Nullable;
@@ -79,7 +80,7 @@ public class SltDocumentationProvider extends AbstractDocumentationProvider {
 
     private String asHtml(SymbolState state, String packageName, PsiElement element) {
         HtmlBuilder builder = new HtmlBuilder();
-        String documentation = StringUtils.replace(StringUtils.replace(state.documentation, " ", "&nbsp;"),
+        String documentation = StringUtils.replace(StringUtils.replace(escape(state.documentation), " ", "&nbsp;"),
                 "\n", HtmlChunk.br().toString());
         builder.append(documentation == null ? HtmlChunk.raw("") : HtmlChunk.raw(documentation));
 
@@ -87,7 +88,7 @@ public class SltDocumentationProvider extends AbstractDocumentationProvider {
         if (form != null && state.binding == SymbolBinding.MACRO) {
             String macroExpand = LispEnvironmentService.getInstance(element.getProject()).macroexpand(form, packageName);
             if (macroExpand != null) {
-                macroExpand = StringUtils.replace(StringUtils.replace(macroExpand, " ", "&nbsp;"),
+                macroExpand = StringUtils.replace(StringUtils.replace(escape(macroExpand), " ", "&nbsp;"),
                         "\n", HtmlChunk.br().toString());
                 builder.append(HtmlChunk.hr());
                 builder.append(HtmlChunk.text(SltBundle.message("slt.documentation.macroexpand")));
@@ -101,5 +102,9 @@ public class SltDocumentationProvider extends AbstractDocumentationProvider {
 
         String doc = builder.toString();
         return StringUtils.isBlank(doc) ? null : doc;
+    }
+
+    private String escape(String s) {
+        return StringEscapeUtils.escapeHtml(s);
     }
 }
