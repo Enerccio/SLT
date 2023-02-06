@@ -4,6 +4,7 @@
 
 - Support for multiple lisp interprets
 - ABCL Support
+- CCL Support
 
 ### Fixes
 
