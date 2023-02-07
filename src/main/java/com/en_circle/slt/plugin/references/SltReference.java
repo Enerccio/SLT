@@ -202,10 +202,7 @@ public class SltReference extends PsiPolyVariantReferenceBase<LispSymbol> {
         PsiFile f = PsiManager.getInstance(myElement.getProject()).findFile(vf);
         if (f == null)
             return null;
-        PsiElement element = f.findElementAt(location.getPosition());
-        if (element == null)
-            return null;
-        return new PsiElementResolveResult(element);
+        return new PsiElementResolveResult(new SltFakePsiElement(f, name, location.getPosition()));
     }
 
     @Override

@@ -9,6 +9,7 @@
 ### Fixes
 
 - Fixed parser issue with dot 
+- Fixed xref speed issues with large psi
 
 ### Changes
 
