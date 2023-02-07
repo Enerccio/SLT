@@ -108,6 +108,7 @@
 
         <!-- Contributors -->
         <gotoClassContributor implementation="com.en_circle.slt.plugin.contributors.SltClassContributor"/>
+
         <gotoSymbolContributor implementation="com.en_circle.slt.plugin.contributors.SltSymbolContributor"/>
     </extensions>
 

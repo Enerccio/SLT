@@ -41,7 +41,7 @@ public class LispParserUtil extends GeneratedParserUtilBase {
     }
 
     public static String getPackage(PsiElement element) {
-        return getPackage(element,  GLOBAL_PACKAGE_RETURN);
+        return getPackage(element, GLOBAL_PACKAGE_RETURN);
     }
 
     public static String getPackage(PsiElement element, Function<Project, String> notFoundSupplier) {

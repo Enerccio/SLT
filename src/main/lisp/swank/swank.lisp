@@ -83,7 +83,7 @@ format suitable for Emacs."
         (let* ((symbol (second data-pair))
                (str (first data-pair))
                (package (third data-pair))
-               (strpackage (format NIL "~S" package)))
+               (strpackage (package-name package)))
           (cond
             ((not symbol) (list str strpackage NIL NIL))
             ((macro-function symbol) (list str strpackage :macro (find-source-location (symbol-function symbol))))
