@@ -17,14 +17,14 @@ Unsupported and will not be supported implementations:
 | Buffer Evaluation | ✅️   | ✅️   | ✅️   | ✅️         |           |       |
 | Documentation     | ✅    | ✅    | ✅️   | ✅️         |           |       |
 | Macroexpand       | ✅    | ✅    | ✅️   | ✅️         |           |       |
-| Debugger          | ✅    | ✅    | ✅️   |            |           |       |
-| Debugger Actions  | ✅    | ✅    | ✅️³️ |            |           |       |
-| Frame REPL        | ✅    | ❎    | ✅️   |            |           |       |
+| Debugger          | ✅    | ✅    | ✅️   | ✅          |           |       |
+| Debugger Actions  | ✅    | ✅    | ✅️³️ | ✅          |           |       |
+| Frame REPL        | ✅    | ❎    | ✅️   | ✅          |           |       |
 | Stepping Debugger | ❎    | ❎    | ❎    | ✅          | ✅         | ✅     |
-| References        | ✅    | ❎    | ✅️   |            |           |       |
-| Inspector         | ✅¹   | ✅²   | ✅️¹  |            |           |       |
+| References        | ✅    | ❎    | ✅️   | ✅️         |           |       |
+| Inspector         | ✅¹   | ✅²   | ✅️¹  | ✅️¹        |           |       |
 | Autocomplete      | ✅    | ✅    | ✅    | ✅          |           |       |
-| Find References   | ✅    | ❎    | ✅️   |            |           |       |
+| Find References   | ✅    | ❎    | ✅️   | ❎          |           |       |
 
 ¹Only read-only inspector available
 

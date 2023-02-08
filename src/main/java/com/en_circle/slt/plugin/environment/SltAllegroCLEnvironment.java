@@ -32,7 +32,7 @@ public class SltAllegroCLEnvironment extends SltLispEnvironmentProcess  {
 
     @Override
     public Environment getType() {
-        return Environment.CCL_PROCESS;
+        return Environment.ALLEGRO_PROCESS;
     }
 
     @Override

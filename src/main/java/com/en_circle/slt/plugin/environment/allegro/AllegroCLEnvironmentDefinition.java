@@ -22,11 +22,11 @@ public class AllegroCLEnvironmentDefinition extends EnvironmentDefinition {
         features.add(LispFeatures.REPL);
         features.add(LispFeatures.DOCUMENTATION);
         features.add(LispFeatures.MACROEXPAND);
+        features.add(LispFeatures.DEBUGGER_ACTION_ARGLIST);
         features.add(LispFeatures.FRAME_EVAL);
         features.add(LispFeatures.INSPECTOR);
         features.add(LispFeatures.INSPECTOR_HISTORY);
         features.add(LispFeatures.AUTOCOMPLETE);
-        features.add(LispFeatures.SEARCH);
         features.add(LispFeatures.XREFS);
     }
 
