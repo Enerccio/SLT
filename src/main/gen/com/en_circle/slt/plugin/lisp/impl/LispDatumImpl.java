@@ -56,12 +56,6 @@ public class LispDatumImpl extends ASTWrapperPsiElement implements LispDatum {
 
   @Override
   @Nullable
-  public LispPair getPair() {
-    return findChildByClass(LispPair.class);
-  }
-
-  @Override
-  @Nullable
   public LispPathname getPathname() {
     return findChildByClass(LispPathname.class);
   }

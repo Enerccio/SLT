@@ -11,20 +11,20 @@ Unsupported and will not be supported implementations:
 
 * CLISP - does not work, maybe with threads, but single threaded it's useless and crashes on debug attempt
 
-| Features / Lisp   | SBCL | ABCL | CCL  |
-|-------------------|------|------|------|
-| REPL              | ✅️   | ✅️   | ✅️   |
-| Buffer Evaluation | ✅️   | ✅️   | ✅️   |
-| Documentation     | ✅    | ✅    | ✅️   |
-| Macroexpand       | ✅    | ✅    | ✅️   |
-| Debugger          | ✅    | ✅    | ✅️   |
-| Debugger Actions  | ✅    | ✅    | ✅️³️ |
-| Frame REPL        | ✅    | ❎    | ✅️   |
-| Stepping Debugger | ❎    | ❎    | ❓    |
-| References        | ✅    | ❎    | ✅️   |
-| Inspector         | ✅¹   | ✅²   | ✅️   |
-| Autocomplete      | ✅    | ✅    | ✅    |
-| Find References   | ✅    | ❎    | ✅️   |
+| Features / Lisp   | SBCL | ABCL | CCL  | Allegro CL | Lispworks | CMUCL |
+|-------------------|------|------|------|------------|-----------|-------|
+| REPL              | ✅️   | ✅️   | ✅️   | ✅️         |           |       |
+| Buffer Evaluation | ✅️   | ✅️   | ✅️   | ✅️         |           |       |
+| Documentation     | ✅    | ✅    | ✅️   | ✅️         |           |       |
+| Macroexpand       | ✅    | ✅    | ✅️   | ✅️         |           |       |
+| Debugger          | ✅    | ✅    | ✅️   |            |           |       |
+| Debugger Actions  | ✅    | ✅    | ✅️³️ |            |           |       |
+| Frame REPL        | ✅    | ❎    | ✅️   |            |           |       |
+| Stepping Debugger | ❎    | ❎    | ❎    | ✅          | ✅         | ✅     |
+| References        | ✅    | ❎    | ✅️   |            |           |       |
+| Inspector         | ✅¹   | ✅²   | ✅️¹  |            |           |       |
+| Autocomplete      | ✅    | ✅    | ✅    | ✅          |           |       |
+| Find References   | ✅    | ❎    | ✅️   |            |           |       |
 
 ¹Only read-only inspector available
 

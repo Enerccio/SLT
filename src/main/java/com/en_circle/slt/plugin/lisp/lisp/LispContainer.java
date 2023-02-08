@@ -20,13 +20,9 @@ public class LispContainer implements LispElement {
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append(getStartingSymbol());
-        for (int i=0; i<items.size(); i++) {
-            sb.append(items.get(i));
-            if (containerType == ContainerType.PAIR && i == items.size() - 1) {
-                sb.append(" . ");
-            } else {
-                sb.append(" ");
-            }
+        for (LispElement item : items) {
+            sb.append(item);
+            sb.append(" ");
         }
         sb.append(getEndingSymbol());
         return sb.toString();
@@ -41,8 +37,7 @@ public class LispContainer implements LispElement {
         StringBuilder sb = new StringBuilder();
         if (offset > 0)
             sb.append("\n");
-        for (int i=0; i<offset; i++)
-            sb.append(" ");
+        sb.append(" ".repeat(Math.max(0, offset)));
         sb.append(getStartingSymbol());
         for (int i=0; i<items.size(); i++) {
             if (items.get(i) instanceof LispContainer) {
@@ -50,9 +45,7 @@ public class LispContainer implements LispElement {
             } else {
                 sb.append(items.get(i));
             }
-            if (containerType == ContainerType.PAIR && i == items.size() - 1) {
-                sb.append(" . ");
-            } else if (i != items.size() - 1){
+            if (i != items.size() - 1){
                 sb.append(" ");
             }
         }
@@ -63,7 +56,6 @@ public class LispContainer implements LispElement {
     private String getStartingSymbol() {
         switch (containerType) {
             case LIST:
-            case PAIR:
                 return "(";
             case VECTOR:
                 return "#(";
@@ -74,7 +66,6 @@ public class LispContainer implements LispElement {
     private String getEndingSymbol() {
         switch (containerType) {
             case LIST:
-            case PAIR:
             case VECTOR:
                 return ")";
         }
@@ -91,6 +82,6 @@ public class LispContainer implements LispElement {
     }
 
     public enum ContainerType {
-        LIST, PAIR, VECTOR
+        LIST, VECTOR
     }
 }

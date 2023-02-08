@@ -1,4 +1,4 @@
-package com.en_circle.slt.plugin.environment.clisp;
+package com.en_circle.slt.plugin.environment.ccl;
 
 import com.en_circle.slt.plugin.environment.LispSltOverridesBase;
 import org.slf4j.Logger;

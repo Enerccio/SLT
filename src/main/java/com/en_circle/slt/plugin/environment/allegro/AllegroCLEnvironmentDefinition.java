@@ -1,11 +1,11 @@
-package com.en_circle.slt.plugin.environment.clisp;
+package com.en_circle.slt.plugin.environment.allegro;
 
 import com.en_circle.slt.plugin.SltBundle;
 import com.en_circle.slt.plugin.environment.*;
 import com.en_circle.slt.plugin.environment.SltLispEnvironmentConfiguration.Builder;
 import com.en_circle.slt.plugin.sdk.LispSdk;
 import com.en_circle.slt.plugin.services.lisp.LispSltOverrides;
-import com.en_circle.slt.plugin.ui.sdk.SdkConfigurationCCLProcess;
+import com.en_circle.slt.plugin.ui.sdk.SdkConfigurationAllegroCLProcess;
 import com.en_circle.slt.plugin.ui.sdk.SdkDialogProvider;
 import com.en_circle.slt.tools.platform.DownloadLispAction;
 import com.intellij.openapi.project.Project;
@@ -14,11 +14,11 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.function.Supplier;
 
-public class CCLEnvironmentDefinition extends EnvironmentDefinition {
+public class AllegroCLEnvironmentDefinition extends EnvironmentDefinition {
 
     private final Set<LispFeatures> features = new HashSet<>();
 
-    public CCLEnvironmentDefinition() {
+    public AllegroCLEnvironmentDefinition() {
         features.add(LispFeatures.REPL);
         features.add(LispFeatures.DOCUMENTATION);
         features.add(LispFeatures.MACROEXPAND);
@@ -32,7 +32,7 @@ public class CCLEnvironmentDefinition extends EnvironmentDefinition {
 
     @Override
     public String getName() {
-        return SltBundle.message("slt.environment.ccl");
+        return SltBundle.message("slt.environment.allegro");
     }
 
     @Override
@@ -42,28 +42,28 @@ public class CCLEnvironmentDefinition extends EnvironmentDefinition {
 
     @Override
     public Supplier<SltLispEnvironment> getEnvironmentCreator() {
-        return SltCCLEnvironment::new;
+        return SltAllegroCLEnvironment::new;
     }
 
     @SuppressWarnings("unchecked")
     @Override
     public <T extends Builder<T, R>, R extends SltLispEnvironmentConfiguration>
     Builder<T, R> buildConfiguration(LispSdk sdk, Project project) {
-        return (Builder<T, R>) new SltCCLEnvironmentConfiguration.Builder()
-                .setExecutable(sdk.cclExecutable)
-                .setMemoryImage(sdk.cclMemoryImage)
+        return (Builder<T, R>) new SltAllegroCLEnvironmentConfiguration.Builder()
+                .setExecutable(sdk.allegroExecutable)
+                .setMemoryImage(sdk.allegroMemoryImage)
                 .setQuicklispStartScriptPath(sdk.quickLispPath)
                 .setProjectDirectory(project.getBasePath());
     }
 
     @Override
     public SdkDialogProvider getDialogProvider() {
-        return SdkConfigurationCCLProcess::new;
+        return SdkConfigurationAllegroCLProcess::new;
     }
 
     @Override
     public LispSltOverrides getOverrides() {
-        return new CCLOverrides();
+        return new AllegroCLOverrides();
     }
 
     @Override

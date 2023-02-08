@@ -4,7 +4,7 @@ import com.en_circle.slt.plugin.SltBundle;
 import com.en_circle.slt.plugin.sdk.LispSdk;
 import com.en_circle.slt.plugin.ui.SltGlobalUIService;
 import com.en_circle.slt.plugin.ui.sdk.SdkDialogProvider.OnSave;
-import com.en_circle.slt.tools.ABCLUtils;
+import com.en_circle.slt.tools.AllegroCLUtils;
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.fileChooser.FileChooserDescriptor;
 import com.intellij.openapi.fileChooser.FileChooserFactory;
@@ -30,7 +30,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.io.File;
 
-public class SdkConfigurationABCLProcess extends DialogWrapper {
+public class SdkConfigurationAllegroCLProcess extends DialogWrapper {
 
     private final Disposable parentDisposable;
     private final LispSdk instance;
@@ -38,12 +38,11 @@ public class SdkConfigurationABCLProcess extends DialogWrapper {
     private boolean isVerified = false;
 
     private JBTextField name;
-    private FileTextField jvmExecutable;
-    private JBTextField jvmArguments;
-    private FileTextField jar;
+    private FileTextField allegroExecutable;
+    private FileTextField allegroImage;
     private FileTextField quicklispPath;
 
-    public SdkConfigurationABCLProcess(@NotNull Component parent, LispSdk instance, String title, OnSave onSave) {
+    public SdkConfigurationAllegroCLProcess(@NotNull Component parent, LispSdk instance, String title, OnSave onSave) {
         super(parent, true);
 
         this.parentDisposable = SltGlobalUIService.getInstance();
@@ -61,36 +60,31 @@ public class SdkConfigurationABCLProcess extends DialogWrapper {
         name.addCaretListener(createChangeListener());
         name.setText(instance.userName);
         if (StringUtils.isBlank(instance.userName)) {
-            name.setText(SltBundle.message("slt.ui.settings.sdk.editor.name.abcl.default"));
+            name.setText(SltBundle.message("slt.ui.settings.sdk.editor.name.allegro.default"));
         }
 
         FileChooserDescriptor descriptor = new FileChooserDescriptor(true, false, false,
                         false, false, false);
-        FileChooserDescriptor descriptorJar = new FileChooserDescriptor(true, false, true,
-                true, false, false);
 
-        jvmExecutable = FileChooserFactory.getInstance()
+        allegroExecutable = FileChooserFactory.getInstance()
                 .createFileTextField(descriptor, true, parentDisposable);
-        jvmExecutable.getField().addCaretListener(createChangeListener());
-        jvmExecutable.getField().setText(instance.abclJvm);
-        jvmArguments = new JBTextField();
-        jvmArguments.addCaretListener(createChangeListener());
-        jvmArguments.setText(instance.abclJvmArgs);
-        jar = FileChooserFactory.getInstance()
-                .createFileTextField(descriptorJar, true, parentDisposable);
-        jar.getField().addCaretListener(createChangeListener());
-        jar.getField().setText(instance.abclJar);
+        allegroExecutable.getField().addCaretListener(createChangeListener());
+        allegroExecutable.getField().setText(instance.sbclExecutable);
+        allegroImage = FileChooserFactory.getInstance()
+                .createFileTextField(descriptor, true, parentDisposable);
+        allegroImage.getField().addCaretListener(createChangeListener());
+        allegroImage.getField().setText(instance.sbclCorePath);
         quicklispPath = FileChooserFactory.getInstance()
                 .createFileTextField(descriptor, true, parentDisposable);
         quicklispPath.getField().addCaretListener(createChangeListener());
         quicklispPath.getField().setText(instance.quickLispPath);
 
-        TextFieldWithBrowseButton abclExecutablePicker = new TextFieldWithBrowseButton(jvmExecutable.getField());
-        abclExecutablePicker.addBrowseFolderListener(
-                SltBundle.message("slt.ui.settings.sdk.editor.jvm.select"), "", null, descriptor);
-        TextFieldWithBrowseButton abclJarPicker = new TextFieldWithBrowseButton(jar.getField());
-        abclJarPicker.addBrowseFolderListener(
-                SltBundle.message("slt.ui.settings.sdk.editor.abcl.select"), "", null, descriptorJar);
+        TextFieldWithBrowseButton cclExecutablePicker = new TextFieldWithBrowseButton(allegroExecutable.getField());
+        cclExecutablePicker.addBrowseFolderListener(
+                SltBundle.message("slt.ui.settings.sdk.editor.allegro.executable.select"), "", null, descriptor);
+        TextFieldWithBrowseButton cclImagePicker = new TextFieldWithBrowseButton(allegroImage.getField());
+        cclImagePicker.addBrowseFolderListener(
+                SltBundle.message("slt.ui.settings.sdk.editor.allegro.image.select"), "", null, descriptor);
         TextFieldWithBrowseButton quicklispPathPicker = new TextFieldWithBrowseButton(quicklispPath.getField());
         //noinspection DialogTitleCapitalization
         quicklispPathPicker.addBrowseFolderListener(
@@ -98,12 +92,10 @@ public class SdkConfigurationABCLProcess extends DialogWrapper {
 
         return new FormBuilder()
                 .addLabeledComponent(SltBundle.message("slt.ui.settings.sdk.editor.name"), name, 1, false)
-                .addLabeledComponent(SltBundle.message("slt.ui.settings.sdk.editor.abcl.jvm.executable"),
-                        abclExecutablePicker, 1, false)
-                .addLabeledComponent(SltBundle.message("slt.ui.settings.sdk.editor.abcl.jvm.args"),
-                        jvmArguments, 1, false)
-                .addLabeledComponent(SltBundle.message("slt.ui.settings.sdk.editor.abcl.jar"),
-                        abclJarPicker, 1, false)
+                .addLabeledComponent(SltBundle.message("slt.ui.settings.sdk.editor.allegro.process.executable"),
+                        cclExecutablePicker, 1, false)
+                .addLabeledComponent(SltBundle.message("slt.ui.settings.sdk.editor.allegro.process.image"),
+                        cclImagePicker, 1, false)
                 .addLabeledComponent(SltBundle.message("slt.ui.settings.sdk.editor.quicklisp"),
                         quicklispPathPicker, 1, false)
                 .addComponentFillVertically(new JPanel(), 0)
@@ -116,8 +108,8 @@ public class SdkConfigurationABCLProcess extends DialogWrapper {
 
     private void verifySdk() {
         name.putClientProperty("JComponent.outline", null);
-        jvmExecutable.getField().putClientProperty("JComponent.outline", null);
-        jar.getField().putClientProperty("JComponent.outline", null);
+        allegroExecutable.getField().putClientProperty("JComponent.outline", null);
+        allegroImage.getField().putClientProperty("JComponent.outline", null);
         quicklispPath.getField().putClientProperty("JComponent.outline", null);
 
         boolean verified = true;
@@ -127,20 +119,18 @@ public class SdkConfigurationABCLProcess extends DialogWrapper {
             name.putClientProperty("JComponent.outline", "error");
         }
 
-        String jvm = jvmExecutable.getField().getText();
-        if (StringUtils.isBlank(jvm)) {
+        String executable = allegroExecutable.getField().getText();
+        if (StringUtils.isBlank(executable)) {
             verified = false;
-            jvmExecutable.getField().putClientProperty("JComponent.outline", "error");
+            allegroExecutable.getField().putClientProperty("JComponent.outline", "error");
         }
 
-        String jvmArgs = jvmArguments.getText();
-
-        String jar = this.jar.getField().getText();
-        if (StringUtils.isNotBlank(jar)) {
-            File file = new File(jar);
+        String core = allegroImage.getField().getText();
+        if (StringUtils.isNotBlank(core)) {
+            File file = new File(core);
             if (!file.exists()) {
                 verified = false;
-                this.jar.getField().putClientProperty("JComponent.outline", "error");
+                allegroImage.getField().putClientProperty("JComponent.outline", "error");
             }
         }
 
@@ -157,27 +147,27 @@ public class SdkConfigurationABCLProcess extends DialogWrapper {
         }
 
         name.repaint();
-        jvmExecutable.getField().repaint();
-        this.jar.getField().repaint();
+        allegroExecutable.getField().repaint();
+        allegroImage.getField().repaint();
         quicklispPath.getField().repaint();
 
         if (verified)
-            verified = checkAndLoadAbcl(jvm, jvmArgs, jar, quicklisp);
+            verified = checkAndLoadAllegro(executable, core, quicklisp);
         if (!verified) {
-            Messages.showErrorDialog(SltBundle.message("slt.ui.settings.sdk.editor.abcl.process.verifying.error"),
+            Messages.showErrorDialog(SltBundle.message("slt.ui.settings.sdk.editor.allegro.process.verifying.error"),
                     SltBundle.message("slt.ui.settings.sdk.editor.verifying.error.title"));
         }
 
         isVerified = verified;
     }
 
-    private boolean checkAndLoadAbcl(String jvm, String jvmArgs, String jar, String quicklisp) {
+    private boolean checkAndLoadAllegro(String executable, String memory, String quicklisp) {
         ProgressWindow verifyWindow = new ProgressWindow(true, false, null,
                 getRootPane(), SltBundle.message("slt.ui.settings.sdk.editor.verifying.cancel"));
-        verifyWindow.setTitle(SltBundle.message("slt.ui.settings.sdk.editor.verifying.abcl"));
+        verifyWindow.setTitle(SltBundle.message("slt.ui.settings.sdk.editor.verifying.ccl"));
         Disposer.register(parentDisposable, verifyWindow);
 
-        ProgressResult<Boolean> result = new ProgressRunner<>(pi -> verifyAbcl(pi, jvm, jvmArgs, jar, quicklisp))
+        ProgressResult<Boolean> result = new ProgressRunner<>(pi -> verifyAllegro(pi, executable, memory, quicklisp))
                 .sync()
                 .onThread(ThreadToUse.POOLED)
                 .withProgress(verifyWindow)
@@ -186,15 +176,14 @@ public class SdkConfigurationABCLProcess extends DialogWrapper {
         return Boolean.TRUE.equals(result.getResult());
     }
 
-    private boolean verifyAbcl(ProgressIndicator pi, String jvm, String jvmArgs, String jar, String quicklisp) {
-        return ABCLUtils.verifyAndInstallDependencies(jvm, jvmArgs, jar, quicklisp, pi);
+    private boolean verifyAllegro(ProgressIndicator pi, String executable, String core, String quicklisp) {
+        return AllegroCLUtils.verifyAndInstallDependencies(executable, core, quicklisp, pi);
     }
 
     private void save() {
         instance.userName = name.getText();
-        instance.abclJvm = jvmExecutable.getField().getText();
-        instance.abclJvmArgs = jvmArguments.getText();
-        instance.abclJar = jar.getField().getText();
+        instance.allegroExecutable = allegroExecutable.getField().getText();
+        instance.allegroMemoryImage = allegroImage.getField().getText();
         instance.quickLispPath = quicklispPath.getField().getText();
         onSave.saveAction(instance);
         close(0);
@@ -210,7 +199,7 @@ public class SdkConfigurationABCLProcess extends DialogWrapper {
     public class VerifyAction extends AbstractAction {
 
         public VerifyAction() {
-            super(SltBundle.message("slt.ui.settings.sdk.editor.abcl.process.verify"));
+            super(SltBundle.message("slt.ui.settings.sdk.editor.allegro.process.verify"));
         }
 
         @Override
@@ -229,7 +218,7 @@ public class SdkConfigurationABCLProcess extends DialogWrapper {
         public void actionPerformed(ActionEvent e) {
             if (!isVerified) {
                 Messages.showInfoMessage(SltBundle.message("slt.ui.settings.sdk.editor.notverified.title"),
-                        SltBundle.message("slt.ui.settings.sdk.editor.abcl.process.notverified.message"));
+                        SltBundle.message("slt.ui.settings.sdk.editor.allegro.process.notverified.message"));
                 return;
             }
 

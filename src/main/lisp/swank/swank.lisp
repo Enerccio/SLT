@@ -8,6 +8,8 @@
   (load (merge-pathnames "swank-abcl.lisp" *load-truename*)))
 (when (eq slt:+slt-interpret+ :ccl)
   (load (merge-pathnames "swank-ccl.lisp" *load-truename*)))
+(when (eq slt:+slt-interpret+ :allegro)
+  (load (merge-pathnames "swank-allegro.lisp" *load-truename*)))
 
 (in-package :swank)
 

@@ -152,7 +152,7 @@ public class SdkConfigurationCCLProcess extends DialogWrapper {
         quicklispPath.getField().repaint();
 
         if (verified)
-            verified = checkAndLoadClispCore(executable, core, quicklisp);
+            verified = checkAndLoadCCL(executable, core, quicklisp);
         if (!verified) {
             Messages.showErrorDialog(SltBundle.message("slt.ui.settings.sdk.editor.ccl.process.verifying.error"),
                     SltBundle.message("slt.ui.settings.sdk.editor.verifying.error.title"));
@@ -161,13 +161,13 @@ public class SdkConfigurationCCLProcess extends DialogWrapper {
         isVerified = verified;
     }
 
-    private boolean checkAndLoadClispCore(String executable, String memory, String quicklisp) {
+    private boolean checkAndLoadCCL(String executable, String memory, String quicklisp) {
         ProgressWindow verifyWindow = new ProgressWindow(true, false, null,
                 getRootPane(), SltBundle.message("slt.ui.settings.sdk.editor.verifying.cancel"));
         verifyWindow.setTitle(SltBundle.message("slt.ui.settings.sdk.editor.verifying.ccl"));
         Disposer.register(parentDisposable, verifyWindow);
 
-        ProgressResult<Boolean> result = new ProgressRunner<>(pi -> verifyClisp(pi, executable, memory, quicklisp))
+        ProgressResult<Boolean> result = new ProgressRunner<>(pi -> verifyCCL(pi, executable, memory, quicklisp))
                 .sync()
                 .onThread(ThreadToUse.POOLED)
                 .withProgress(verifyWindow)
@@ -176,7 +176,7 @@ public class SdkConfigurationCCLProcess extends DialogWrapper {
         return Boolean.TRUE.equals(result.getResult());
     }
 
-    private boolean verifyClisp(ProgressIndicator pi, String executable, String core, String quicklisp) {
+    private boolean verifyCCL(ProgressIndicator pi, String executable, String core, String quicklisp) {
         return CCLUtils.verifyAndInstallDependencies(executable, core, quicklisp, pi);
     }
 

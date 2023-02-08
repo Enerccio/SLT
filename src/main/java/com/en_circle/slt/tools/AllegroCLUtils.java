@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
-public class CCLUtils {
+public class AllegroCLUtils {
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
     public static boolean verifyAndInstallDependencies(String executable, String memoryImage, String quicklisp, ProgressIndicator pi) {
@@ -26,16 +26,17 @@ public class CCLUtils {
                 args.add("-I");
                 args.add(memoryImage);
             }
-            args.add("-b");
+            args.add("--batch");
 
-            File tempTestFile = FileUtil.createTempFile("testCCL", ".cl");
+            File tempTestFile = FileUtil.createTempFile("testAllegro", ".cl");
             if (tempTestFile.exists())
                 tempTestFile.delete();
             FileUtils.writeStringToFile(tempTestFile, new VerifyTemplate(quicklisp).render(), StandardCharsets.UTF_8);
             tempTestFile.deleteOnExit();
 
-            args.add("-l");
+            args.add("-L");
             args.add(tempTestFile.getAbsolutePath());
+            args.add("--kill");
 
             try {
                 ProcessBuilder processBuilder = new ProcessBuilder(args.toArray(new String[0]));
@@ -49,7 +50,7 @@ public class CCLUtils {
                 errorController.addUpdateListener(errorValue::append);
                 outputController.addUpdateListener(outputValue::append);
                 WaitForOccurrence waiter = new WaitForOccurrence("SltVerified");
-                errorController.addUpdateListener(waiter);
+                outputController.addUpdateListener(waiter);
                 outputController.addUpdateListener(data -> {
                     displayValue.append(data);
                     String str = displayValue.toString();
@@ -81,7 +82,7 @@ public class CCLUtils {
 
                 errorController.join();
                 outputController.join();
-                return errorValue.toString().contains("SltVerified");
+                return outputValue.toString().contains("SltVerified");
             } finally {
                 tempTestFile.delete();
             }
