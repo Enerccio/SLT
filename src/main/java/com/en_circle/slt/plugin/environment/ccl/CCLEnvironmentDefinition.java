@@ -1,11 +1,11 @@
-package com.en_circle.slt.plugin.environment.abcl;
+package com.en_circle.slt.plugin.environment.ccl;
 
 import com.en_circle.slt.plugin.SltBundle;
 import com.en_circle.slt.plugin.environment.*;
 import com.en_circle.slt.plugin.environment.SltLispEnvironmentConfiguration.Builder;
 import com.en_circle.slt.plugin.sdk.LispSdk;
 import com.en_circle.slt.plugin.services.lisp.LispSltOverrides;
-import com.en_circle.slt.plugin.ui.sdk.SdkConfigurationABCLProcess;
+import com.en_circle.slt.plugin.ui.sdk.SdkConfigurationCCLProcess;
 import com.en_circle.slt.plugin.ui.sdk.SdkDialogProvider;
 import com.en_circle.slt.tools.platform.DownloadLispAction;
 import com.intellij.openapi.project.Project;
@@ -14,23 +14,28 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.function.Supplier;
 
-public class ABCLEnvironmentDefinition extends EnvironmentDefinition {
+public class CCLEnvironmentDefinition extends EnvironmentDefinition {
 
     private final Set<LispFeatures> features = new HashSet<>();
 
-    public ABCLEnvironmentDefinition() {
+    public CCLEnvironmentDefinition() {
         features.add(LispFeatures.REPL);
         features.add(LispFeatures.DOCUMENTATION);
         features.add(LispFeatures.MACROEXPAND);
+        features.add(LispFeatures.FRAME_EVAL);
+        features.add(LispFeatures.BREAKPOINTS);
+        features.add(LispFeatures.BREAKPOINT_STEPPING);
         features.add(LispFeatures.INSPECTOR);
-        features.add(LispFeatures.DEBUGGER_ACTION_ARGLIST);
+        features.add(LispFeatures.INSPECTOR_HISTORY);
         features.add(LispFeatures.AUTOCOMPLETE);
+        features.add(LispFeatures.SEARCH);
+        features.add(LispFeatures.XREFS);
         features.add(LispFeatures.FUNC_ARGS);
     }
 
     @Override
     public String getName() {
-        return SltBundle.message("slt.environment.abcl");
+        return SltBundle.message("slt.environment.ccl");
     }
 
     @Override
@@ -40,29 +45,28 @@ public class ABCLEnvironmentDefinition extends EnvironmentDefinition {
 
     @Override
     public Supplier<SltLispEnvironment> getEnvironmentCreator() {
-        return SltABCLEnvironment::new;
+        return SltCCLEnvironment::new;
     }
 
     @SuppressWarnings("unchecked")
     @Override
-    public <T extends Builder<T, R>, R extends SltLispEnvironmentConfiguration> Builder<T, R>
-    buildConfiguration(LispSdk sdk, Project project) {
-        return (Builder<T, R>) new SltABCLEnvironmentConfiguration.Builder()
-                .setJvm(sdk.abclJvm)
-                .setJvmArgs(sdk.abclJvmArgs)
-                .setAbclJar(sdk.abclJar)
+    public <T extends Builder<T, R>, R extends SltLispEnvironmentConfiguration>
+    Builder<T, R> buildConfiguration(LispSdk sdk, Project project) {
+        return (Builder<T, R>) new SltCCLEnvironmentConfiguration.Builder()
+                .setExecutable(sdk.cclExecutable)
+                .setMemoryImage(sdk.cclMemoryImage)
                 .setQuicklispStartScriptPath(sdk.quickLispPath)
                 .setProjectDirectory(project.getBasePath());
     }
 
     @Override
     public SdkDialogProvider getDialogProvider() {
-        return SdkConfigurationABCLProcess::new;
+        return SdkConfigurationCCLProcess::new;
     }
 
     @Override
     public LispSltOverrides getOverrides() {
-        return new ABCLOverrides();
+        return new CCLOverrides();
     }
 
     @Override

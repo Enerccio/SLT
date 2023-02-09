@@ -8,6 +8,12 @@
   (load (merge-pathnames "swank-abcl.lisp" *load-truename*)))
 (when (eq slt:+slt-interpret+ :ccl)
   (load (merge-pathnames "swank-ccl.lisp" *load-truename*)))
+(when (eq slt:+slt-interpret+ :allegro)
+  (load (merge-pathnames "swank-allegro.lisp" *load-truename*)))
+(when (eq slt:+slt-interpret+ :cmucl)
+  (load (merge-pathnames "swank-cmucl.lisp" *load-truename*))
+  (in-package swank/source-file-cache)
+  (setf *source-snippet-size* 0))
 
 (in-package :swank)
 

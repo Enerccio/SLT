@@ -12,7 +12,7 @@ public class ParserTest {
 
     public static void main(String[] args) {
         String data = """
-                (a .
+                ((a) . B)
                 """;
 
         LispCoreProjectEnvironment projectEnvironment = new LispCoreProjectEnvironment();

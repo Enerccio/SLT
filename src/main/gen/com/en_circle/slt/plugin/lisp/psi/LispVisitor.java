@@ -55,10 +55,6 @@ public class LispVisitor extends PsiElementVisitor {
     visitPsiElement(o);
   }
 
-  public void visitPair(@NotNull LispPair o) {
-    visitPsiElement(o);
-  }
-
   public void visitPathname(@NotNull LispPathname o) {
     visitPsiElement(o);
   }

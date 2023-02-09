@@ -5,6 +5,8 @@ public enum LispInterpret {
     ABCL(":abcl"),
     SBCL(":sbcl"),
     CCL(":ccl"),
+    ALLEGRO(":allegro"),
+    CMUCL(":cmucl")
 
     ;
 

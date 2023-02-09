@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
-public class CCLUtils {
+public class CMUCLUtils {
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
     public static boolean verifyAndInstallDependencies(String executable, String memoryImage, String quicklisp, ProgressIndicator pi) {
@@ -23,18 +23,18 @@ public class CCLUtils {
             List<String> args = new ArrayList<>();
             SltUtils.addExecutable(args, executable);
             if (StringUtils.isNotBlank(memoryImage)) {
-                args.add("-I");
+                args.add("-core");
                 args.add(memoryImage);
             }
-            args.add("-b");
+            args.add("-batch");
 
-            File tempTestFile = FileUtil.createTempFile("testCCL", ".cl");
+            File tempTestFile = FileUtil.createTempFile("testCMUCL", ".cl");
             if (tempTestFile.exists())
                 tempTestFile.delete();
             FileUtils.writeStringToFile(tempTestFile, new VerifyTemplate(quicklisp).render(), StandardCharsets.UTF_8);
             tempTestFile.deleteOnExit();
 
-            args.add("-l");
+            args.add("-load");
             args.add(tempTestFile.getAbsolutePath());
 
             try {

@@ -11,20 +11,24 @@ Unsupported and will not be supported implementations:
 
 * CLISP - does not work, maybe with threads, but single threaded it's useless and crashes on debug attempt
 
-| Features / Lisp   | SBCL | ABCL | CCL  |
-|-------------------|------|------|------|
-| REPL              | ✅️   | ✅️   | ✅️   |
-| Buffer Evaluation | ✅️   | ✅️   | ✅️   |
-| Documentation     | ✅    | ✅    | ✅️   |
-| Macroexpand       | ✅    | ✅    | ✅️   |
-| Debugger          | ✅    | ✅    | ✅️   |
-| Debugger Actions  | ✅    | ✅    | ✅️³️ |
-| Frame REPL        | ✅    | ❎    | ✅️   |
-| Stepping Debugger | ❎    | ❎    | ❓    |
-| References        | ✅    | ❎    | ✅️   |
-| Inspector         | ✅¹   | ✅²   | ✅️   |
-| Autocomplete      | ✅    | ✅    | ✅    |
-| Find References   | ✅    | ❎    | ✅️   |
+* LispWorks - unfortunately free version only works as GUI so not usable. 
+
+| Features / Lisp              | SBCL | ABCL | CCL  | Allegro CL | CMUCL |
+|------------------------------|------|------|------|------------|-------|
+| REPL                         | ✅️   | ✅️   | ✅️   | ✅️         | ✅️    |
+| Buffer Evaluation            | ✅️   | ✅️   | ✅️   | ✅️         | ✅️    |
+| Documentation                | ✅    | ✅    | ✅️   | ✅️         | ✅️    |
+| Macroexpand                  | ✅    | ✅    | ✅️   | ✅️         | ✅️    |
+| Debugger                     | ✅    | ✅    | ✅️   | ✅          | ✅     |
+| Debugger Actions             | ✅    | ✅    | ✅️³️ | ✅⁴         | ✅     |
+| Frame REPL                   | ✅    | ❎    | ✅️   | ✅          | ✅     |
+| Stepping Debugger            | ❎    | ❎    | ❎    | ✅          | ✅     |
+| References                   | ✅    | ❎    | ✅️   | ✅️         | ❎     |
+| Inspector                    | ✅¹   | ✅²   | ✅️¹  | ✅️¹        | ✅️¹   |
+| Autocomplete                 | ✅    | ✅    | ✅    | ✅          | ✅     |
+| Find References              | ✅    | ❎    | ✅️   | ❎          | ❎     |
+| Function Arguments           | ✅    | ✅    | ✅️   | ✅️         | ✅️    |
+| Automatic Download - Windows | ✅    | ❓    | ❓    | ❎          | ❓     |
 
 ¹Only read-only inspector available
 
@@ -35,3 +39,6 @@ there is no automatic restart action argument detection.
 Thus, you need to supply your own and every action has "invoke with arguments" or "invoke without arguments"
 option, so you have to decide. FML for ansi common lisp not having ansi way to get restart
 arguments because fuck you that's why. 
+
+⁴Allegro CL restarts have correct arglists so actions work but for some reason all restarts from SWANK have arguments,
+event abort ones... 

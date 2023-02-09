@@ -24,6 +24,13 @@
         kcl scl openmcl mcl abcl ecl)
   (error 'not-implemented :proc (list 'quit code)))
 
+(defun starts-with-p (start s)
+  (let ((start-length (length (string start))))
+    (when (>= (length s) start-length)
+      (string-equal s start :start1 0 :end1 start-length))))
+
+(format T "Current lisp interpret: ~S~%" (lisp-implementation-type))
+
 (case slt:+slt-interpret+
   (:sbcl (unless (string= "SBCL"
              (lisp-implementation-type))
@@ -36,6 +43,14 @@
   (:ccl (unless (string= "Clozure Common Lisp"
                (lisp-implementation-type))
              (format *error-output* "Invalid lisp instance. Maybe a configuration error? This is not Clozure Common Lisp!~%")
+             (portable-quit 1)))
+  (:allegro (unless (starts-with-p "International Allegro CL"
+                       (lisp-implementation-type))
+               (format *error-output* "Invalid lisp instance. Maybe a configuration error? This is not Allegro Common Lisp!~%")
+               (portable-quit 1)))
+  (:cmucl (unless (string= "CMU Common Lisp"
+               (lisp-implementation-type))
+             (format *error-output* "Invalid lisp instance. Maybe a configuration error? This is not CMU Common Lisp!~%")
              (portable-quit 1)))
   (otherwise
    (format *error-output* "Unsupported lisp instance. Maybe a configuration error?~%")

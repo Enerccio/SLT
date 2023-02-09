@@ -152,7 +152,7 @@ public class SdkConfigurationSBCLProcess extends DialogWrapper {
         quicklispPath.getField().repaint();
 
         if (verified)
-            verified = checkAndLoadSbclCore(executable, core, quicklisp);
+            verified = checkAndLoadSbcl(executable, core, quicklisp);
         if (!verified) {
             Messages.showErrorDialog(SltBundle.message("slt.ui.settings.sdk.editor.sbcl.process.verifying.error"),
                     SltBundle.message("slt.ui.settings.sdk.editor.verifying.error.title"));
@@ -161,7 +161,7 @@ public class SdkConfigurationSBCLProcess extends DialogWrapper {
         isVerified = verified;
     }
 
-    private boolean checkAndLoadSbclCore(String executable, String core, String quicklisp) {
+    private boolean checkAndLoadSbcl(String executable, String core, String quicklisp) {
         ProgressWindow verifyWindow = new ProgressWindow(true, false, null,
                 getRootPane(), SltBundle.message("slt.ui.settings.sdk.editor.verifying.cancel"));
         verifyWindow.setTitle(SltBundle.message("slt.ui.settings.sdk.editor.verifying.sbcl"));

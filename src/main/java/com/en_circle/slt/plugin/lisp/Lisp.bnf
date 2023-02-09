@@ -28,7 +28,7 @@ enhancement ::= REFERENCE_SET | TEST_SUCCESS | UNQUOTE | UNQUOTE_SPLICE | BACKQU
 
 datum ::= tested | evaled | pathname | UNDEFINED_SEQUENCE | BIT_ARRAY | CHARACTER | REFERENCE_LABEL
             | number | real_pair
-            | compound_symbol
+            | compound_symbol | DOT
             | string | vector | array | structure | pair | list
 
 tested ::= (TEST_SUCCESS | TEST_FALURE) sexpr
@@ -44,9 +44,7 @@ array ::= ARRAY_START list
 structure ::= STRUCTURE_TOKEN list
 
 list ::= LPAREN sexpr* RPAREN { pin = 2 recoverWhile=list_recovery }
-private list_recovery ::= !(RPAREN | sexpr)
-
-pair ::= LPAREN sexpr+ DOT sexpr RPAREN
+private list_recovery ::= !(sexpr | RPAREN)
 
 string ::= STRING_TOKEN
 

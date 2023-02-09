@@ -198,7 +198,7 @@ public class LispUtils {
             stack.peek().add(new com.en_circle.slt.plugin.lisp.lisp.LispSymbol("defstructure"));
             super.visitStructure(o);
             List<LispElement> self = stack.pop();
-            LispContainer container = new LispContainer(self, ContainerType.PAIR);
+            LispContainer container = new LispContainer(self, ContainerType.LIST);
             stack.peek().add(container);
             addOffset(o, container);
         }
@@ -217,16 +217,6 @@ public class LispUtils {
             super.visitVector(o);
             List<LispElement> self = stack.pop();
             LispContainer container = new LispContainer(self, ContainerType.VECTOR);
-            stack.peek().add(container);
-            addOffset(o, container);
-        }
-
-        @Override
-        public void visitPair(@NotNull LispPair o) {
-            stack.push(new ArrayList<>());
-            super.visitPair(o);
-            List<LispElement> self = stack.pop();
-            LispContainer container = new LispContainer(self, ContainerType.PAIR);
             stack.peek().add(container);
             addOffset(o, container);
         }

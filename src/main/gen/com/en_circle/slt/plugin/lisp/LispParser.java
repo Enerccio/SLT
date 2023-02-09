@@ -96,7 +96,7 @@ public class LispParser implements PsiParser, LightPsiParser {
   /* ********************************************************** */
   // tested | evaled | pathname | UNDEFINED_SEQUENCE | BIT_ARRAY | CHARACTER | REFERENCE_LABEL
   //             | number | real_pair
-  //             | compound_symbol
+  //             | compound_symbol | DOT
   //             | string | vector | array | structure | pair | list
   public static boolean datum(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "datum")) return false;
@@ -112,11 +112,12 @@ public class LispParser implements PsiParser, LightPsiParser {
     if (!r) r = number(b, l + 1);
     if (!r) r = real_pair(b, l + 1);
     if (!r) r = compound_symbol(b, l + 1);
+    if (!r) r = consumeToken(b, DOT);
     if (!r) r = string(b, l + 1);
     if (!r) r = vector(b, l + 1);
     if (!r) r = array(b, l + 1);
     if (!r) r = structure(b, l + 1);
-    if (!r) r = pair(b, l + 1);
+    if (!r) r = consumeToken(b, PAIR);
     if (!r) r = list(b, l + 1);
     exit_section_(b, l, m, r, false, null);
     return r;
@@ -214,7 +215,7 @@ public class LispParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // !(RPAREN | sexpr)
+  // !(sexpr | RPAREN)
   static boolean list_recovery(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "list_recovery")) return false;
     boolean r;
@@ -224,12 +225,12 @@ public class LispParser implements PsiParser, LightPsiParser {
     return r;
   }
 
-  // RPAREN | sexpr
+  // sexpr | RPAREN
   private static boolean list_recovery_0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "list_recovery_0")) return false;
     boolean r;
-    r = consumeToken(b, RPAREN);
-    if (!r) r = sexpr(b, l + 1);
+    r = sexpr(b, l + 1);
+    if (!r) r = consumeToken(b, RPAREN);
     return r;
   }
 
@@ -259,58 +260,6 @@ public class LispParser implements PsiParser, LightPsiParser {
     Marker m = enter_section_(b);
     r = consumeToken(b, OCTAL_NUMBER_TOKEN);
     exit_section_(b, m, OCTAL_NUMBER, r);
-    return r;
-  }
-
-  /* ********************************************************** */
-  // LPAREN sexpr+ DOT sexpr RPAREN
-  public static boolean pair(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "pair")) return false;
-    if (!nextTokenIs(b, LPAREN)) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = consumeToken(b, LPAREN);
-    r = r && pair_1(b, l + 1);
-    r = r && consumeToken(b, DOT);
-    r = r && sexpr(b, l + 1);
-    r = r && consumeToken(b, RPAREN);
-    exit_section_(b, m, PAIR, r);
-    return r;
-  }
-
-  // sexpr+
-  private static boolean pair_1(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "pair_1")) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = sexpr(b, l + 1);
-    while (r) {
-      int c = current_position_(b);
-      if (!sexpr(b, l + 1)) break;
-      if (!empty_element_parsed_guard_(b, "pair_1", c)) break;
-    }
-    exit_section_(b, m, null, r);
-    return r;
-  }
-
-  /* ********************************************************** */
-  // !(DOT | RPAREN | sexpr)
-  static boolean pair_recovery(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "pair_recovery")) return false;
-    boolean r;
-    Marker m = enter_section_(b, l, _NOT_);
-    r = !pair_recovery_0(b, l + 1);
-    exit_section_(b, l, m, r, false, null);
-    return r;
-  }
-
-  // DOT | RPAREN | sexpr
-  private static boolean pair_recovery_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "pair_recovery_0")) return false;
-    boolean r;
-    r = consumeToken(b, DOT);
-    if (!r) r = consumeToken(b, RPAREN);
-    if (!r) r = sexpr(b, l + 1);
     return r;
   }
 

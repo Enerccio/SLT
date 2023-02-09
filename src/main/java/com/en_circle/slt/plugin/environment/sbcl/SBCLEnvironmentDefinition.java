@@ -31,6 +31,7 @@ public class SBCLEnvironmentDefinition extends EnvironmentDefinition {
         features.add(LispFeatures.AUTOCOMPLETE);
         features.add(LispFeatures.SEARCH);
         features.add(LispFeatures.XREFS);
+        features.add(LispFeatures.FUNC_ARGS);
     }
 
     @Override

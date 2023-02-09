@@ -17,7 +17,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SltCCLEnvironment extends SltLispEnvironmentProcess  {
+public class SltCMUCLEnvironment extends SltLispEnvironmentProcess  {
 
     private int port;
 
@@ -28,18 +28,18 @@ public class SltCCLEnvironment extends SltLispEnvironmentProcess  {
 
     @Override
     public SltLispProcessInformation getInformation() {
-        return new SltCCLLispProcessInformation();
+        return new SltCMUCLLispProcessInformation();
     }
 
     @Override
     public Environment getType() {
-        return Environment.CCL_PROCESS;
+        return Environment.CMUCL_PROCESS;
     }
 
     @Override
     protected Object prepareProcessEnvironment(SltLispEnvironmentProcessConfiguration configuration) throws SltProcessException {
-        SltCCLEnvironmentConfiguration c = getConfiguration(configuration);
-        CCLEnvironment e = new CCLEnvironment();
+        SltCMUCLEnvironmentConfiguration c = getConfiguration(configuration);
+        CMUCLEnvironment e = new CMUCLEnvironment();
         try {
             e.port = getFreePort();
             if (e.port == 0) {
@@ -54,7 +54,7 @@ public class SltCCLEnvironment extends SltLispEnvironmentProcess  {
             e.serverStartSetup = new File(tempDir, "startServer.cl");
             e.serverStartSetup.deleteOnExit();
             String sltCorePath = e.sltCore.getAbsolutePath();
-            String startScriptTemplate = new CCLInitScriptTemplate(c, sltCorePath, e.port).render();
+            String startScriptTemplate = new CMUCLInitScriptTemplate(c, sltCorePath, e.port).render();
             FileUtils.write(e.serverStartSetup, startScriptTemplate, StandardCharsets.UTF_8);
 
             tempDir.deleteOnExit();
@@ -66,26 +66,26 @@ public class SltCCLEnvironment extends SltLispEnvironmentProcess  {
 
     @Override
     protected File getProcessWorkDirectory(SltLispEnvironmentProcessConfiguration configuration, Object environment) throws SltProcessException {
-        SltCCLEnvironmentConfiguration c = getConfiguration(configuration);
-        CCLEnvironment e = getEnvironment(environment);
+        SltCMUCLEnvironmentConfiguration c = getConfiguration(configuration);
+        CMUCLEnvironment e = getEnvironment(environment);
 
         return e.serverStartSetup.getParentFile();
     }
 
     @Override
     protected String[] getProcessCommand(SltLispEnvironmentProcessConfiguration configuration, Object environment) throws SltProcessException {
-        SltCCLEnvironmentConfiguration c = getConfiguration(configuration);
-        CCLEnvironment e = getEnvironment(environment);
+        SltCMUCLEnvironmentConfiguration c = getConfiguration(configuration);
+        CMUCLEnvironment e = getEnvironment(environment);
         this.port = e.port;
 
         List<String> parameters = new ArrayList<>();
         SltUtils.addExecutable(parameters, c.getExecutablePath());
         if (StringUtils.isNotBlank(c.getMemoryImage())) {
-            parameters.add("-I");
+            parameters.add("-core");
             parameters.add(c.getMemoryImage());
         }
 
-        parameters.add("-l");
+        parameters.add("-load");
         parameters.add(e.serverStartSetup.getName());
 
         return parameters.toArray(new String[0]);
@@ -93,8 +93,8 @@ public class SltCCLEnvironment extends SltLispEnvironmentProcess  {
 
     @Override
     protected ProcessInitializationWaiter waitForFullInitialization(SltLispEnvironmentProcessConfiguration configuration, Object environment) throws SltProcessException {
-        SltCCLEnvironmentConfiguration c = getConfiguration(configuration);
-        CCLEnvironment e = getEnvironment(environment);
+        SltCMUCLEnvironmentConfiguration c = getConfiguration(configuration);
+        CMUCLEnvironment e = getEnvironment(environment);
 
         WaitForOccurrence wait = new WaitForOccurrence("Swank started at port");
         errorController.addUpdateListener(wait);
@@ -102,16 +102,16 @@ public class SltCCLEnvironment extends SltLispEnvironmentProcess  {
         return wait;
     }
 
-    private SltCCLEnvironmentConfiguration getConfiguration(SltLispEnvironmentProcessConfiguration configuration) throws SltProcessException {
-        if (!(configuration instanceof SltCCLEnvironmentConfiguration))
-            throw new SltProcessException("Configuration must be SltCCLEnvironmentConfiguration");
-        return (SltCCLEnvironmentConfiguration) configuration;
+    private SltCMUCLEnvironmentConfiguration getConfiguration(SltLispEnvironmentProcessConfiguration configuration) throws SltProcessException {
+        if (!(configuration instanceof SltCMUCLEnvironmentConfiguration))
+            throw new SltProcessException("Configuration must be SltCMUCLEnvironmentConfiguration");
+        return (SltCMUCLEnvironmentConfiguration) configuration;
     }
 
-    private CCLEnvironment getEnvironment(Object environment) {
-        assert (environment instanceof CCLEnvironment);
+    private CMUCLEnvironment getEnvironment(Object environment) {
+        assert (environment instanceof CMUCLEnvironment);
 
-        return (CCLEnvironment) environment;
+        return (CMUCLEnvironment) environment;
     }
 
     private int getFreePort() {
@@ -126,7 +126,7 @@ public class SltCCLEnvironment extends SltLispEnvironmentProcess  {
     }
 
 
-    private class SltCCLLispProcessInformation implements SltLispProcessInformation {
+    private class SltCMUCLLispProcessInformation implements SltLispProcessInformation {
 
         @Override
         public String getPid() {
@@ -134,7 +134,7 @@ public class SltCCLEnvironment extends SltLispEnvironmentProcess  {
         }
     }
 
-    private static class CCLEnvironment {
+    private static class CMUCLEnvironment {
 
         File sltCore;
         File serverStartSetup;
@@ -142,9 +142,9 @@ public class SltCCLEnvironment extends SltLispEnvironmentProcess  {
 
     }
 
-    private static class CCLInitScriptTemplate extends Template {
+    private static class CMUCLInitScriptTemplate extends Template {
 
-        public CCLInitScriptTemplate(SltCCLEnvironmentConfiguration configuration, String sltCoreScript, int port) {
+        public CMUCLInitScriptTemplate(SltCMUCLEnvironmentConfiguration configuration, String sltCoreScript, int port) {
             String quicklispPath = configuration.getQuicklispStartScript();
             if (quicklispPath.contains("\\")) {
                 quicklispPath = StringUtils.replace(quicklispPath, "\\", "\\\\");
@@ -160,7 +160,7 @@ public class SltCCLEnvironment extends SltLispEnvironmentProcess  {
             add("port", "" + port);
             add("cwd", cwd);
             add("corefile", sltCoreScript);
-            add("interpret", LispInterpret.CCL.symbolName);
+            add("interpret", LispInterpret.CMUCL.symbolName);
         }
 
         @Override
