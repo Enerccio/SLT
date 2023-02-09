@@ -21,7 +21,7 @@ public class SBCLUtils {
     public static boolean verifyAndInstallDependencies(String executable, String core, String quicklisp, ProgressIndicator pi) {
         try {
             List<String> args = new ArrayList<>();
-            args.add(executable);
+            SltUtils.addExecutable(args, executable);
             if (StringUtils.isNotBlank(core)) {
                 args.add("--core");
                 args.add(core);

@@ -21,7 +21,7 @@ public class CCLUtils {
     public static boolean verifyAndInstallDependencies(String executable, String memoryImage, String quicklisp, ProgressIndicator pi) {
         try {
             List<String> args = new ArrayList<>();
-            args.add(executable);
+            SltUtils.addExecutable(args, executable);
             if (StringUtils.isNotBlank(memoryImage)) {
                 args.add("-I");
                 args.add(memoryImage);
