@@ -27,6 +27,7 @@ Unsupported and will not be supported implementations:
 | Inspector                    | ✅¹   | ✅²   | ✅️¹  | ✅️¹        | ✅️¹   |
 | Autocomplete                 | ✅    | ✅    | ✅    | ✅          | ✅     |
 | Find References              | ✅    | ❎    | ✅️   | ❎          | ❎     |
+| Function Arguments           | ✅    | ✅    | ✅️   | ✅️         | ✅️    |
 | Automatic Download - Windows | ✅    | ❓    | ❓    | ❎          | ❓     |
 
 ¹Only read-only inspector available

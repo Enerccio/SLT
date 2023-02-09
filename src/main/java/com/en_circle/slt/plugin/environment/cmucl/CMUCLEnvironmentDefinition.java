@@ -27,6 +27,7 @@ public class CMUCLEnvironmentDefinition extends EnvironmentDefinition {
         features.add(LispFeatures.INSPECTOR);
         features.add(LispFeatures.INSPECTOR_HISTORY);
         features.add(LispFeatures.AUTOCOMPLETE);
+        features.add(LispFeatures.FUNC_ARGS);
     }
 
     @Override

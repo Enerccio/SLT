@@ -11,6 +11,7 @@ public enum LispFeatures {
     INSPECTOR_HISTORY,
     AUTOCOMPLETE,
     SEARCH,
-    XREFS
+    XREFS,
+    FUNC_ARGS,
 
 }

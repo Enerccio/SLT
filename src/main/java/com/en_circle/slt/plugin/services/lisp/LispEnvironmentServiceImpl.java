@@ -270,7 +270,7 @@ public class LispEnvironmentServiceImpl implements LispEnvironmentService {
                     if (onFailureServerState != null)
                         onFailureServerState.run();
                 }
-            } else {
+            } else if (!starting) {
                 doSend(request);
             }
         });

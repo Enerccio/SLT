@@ -28,6 +28,7 @@ public class AllegroCLEnvironmentDefinition extends EnvironmentDefinition {
         features.add(LispFeatures.INSPECTOR_HISTORY);
         features.add(LispFeatures.AUTOCOMPLETE);
         features.add(LispFeatures.XREFS);
+        features.add(LispFeatures.FUNC_ARGS);
     }
 
     @Override

@@ -25,6 +25,7 @@ public class ABCLEnvironmentDefinition extends EnvironmentDefinition {
         features.add(LispFeatures.INSPECTOR);
         features.add(LispFeatures.DEBUGGER_ACTION_ARGLIST);
         features.add(LispFeatures.AUTOCOMPLETE);
+        features.add(LispFeatures.FUNC_ARGS);
     }
 
     @Override
