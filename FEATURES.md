@@ -11,20 +11,22 @@ Unsupported and will not be supported implementations:
 
 * CLISP - does not work, maybe with threads, but single threaded it's useless and crashes on debug attempt
 
-| Features / Lisp   | SBCL | ABCL | CCL  | Allegro CL | Lispworks | CMUCL |
-|-------------------|------|------|------|------------|-----------|-------|
-| REPL              | ✅️   | ✅️   | ✅️   | ✅️         |           |       |
-| Buffer Evaluation | ✅️   | ✅️   | ✅️   | ✅️         |           |       |
-| Documentation     | ✅    | ✅    | ✅️   | ✅️         |           |       |
-| Macroexpand       | ✅    | ✅    | ✅️   | ✅️         |           |       |
-| Debugger          | ✅    | ✅    | ✅️   | ✅          |           |       |
-| Debugger Actions  | ✅    | ✅    | ✅️³️ | ✅          |           |       |
-| Frame REPL        | ✅    | ❎    | ✅️   | ✅          |           |       |
-| Stepping Debugger | ❎    | ❎    | ❎    | ✅          | ✅         | ✅     |
-| References        | ✅    | ❎    | ✅️   | ✅️         |           |       |
-| Inspector         | ✅¹   | ✅²   | ✅️¹  | ✅️¹        |           |       |
-| Autocomplete      | ✅    | ✅    | ✅    | ✅          |           |       |
-| Find References   | ✅    | ❎    | ✅️   | ❎          |           |       |
+* LispWorks - unfortunately free version only works as GUI so not usable. 
+
+| Features / Lisp   | SBCL | ABCL | CCL  | Allegro CL | CMUCL |
+|-------------------|------|------|------|------------|-------|
+| REPL              | ✅️   | ✅️   | ✅️   | ✅️         |       |
+| Buffer Evaluation | ✅️   | ✅️   | ✅️   | ✅️         |       |
+| Documentation     | ✅    | ✅    | ✅️   | ✅️         |       |
+| Macroexpand       | ✅    | ✅    | ✅️   | ✅️         |       |
+| Debugger          | ✅    | ✅    | ✅️   | ✅          |       |
+| Debugger Actions  | ✅    | ✅    | ✅️³️ | ✅          |       |
+| Frame REPL        | ✅    | ❎    | ✅️   | ✅          |       |
+| Stepping Debugger | ❎    | ❎    | ❎    | ✅          | ✅     |
+| References        | ✅    | ❎    | ✅️   | ✅️         |       |
+| Inspector         | ✅¹   | ✅²   | ✅️¹  | ✅️¹        |       |
+| Autocomplete      | ✅    | ✅    | ✅    | ✅          |       |
+| Find References   | ✅    | ❎    | ✅️   | ❎          |       |
 
 ¹Only read-only inspector available
 
