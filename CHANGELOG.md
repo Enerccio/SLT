@@ -5,6 +5,8 @@
 - Support for multiple lisp interprets
 - ABCL Support
 - CCL Support
+- AllegroCL Support
+- CMUCL Support
 
 ### Fixes
 

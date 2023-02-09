@@ -48,6 +48,10 @@
                        (lisp-implementation-type))
                (format *error-output* "Invalid lisp instance. Maybe a configuration error? This is not Allegro Common Lisp!~%")
                (portable-quit 1)))
+  (:cmucl (unless (string= "CMU Common Lisp"
+               (lisp-implementation-type))
+             (format *error-output* "Invalid lisp instance. Maybe a configuration error? This is not CMU Common Lisp!~%")
+             (portable-quit 1)))
   (otherwise
    (format *error-output* "Unsupported lisp instance. Maybe a configuration error?~%")
    (portable-quit 1)))

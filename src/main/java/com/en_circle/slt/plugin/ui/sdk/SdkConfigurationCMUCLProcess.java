@@ -4,7 +4,7 @@ import com.en_circle.slt.plugin.SltBundle;
 import com.en_circle.slt.plugin.sdk.LispSdk;
 import com.en_circle.slt.plugin.ui.SltGlobalUIService;
 import com.en_circle.slt.plugin.ui.sdk.SdkDialogProvider.OnSave;
-import com.en_circle.slt.tools.AllegroCLUtils;
+import com.en_circle.slt.tools.CMUCLUtils;
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.fileChooser.FileChooserDescriptor;
 import com.intellij.openapi.fileChooser.FileChooserFactory;
@@ -30,7 +30,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.io.File;
 
-public class SdkConfigurationAllegroCLProcess extends DialogWrapper {
+public class SdkConfigurationCMUCLProcess extends DialogWrapper {
 
     private final Disposable parentDisposable;
     private final LispSdk instance;
@@ -38,11 +38,11 @@ public class SdkConfigurationAllegroCLProcess extends DialogWrapper {
     private boolean isVerified = false;
 
     private JBTextField name;
-    private FileTextField allegroExecutable;
-    private FileTextField allegroImage;
+    private FileTextField cmuclExecutable;
+    private FileTextField cmuclImage;
     private FileTextField quicklispPath;
 
-    public SdkConfigurationAllegroCLProcess(@NotNull Component parent, LispSdk instance, String title, OnSave onSave) {
+    public SdkConfigurationCMUCLProcess(@NotNull Component parent, LispSdk instance, String title, OnSave onSave) {
         super(parent, true);
 
         this.parentDisposable = SltGlobalUIService.getInstance();
@@ -60,31 +60,31 @@ public class SdkConfigurationAllegroCLProcess extends DialogWrapper {
         name.addCaretListener(createChangeListener());
         name.setText(instance.userName);
         if (StringUtils.isBlank(instance.userName)) {
-            name.setText(SltBundle.message("slt.ui.settings.sdk.editor.name.allegro.default"));
+            name.setText(SltBundle.message("slt.ui.settings.sdk.editor.name.cmucl.default"));
         }
 
         FileChooserDescriptor descriptor = new FileChooserDescriptor(true, false, false,
                         false, false, false);
 
-        allegroExecutable = FileChooserFactory.getInstance()
+        cmuclExecutable = FileChooserFactory.getInstance()
                 .createFileTextField(descriptor, true, parentDisposable);
-        allegroExecutable.getField().addCaretListener(createChangeListener());
-        allegroExecutable.getField().setText(instance.sbclExecutable);
-        allegroImage = FileChooserFactory.getInstance()
+        cmuclExecutable.getField().addCaretListener(createChangeListener());
+        cmuclExecutable.getField().setText(instance.sbclExecutable);
+        cmuclImage = FileChooserFactory.getInstance()
                 .createFileTextField(descriptor, true, parentDisposable);
-        allegroImage.getField().addCaretListener(createChangeListener());
-        allegroImage.getField().setText(instance.sbclCorePath);
+        cmuclImage.getField().addCaretListener(createChangeListener());
+        cmuclImage.getField().setText(instance.sbclCorePath);
         quicklispPath = FileChooserFactory.getInstance()
                 .createFileTextField(descriptor, true, parentDisposable);
         quicklispPath.getField().addCaretListener(createChangeListener());
         quicklispPath.getField().setText(instance.quickLispPath);
 
-        TextFieldWithBrowseButton cclExecutablePicker = new TextFieldWithBrowseButton(allegroExecutable.getField());
-        cclExecutablePicker.addBrowseFolderListener(
-                SltBundle.message("slt.ui.settings.sdk.editor.allegro.executable.select"), "", null, descriptor);
-        TextFieldWithBrowseButton cclImagePicker = new TextFieldWithBrowseButton(allegroImage.getField());
-        cclImagePicker.addBrowseFolderListener(
-                SltBundle.message("slt.ui.settings.sdk.editor.allegro.image.select"), "", null, descriptor);
+        TextFieldWithBrowseButton cmuclExecutablePicker = new TextFieldWithBrowseButton(cmuclExecutable.getField());
+        cmuclExecutablePicker.addBrowseFolderListener(
+                SltBundle.message("slt.ui.settings.sdk.editor.cmucl.executable.select"), "", null, descriptor);
+        TextFieldWithBrowseButton cmuclImagePicker = new TextFieldWithBrowseButton(cmuclImage.getField());
+        cmuclImagePicker.addBrowseFolderListener(
+                SltBundle.message("slt.ui.settings.sdk.editor.cmucl.image.select"), "", null, descriptor);
         TextFieldWithBrowseButton quicklispPathPicker = new TextFieldWithBrowseButton(quicklispPath.getField());
         //noinspection DialogTitleCapitalization
         quicklispPathPicker.addBrowseFolderListener(
@@ -92,10 +92,10 @@ public class SdkConfigurationAllegroCLProcess extends DialogWrapper {
 
         return new FormBuilder()
                 .addLabeledComponent(SltBundle.message("slt.ui.settings.sdk.editor.name"), name, 1, false)
-                .addLabeledComponent(SltBundle.message("slt.ui.settings.sdk.editor.allegro.process.executable"),
-                        cclExecutablePicker, 1, false)
-                .addLabeledComponent(SltBundle.message("slt.ui.settings.sdk.editor.allegro.process.image"),
-                        cclImagePicker, 1, false)
+                .addLabeledComponent(SltBundle.message("slt.ui.settings.sdk.editor.cmucl.process.executable"),
+                        cmuclExecutablePicker, 1, false)
+                .addLabeledComponent(SltBundle.message("slt.ui.settings.sdk.editor.cmucl.process.image"),
+                        cmuclImagePicker, 1, false)
                 .addLabeledComponent(SltBundle.message("slt.ui.settings.sdk.editor.quicklisp"),
                         quicklispPathPicker, 1, false)
                 .addComponentFillVertically(new JPanel(), 0)
@@ -108,8 +108,8 @@ public class SdkConfigurationAllegroCLProcess extends DialogWrapper {
 
     private void verifySdk() {
         name.putClientProperty("JComponent.outline", null);
-        allegroExecutable.getField().putClientProperty("JComponent.outline", null);
-        allegroImage.getField().putClientProperty("JComponent.outline", null);
+        cmuclExecutable.getField().putClientProperty("JComponent.outline", null);
+        cmuclImage.getField().putClientProperty("JComponent.outline", null);
         quicklispPath.getField().putClientProperty("JComponent.outline", null);
 
         boolean verified = true;
@@ -119,18 +119,18 @@ public class SdkConfigurationAllegroCLProcess extends DialogWrapper {
             name.putClientProperty("JComponent.outline", "error");
         }
 
-        String executable = allegroExecutable.getField().getText();
+        String executable = cmuclExecutable.getField().getText();
         if (StringUtils.isBlank(executable)) {
             verified = false;
-            allegroExecutable.getField().putClientProperty("JComponent.outline", "error");
+            cmuclExecutable.getField().putClientProperty("JComponent.outline", "error");
         }
 
-        String core = allegroImage.getField().getText();
+        String core = cmuclImage.getField().getText();
         if (StringUtils.isNotBlank(core)) {
             File file = new File(core);
             if (!file.exists()) {
                 verified = false;
-                allegroImage.getField().putClientProperty("JComponent.outline", "error");
+                cmuclImage.getField().putClientProperty("JComponent.outline", "error");
             }
         }
 
@@ -147,27 +147,27 @@ public class SdkConfigurationAllegroCLProcess extends DialogWrapper {
         }
 
         name.repaint();
-        allegroExecutable.getField().repaint();
-        allegroImage.getField().repaint();
+        cmuclExecutable.getField().repaint();
+        cmuclImage.getField().repaint();
         quicklispPath.getField().repaint();
 
         if (verified)
-            verified = checkAndLoadAllegro(executable, core, quicklisp);
+            verified = checkAndLoadCMUCL(executable, core, quicklisp);
         if (!verified) {
-            Messages.showErrorDialog(SltBundle.message("slt.ui.settings.sdk.editor.allegro.process.verifying.error"),
+            Messages.showErrorDialog(SltBundle.message("slt.ui.settings.sdk.editor.cmucl.process.verifying.error"),
                     SltBundle.message("slt.ui.settings.sdk.editor.verifying.error.title"));
         }
 
         isVerified = verified;
     }
 
-    private boolean checkAndLoadAllegro(String executable, String memory, String quicklisp) {
+    private boolean checkAndLoadCMUCL(String executable, String memory, String quicklisp) {
         ProgressWindow verifyWindow = new ProgressWindow(true, false, null,
                 getRootPane(), SltBundle.message("slt.ui.settings.sdk.editor.verifying.cancel"));
-        verifyWindow.setTitle(SltBundle.message("slt.ui.settings.sdk.editor.verifying.allegro"));
+        verifyWindow.setTitle(SltBundle.message("slt.ui.settings.sdk.editor.verifying.cmucl"));
         Disposer.register(parentDisposable, verifyWindow);
 
-        ProgressResult<Boolean> result = new ProgressRunner<>(pi -> verifyAllegro(pi, executable, memory, quicklisp))
+        ProgressResult<Boolean> result = new ProgressRunner<>(pi -> verifyCMUCL(pi, executable, memory, quicklisp))
                 .sync()
                 .onThread(ThreadToUse.POOLED)
                 .withProgress(verifyWindow)
@@ -176,14 +176,14 @@ public class SdkConfigurationAllegroCLProcess extends DialogWrapper {
         return Boolean.TRUE.equals(result.getResult());
     }
 
-    private boolean verifyAllegro(ProgressIndicator pi, String executable, String core, String quicklisp) {
-        return AllegroCLUtils.verifyAndInstallDependencies(executable, core, quicklisp, pi);
+    private boolean verifyCMUCL(ProgressIndicator pi, String executable, String core, String quicklisp) {
+        return CMUCLUtils.verifyAndInstallDependencies(executable, core, quicklisp, pi);
     }
 
     private void save() {
         instance.userName = name.getText();
-        instance.allegroExecutable = allegroExecutable.getField().getText();
-        instance.allegroMemoryImage = allegroImage.getField().getText();
+        instance.cmuclExecutable = cmuclExecutable.getField().getText();
+        instance.cmuclMemoryImage = cmuclImage.getField().getText();
         instance.quickLispPath = quicklispPath.getField().getText();
         onSave.saveAction(instance);
         close(0);
@@ -199,7 +199,7 @@ public class SdkConfigurationAllegroCLProcess extends DialogWrapper {
     public class VerifyAction extends AbstractAction {
 
         public VerifyAction() {
-            super(SltBundle.message("slt.ui.settings.sdk.editor.allegro.process.verify"));
+            super(SltBundle.message("slt.ui.settings.sdk.editor.cmucl.process.verify"));
         }
 
         @Override
@@ -218,7 +218,7 @@ public class SdkConfigurationAllegroCLProcess extends DialogWrapper {
         public void actionPerformed(ActionEvent e) {
             if (!isVerified) {
                 Messages.showInfoMessage(SltBundle.message("slt.ui.settings.sdk.editor.notverified.title"),
-                        SltBundle.message("slt.ui.settings.sdk.editor.allegro.process.notverified.message"));
+                        SltBundle.message("slt.ui.settings.sdk.editor.cmucl.process.notverified.message"));
                 return;
             }
 

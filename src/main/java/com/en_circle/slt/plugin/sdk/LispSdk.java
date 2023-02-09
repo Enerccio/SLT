@@ -34,6 +34,10 @@ public class LispSdk implements PersistentStateComponent<LispSdk> {
     public String allegroExecutable;
     public String allegroMemoryImage;
 
+    // CMUCL Process used
+    public String cmuclExecutable;
+    public String cmuclMemoryImage;
+
     public Environment getEnvironment() {
         if (environment == null) {
             // backwards compat

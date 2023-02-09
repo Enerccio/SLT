@@ -3,7 +3,6 @@
 (defun get-restart-function-args (restart)
   (let ((function (slot-value restart 'function)))
     (when function
-            (describe function)
       (excl:arglist function))))
 
 (in-package :swank/allegro)

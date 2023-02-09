@@ -4,15 +4,15 @@ package com.en_circle.slt.plugin.environment;
 import com.en_circle.slt.plugin.environment.SltLispEnvironment.SltLispOutputChangedListener;
 import com.en_circle.slt.plugin.environment.SltLispEnvironmentProcess.SltLispEnvironmentProcessConfiguration;
 
-public class SltCCLEnvironmentConfiguration implements SltLispEnvironmentProcessConfiguration {
+public class SltCMUCLEnvironmentConfiguration implements SltLispEnvironmentProcessConfiguration {
 
-    private String executablePath = "ccl";
+    private String executablePath = "cmucl";
     private String memoryImage = "";
     private String quicklispStartScript = "~/quicklisp/setup.lisp";
     private String projectDirectory = "/tmp";
     private SltLispOutputChangedListener listener = null;
 
-    private SltCCLEnvironmentConfiguration() {
+    private SltCMUCLEnvironmentConfiguration() {
 
     }
 
@@ -37,9 +37,9 @@ public class SltCCLEnvironmentConfiguration implements SltLispEnvironmentProcess
         return listener;
     }
 
-    public static class Builder implements SltLispEnvironmentConfiguration.Builder<Builder, SltCCLEnvironmentConfiguration> {
+    public static class Builder implements SltLispEnvironmentConfiguration.Builder<Builder, SltCMUCLEnvironmentConfiguration> {
 
-        private final SltCCLEnvironmentConfiguration c = new SltCCLEnvironmentConfiguration();
+        private final SltCMUCLEnvironmentConfiguration c = new SltCMUCLEnvironmentConfiguration();
         private boolean built = false;
 
         public Builder setExecutable(String executable) {
@@ -79,7 +79,7 @@ public class SltCCLEnvironmentConfiguration implements SltLispEnvironmentProcess
         }
 
         @Override
-        public SltCCLEnvironmentConfiguration build() {
+        public SltCMUCLEnvironmentConfiguration build() {
             checkNotBuilt();
             built = true;
             return c;

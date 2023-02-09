@@ -15,18 +15,18 @@ Unsupported and will not be supported implementations:
 
 | Features / Lisp              | SBCL | ABCL | CCL  | Allegro CL | CMUCL |
 |------------------------------|------|------|------|------------|-------|
-| REPL                         | ✅️   | ✅️   | ✅️   | ✅️         |       |
-| Buffer Evaluation            | ✅️   | ✅️   | ✅️   | ✅️         |       |
-| Documentation                | ✅    | ✅    | ✅️   | ✅️         |       |
-| Macroexpand                  | ✅    | ✅    | ✅️   | ✅️         |       |
-| Debugger                     | ✅    | ✅    | ✅️   | ✅          |       |
-| Debugger Actions             | ✅    | ✅    | ✅️³️ | ✅⁴         |       |
-| Frame REPL                   | ✅    | ❎    | ✅️   | ✅          |       |
+| REPL                         | ✅️   | ✅️   | ✅️   | ✅️         | ✅️    |
+| Buffer Evaluation            | ✅️   | ✅️   | ✅️   | ✅️         | ✅️    |
+| Documentation                | ✅    | ✅    | ✅️   | ✅️         | ✅️    |
+| Macroexpand                  | ✅    | ✅    | ✅️   | ✅️         | ✅️    |
+| Debugger                     | ✅    | ✅    | ✅️   | ✅          | ✅     |
+| Debugger Actions             | ✅    | ✅    | ✅️³️ | ✅⁴         | ✅     |
+| Frame REPL                   | ✅    | ❎    | ✅️   | ✅          | ✅     |
 | Stepping Debugger            | ❎    | ❎    | ❎    | ✅          | ✅     |
-| References                   | ✅    | ❎    | ✅️   | ✅️         |       |
-| Inspector                    | ✅¹   | ✅²   | ✅️¹  | ✅️¹        |       |
-| Autocomplete                 | ✅    | ✅    | ✅    | ✅          |       |
-| Find References              | ✅    | ❎    | ✅️   | ❎          |       |
+| References                   | ✅    | ❎    | ✅️   | ✅️         | ❎     |
+| Inspector                    | ✅¹   | ✅²   | ✅️¹  | ✅️¹        | ✅️¹   |
+| Autocomplete                 | ✅    | ✅    | ✅    | ✅          | ✅     |
+| Find References              | ✅    | ❎    | ✅️   | ❎          | ❎     |
 | Automatic Download - Windows | ✅    | ❓    | ❓    | ❎          | ❓     |
 
 ¹Only read-only inspector available
