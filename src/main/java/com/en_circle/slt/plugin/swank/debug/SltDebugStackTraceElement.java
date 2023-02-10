@@ -14,7 +14,7 @@ public class SltDebugStackTraceElement {
     private final SourceLocation location;
 
     public SltDebugStackTraceElement(LispContainer source) {
-        String text = source.getItems().get(2).toString();
+        String text = source.getItems().get(2).nativeString();
         this.line = LispUtils.unescape(text);
         text = source.getItems().get(1).toString();
         this.detailedCall = LispUtils.unescape(text);
