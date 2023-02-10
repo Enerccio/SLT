@@ -21,7 +21,7 @@
 ![GitHub issues](https://img.shields.io/github/issues/Enerccio/SLT)
 ![GitHub branch checks state](https://img.shields.io/github/checks-status/Enerccio/SLT/master)
 
-![Subreddit subscribers](https://img.shields.io/reddit/subreddit-subscribers/SLT_IDE?style=social)
+[![Subreddit subscribers](https://img.shields.io/reddit/subreddit-subscribers/SLT_IDE?style=social)](https://old.reddit.com/r/SLT_IDE/)
 ![GitHub forks](https://img.shields.io/github/forks/Enerccio/SLT?style=social)
 ![GitHub Repo stars](https://img.shields.io/github/stars/Enerccio/SLT?style=social)
 ![GitHub watchers](https://img.shields.io/github/watchers/Enerccio/SLT?style=social)
