@@ -33,7 +33,7 @@
 **THIS PLUGIN IS EXPERIMENTAL and can crash at any time! Please report all bugs!**
 
 This plugin is providing support for Common Lisp for JetBrains IDEs. 
-Using modified SLIME/Swank protocol to communicate with lisp runtime providing 
+Using modified SLIME/Swank protocol to communicate with lisp interpret providing 
 IDE capabilities for Common Lisp.
 
 # (Somewhat) Detailed Installation and Usage Guide
@@ -47,8 +47,15 @@ https://github.com/Enerccio/SLT/wiki/User-Guide
 
 Optionally (see more - guide):
 
-1) [Steel Bank Common Lisp](https://www.sbcl.org/) installed
+1) One of the supported LISP Interprets installed:
+   * [Steel Bank Common Lisp](https://www.sbcl.org/)
+   * [Armed Bear Common Lisp](https://armedbear.common-lisp.dev/)
+   * [Clozure Common Lisp](https://ccl.clozure.com/)
+   * [Allegro CL](https://franz.com/products/allegro-common-lisp/)
+   * [CMUCL](https://www.cons.org/cmucl/)
 2) [Quicklisp](https://www.quicklisp.org/beta/) installed
+
+(Not all features work with all interprets, see [FEATURES.md](FEATURES.md) for more info!)
 
 ## Getting started
 
