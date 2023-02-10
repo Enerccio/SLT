@@ -39,88 +39,112 @@ public class SwankPacket {
         return new SwankPacket(formatted);
     }
 
-    public static SwankPacket sltEval(String sexpression, BigInteger continuation) {
-        return sltEval(sexpression, ":CL-USER", continuation);
+    public static SwankPacket sltEval(String sexpression, String breakpoints, BigInteger continuation) {
+        return sltEval(sexpression, breakpoints, ":CL-USER", continuation);
     }
 
-    public static SwankPacket sltEval(String sexpression, String packageName, BigInteger continuation) {
-        return sltEval(sexpression, packageName, "T", continuation);
+    public static SwankPacket sltEval(String sexpression, String breakpoints, String packageName, BigInteger continuation) {
+        return sltEval(sexpression, breakpoints, packageName, "T", continuation);
     }
 
-    public static SwankPacket sltEval(String sexpression, String packageName, String thread, BigInteger continuation) {
+    public static SwankPacket sltEval(String sexpression, String breakpoints,
+                                      String packageName, String thread, BigInteger continuation) {
+        String evalExpression = sexpression;
+        if (breakpoints != null) {
+            evalExpression = String.format("(progn (slt-core::with-breakpoints \"%s\") %s)", breakpoints, sexpression);
+        }
         packageName = StringUtils.replace(packageName, "\\", "\\\\");
         packageName = StringUtils.replace(packageName, "\"", "\\\"");
-        sexpression = StringUtils.replace(sexpression, "\\", "\\\\");
-        sexpression = StringUtils.replace(sexpression, "\"", "\\\"");
+        evalExpression = StringUtils.replace(evalExpression, "\\", "\\\\");
+        evalExpression = StringUtils.replace(evalExpression, "\"", "\\\"");
         String formatted = String.format("(:emacs-rex (swank:slt-eval \"%s\") \":%s\" %s %s)",
-                sexpression, packageName, thread, continuation);
+                evalExpression, packageName, thread, continuation);
         return new SwankPacket(formatted);
     }
 
-    public static SwankPacket evalInFrame(String sexpression, BigInteger frame, String packageName, BigInteger thread, BigInteger continuation) {
+    public static SwankPacket evalInFrame(String sexpression, String breakpoints, BigInteger frame, String packageName, BigInteger thread, BigInteger continuation) {
+        String evalExpression = sexpression;
+        if (breakpoints != null) {
+            evalExpression = String.format("(progn (slt-core::with-breakpoints \"%s\") %s)", breakpoints, sexpression);
+        }
         packageName = StringUtils.replace(packageName, "\\", "\\\\");
         packageName = StringUtils.replace(packageName, "\"", "\\\"");
-        sexpression = StringUtils.replace(sexpression, "\\", "\\\\");
-        sexpression = StringUtils.replace(sexpression, "\"", "\\\"");
+        evalExpression = StringUtils.replace(evalExpression, "\\", "\\\\");
+        evalExpression = StringUtils.replace(evalExpression, "\"", "\\\"");
         String formatted = String.format("(:emacs-rex (swank:eval-string-in-frame \"%s\" %s \"%s\") \":%s\" %s %s)",
-                sexpression, frame, packageName, packageName, thread, continuation);
+                evalExpression, frame, packageName, packageName, thread, continuation);
         return new SwankPacket(formatted);
     }
 
-    public static SwankPacket evalRegion(String region, BigInteger continuation) {
-        return evalRegion(region, ":CL-USER", "T", continuation);
+    public static SwankPacket evalRegion(String region, String breakpoints, BigInteger continuation) {
+        return evalRegion(region, breakpoints, ":CL-USER", "T", continuation);
     }
 
-    public static SwankPacket evalRegion(String region, String packageName, BigInteger continuation) {
-        return evalRegion(region, packageName, "T", continuation);
+    public static SwankPacket evalRegion(String region, String breakpoints, String packageName, BigInteger continuation) {
+        return evalRegion(region, breakpoints, packageName, "T", continuation);
     }
 
-    public static SwankPacket evalRegion(String region, String packageName, String thread, BigInteger continuation) {
+    public static SwankPacket evalRegion(String region, String breakpoints, String packageName, String thread, BigInteger continuation) {
+        String evalRegion = region;
+        if (breakpoints != null) {
+            evalRegion = String.format("(progn (slt-core::with-breakpoints \"%s\") %s)", breakpoints, region);
+        }
         packageName = StringUtils.replace(packageName, "\\", "\\\\");
         packageName = StringUtils.replace(packageName, "\"", "\\\"");
-        region = StringUtils.replace(region, "\\", "\\\\");
-        region = StringUtils.replace(region, "\"", "\\\"");
+        evalRegion = StringUtils.replace(evalRegion, "\\", "\\\\");
+        evalRegion = StringUtils.replace(evalRegion, "\"", "\\\"");
         String formatted = String.format("(:emacs-rex (swank:interactive-eval-region \"%s\") \":%s\" %s %s)",
-                region, packageName, thread, continuation);
+                evalRegion, packageName, thread, continuation);
         return new SwankPacket(formatted);
     }
 
-    public static SwankPacket swankEvalAndGrab(String sexpression, BigInteger continuation) {
-        return swankEvalAndGrab(sexpression, ":CL-USER", continuation);
+    public static SwankPacket swankEvalAndGrab(String sexpression, String breakpoints, BigInteger continuation) {
+        return swankEvalAndGrab(sexpression, breakpoints, ":CL-USER", continuation);
     }
 
-    public static SwankPacket swankEvalAndGrab(String sexpression, String packageName, BigInteger continuation) {
-        return swankEvalAndGrab(sexpression, packageName, "T", continuation);
+    public static SwankPacket swankEvalAndGrab(String sexpression, String breakpoints, String packageName, BigInteger continuation) {
+        return swankEvalAndGrab(sexpression, breakpoints, packageName, "T", continuation);
     }
 
-    public static SwankPacket swankEvalAndGrab(String sexpression, String packageName, String thread, BigInteger continuation) {
+    public static SwankPacket swankEvalAndGrab(String sexpression, String breakpoints, String packageName, String thread, BigInteger continuation) {
+        String evalExpression = sexpression;
+        if (breakpoints != null) {
+            evalExpression = String.format("(progn (slt-core::with-breakpoints \"%s\") %s)", breakpoints, sexpression);
+        }
         packageName = StringUtils.replace(packageName, "\\", "\\\\");
         packageName = StringUtils.replace(packageName, "\"", "\\\"");
-        sexpression = StringUtils.replace(sexpression, "\\", "\\\\");
-        sexpression = StringUtils.replace(sexpression, "\"", "\\\"");
+        evalExpression = StringUtils.replace(evalExpression, "\\", "\\\\");
+        evalExpression = StringUtils.replace(evalExpression, "\"", "\\\"");
         String formatted = String.format("(:emacs-rex (swank:eval-and-grab-output \"%s\") \":%s\" %s %s)",
-                sexpression, packageName, thread, continuation);
+                evalExpression, packageName, thread, continuation);
         return new SwankPacket(formatted);
     }
 
-    public static SwankPacket swankEvalRegion(String code, String filename, int bufferPosition, BigInteger continuation) {
-        return swankEvalRegion(code, filename, bufferPosition, ":CL-USER", continuation);
+    public static SwankPacket swankEvalRegion(String code, String breakpoints, String filename, int bufferPosition, BigInteger continuation) {
+        return swankEvalRegion(code, breakpoints, filename, bufferPosition, ":CL-USER", continuation);
     }
 
-    public static SwankPacket swankEvalRegion(String code, String filename, int bufferPosition, String packageName, BigInteger continuation) {
-        return swankEvalRegion(code, filename, bufferPosition, packageName, "T", continuation);
+    public static SwankPacket swankEvalRegion(String code, String breakpoints, String filename, int bufferPosition, String packageName, BigInteger continuation) {
+        return swankEvalRegion(code, breakpoints, filename, bufferPosition, packageName, "T", continuation);
     }
 
-    public static SwankPacket swankEvalRegion(String code, String filename, int bufferPosition,
+    public static SwankPacket swankEvalRegion(String code, String breakpoints, String filename, int bufferPosition,
                                               String packageName, String thread, BigInteger continuation) {
+        if (breakpoints == null) {
+            breakpoints = "NIL";
+        } else {
+            breakpoints = "\"" + breakpoints + "\"";
+        }
         packageName = StringUtils.replace(packageName, "\\", "\\\\");
         packageName = StringUtils.replace(packageName, "\"", "\\\"");
         code = StringUtils.replace(code, "\\", "\\\\");
         code = StringUtils.replace(code, "\"", "\\\"");
+        breakpoints = StringUtils.replace(breakpoints, "\\", "\\\\");
+        breakpoints = StringUtils.replace(breakpoints, "\"", "\\\"");
         filename = StringUtils.replace(filename, "\\", "\\\\");
         filename = StringUtils.replace(filename, "\"", "\\\"");
-        String formatted = String.format("(:emacs-rex (swank:compile-string-region-slt \"%s\" \"%s\" %s \"%s\" :%s) \":%s\" %s %s)",
-                code, filename, bufferPosition, filename, packageName, packageName, thread, continuation);
+        String formatted = String.format("(:emacs-rex (swank:compile-string-region-slt \"%s\" %s \"%s\" %s \"%s\" :%s) \":%s\" %s %s)",
+                code, breakpoints, filename, bufferPosition, filename, packageName, packageName, thread, continuation);
         return new SwankPacket(formatted);
     }
 
@@ -220,21 +244,26 @@ public class SwankPacket {
         return new SwankPacket(formatted);
     }
 
-    public static SwankPacket loadFile(String file, BigInteger continuation) {
-        return loadFile(file, "CL-USER", continuation);
+    public static SwankPacket loadFile(String file, String breakpoints, BigInteger continuation) {
+        return loadFile(file, breakpoints, "CL-USER", continuation);
     }
 
-    public static SwankPacket loadFile(String file, String packageName, BigInteger continuation) {
-        return loadFile(file, packageName, "T", continuation);
+    public static SwankPacket loadFile(String file, String breakpoints, String packageName, BigInteger continuation) {
+        return loadFile(file, breakpoints, packageName, "T", continuation);
     }
 
-    public static SwankPacket loadFile(String file, String packageName, String thread, BigInteger continuation) {
+    public static SwankPacket loadFile(String file, String breakpoints, String packageName, String thread, BigInteger continuation) {
+        if (breakpoints == null) {
+            breakpoints = "NIL";
+        } else {
+            breakpoints = "\"" + breakpoints + "\"";
+        }
         packageName = StringUtils.replace(packageName, "\\", "\\\\");
         packageName = StringUtils.replace(packageName, "\"", "\\\"");
         file = StringUtils.replace(file, "\\", "\\\\");
         file = StringUtils.replace(file, "\"", "\\\"");
-        String formatted = String.format("(:emacs-rex (swank:load-file \"%s\") \":%s\" %s %s)",
-                file, packageName, thread, continuation);
+        String formatted = String.format("(:emacs-rex (swank:load-file-breakpoints \"%s\" %s) \":%s\" %s %s)",
+                file, breakpoints, packageName, thread, continuation);
         return new SwankPacket(formatted);
     }
 

@@ -5,6 +5,7 @@ import com.en_circle.slt.plugin.lisp.lisp.LispSymbol;
 import com.en_circle.slt.plugin.params.LispArgslist;
 import com.en_circle.slt.plugin.swank.SlimeRequest;
 import com.en_circle.slt.plugin.swank.SwankPacket;
+import com.intellij.openapi.project.Project;
 
 import java.math.BigInteger;
 
@@ -25,7 +26,7 @@ public class Argslist extends SlimeRequest {
     }
 
     @Override
-    public SwankPacket createPacket(BigInteger requestId) {
+    public SwankPacket createPacket(BigInteger requestId, Project project) {
         return SwankPacket.argslist(symbol, packageName, requestId);
     }
 

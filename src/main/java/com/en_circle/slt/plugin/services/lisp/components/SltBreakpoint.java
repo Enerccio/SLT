@@ -15,9 +15,6 @@ public class SltBreakpoint implements Comparable<SltBreakpoint> {
             Comparator.comparing(SltBreakpoint::getSymbol);
 
     private String symbol;
-    private SltBreakpointType type = SltBreakpointType.STANDARD;
-
-    private boolean installed;
 
     private final Set<XBreakpoint<SltBreakpointProperties>> nativeBreakpoints = new HashSet<>();
 
@@ -25,24 +22,8 @@ public class SltBreakpoint implements Comparable<SltBreakpoint> {
         this.symbol = breakpointSymbol;
     }
 
-    public SltBreakpointType getType() {
-        return type;
-    }
-
-    public void setType(SltBreakpointType type) {
-        this.type = type;
-    }
-
     public Set<XBreakpoint<SltBreakpointProperties>> getNativeBreakpoints() {
         return nativeBreakpoints;
-    }
-
-    public boolean isInstalled() {
-        return installed;
-    }
-
-    public void setInstalled(boolean installed) {
-        this.installed = installed;
     }
 
     public String getSymbol() {
@@ -65,15 +46,12 @@ public class SltBreakpoint implements Comparable<SltBreakpoint> {
 
         SltBreakpoint that = (SltBreakpoint) o;
 
-        if (!Objects.equals(symbol, that.symbol)) return false;
-        return type == that.type;
+        return Objects.equals(symbol, that.symbol);
     }
 
     @Override
     public int hashCode() {
-        int result = symbol != null ? symbol.hashCode() : 0;
-        result = 31 * result + (type != null ? type.hashCode() : 0);
-        return result;
+        return symbol != null ? symbol.hashCode() : 0;
     }
 
     public boolean shouldBeInstalled() {
@@ -88,11 +66,5 @@ public class SltBreakpoint implements Comparable<SltBreakpoint> {
     @Override
     public int compareTo(@NotNull SltBreakpoint o) {
         return COMPARATOR.compare(this, o);
-    }
-
-    public enum SltBreakpointType {
-
-        STANDARD, METHOD
-
     }
 }

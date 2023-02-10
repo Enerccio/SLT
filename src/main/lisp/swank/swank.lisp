@@ -52,7 +52,9 @@ format suitable for Emacs."
                     (princ restart stream)))
                 (swank-backend::get-restart-function-args restart)))))
 
-(defslimefun compile-string-region-slt (string buffer offset filename package)
+(defslimefun compile-string-region-slt (string breakpoints buffer offset filename package)
+    (when breakpoints
+        (slt-core:with-breakpoints breakpoints))
     (with-buffer-syntax ()
       (collect-notes
        (lambda ()
@@ -111,7 +113,13 @@ format suitable for Emacs."
       (cond ((eq args :not-available) nil)
 	    (t args)))))
 
+(defslimefun load-file-breakpoints (filename breakpoints)
+  (when breakpoints
+    (slt-core:with-breakpoints breakpoints))
+  (to-string (load (filename-to-pathname filename))))
+
 (export 'slt-eval)
 (export 'compile-string-region-slt)
 (export 'find-reference-prefix)
 (export 'operator-arglist-list)
+(export 'load-file-breakpoints)

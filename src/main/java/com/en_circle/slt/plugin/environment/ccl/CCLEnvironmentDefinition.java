@@ -23,8 +23,6 @@ public class CCLEnvironmentDefinition extends EnvironmentDefinition {
         features.add(LispFeatures.DOCUMENTATION);
         features.add(LispFeatures.MACROEXPAND);
         features.add(LispFeatures.FRAME_EVAL);
-        features.add(LispFeatures.BREAKPOINTS);
-        features.add(LispFeatures.BREAKPOINT_STEPPING);
         features.add(LispFeatures.INSPECTOR);
         features.add(LispFeatures.INSPECTOR_HISTORY);
         features.add(LispFeatures.AUTOCOMPLETE);

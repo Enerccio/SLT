@@ -7,6 +7,11 @@
 
 (in-package :swank/allegro)
 
+(let ((old-function #'frame-source-location))
+  (defimplementation frame-source-location (index)
+    (handler-case (funcall old-function index)
+      (error (e) NIL))))
+
 (in-package :swank)
 
 (defslimefun backtrace (start end)

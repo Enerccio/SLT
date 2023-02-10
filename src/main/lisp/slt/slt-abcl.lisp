@@ -1,8 +1,16 @@
 (in-package :slt-core)
 
-(defun install-breakpoint (symbol) )
+(defun uninstall-breakpoints () (symbol)
+  NIL)
 
-(defun uninstall-breakpoint (symbol) )
+(defun uninstall-breakpoint (name)
+  NIL)
+
+(defun install-breakpoint (function-name)
+  NIL)
+
+(defun with-breakpoints (symbols)
+  NIL)
 
 (defun specialp (test-sym)
     NIL)

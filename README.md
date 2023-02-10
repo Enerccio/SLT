@@ -6,7 +6,7 @@
 [![0.1.0](https://badgen.net/github/milestones/enerccio/SLT/1)](https://github.com/enerccio/SLT/milestone/1)
 [![0.2.0](https://badgen.net/github/milestones/enerccio/SLT/2)](https://github.com/enerccio/SLT/milestone/2)
 [![0.3.0](https://badgen.net/github/milestones/enerccio/SLT/4)](https://github.com/enerccio/SLT/milestone/4)
-[![0.3.0](https://badgen.net/github/milestones/enerccio/SLT/5)](https://github.com/enerccio/SLT/milestone/5)
+[![0.4.0](https://badgen.net/github/milestones/enerccio/SLT/5)](https://github.com/enerccio/SLT/milestone/5)
 ![GitHub all releases](https://img.shields.io/github/downloads/Enerccio/SLT/total)
 ![GitHub last commit](https://img.shields.io/github/last-commit/Enerccio/SLT)
 ![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/Enerccio/SLT)
@@ -58,12 +58,11 @@ You can also open this as a project in Intellij Idea.
 * [x] REPL
 * [x] Interactive debugging
 * [x] Argument help (Ctrl+P)
-* [ ] Inspection
+* [x] Inspection
   * [x] Basic inspection
   * [ ] Actions
   * [ ] Inspection eval
-* [ ] Walkable debugger without actions 
-  * [ ] Breakpoints
+* [x] Breakpoints
 * [x] Documentation 
 * [x] Macro expand in documentation
   * Macro expand requires you to hover element twice for now
@@ -90,7 +89,18 @@ this is implemented manually.
 
 This project is licensed under [Apache License v2](LICENSE.txt).
 
-### What does SLT even mean?
+# How to help?
+
+* Please install the plugin and try it out!
+* Report all bugs so I can catch them all. Click [here](https://github.com/enerccio/SLT/issues/new) to report.
+* If you like the project, consider starring it or spreading info about it
+* This project is OSS so if you have knowledge and want to implement something you can fork the repo and then create PR!
+
+## Donations
+
+If you feel like it, you can donate to support my work via [Liberapay](https://liberapay.com/Enerccio/donate).
+
+# What does SLT even mean?
 
 SLT - Speech Language Therapy. Only cure for LISP!
 

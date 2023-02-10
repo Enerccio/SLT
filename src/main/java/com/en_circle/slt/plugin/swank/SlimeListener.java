@@ -45,7 +45,7 @@ public class SlimeListener implements SwankClient.SwankReply {
     public void call(SlimeRequest request, SwankClient client) {
         BigInteger requestId = request.getRequestId() == null ? nextRpc() : request.getRequestId();
         requests.put(requestId, request);
-        SwankPacket packet = request.createPacket(requestId);
+        SwankPacket packet = request.createPacket(requestId, project);
         if (logger != null) {
             logger.logRequest(packet.getSentData());
         }

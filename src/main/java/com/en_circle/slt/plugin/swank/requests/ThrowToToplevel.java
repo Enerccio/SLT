@@ -2,6 +2,7 @@ package com.en_circle.slt.plugin.swank.requests;
 
 import com.en_circle.slt.plugin.swank.SlimeRequest;
 import com.en_circle.slt.plugin.swank.SwankPacket;
+import com.intellij.openapi.project.Project;
 
 import java.math.BigInteger;
 
@@ -18,7 +19,7 @@ public class ThrowToToplevel extends SlimeRequest {
     }
 
     @Override
-    public SwankPacket createPacket(BigInteger requestId) {
+    public SwankPacket createPacket(BigInteger requestId, Project project) {
         return SwankPacket.throwToToplevel(threadId, requestId);
     }
 }

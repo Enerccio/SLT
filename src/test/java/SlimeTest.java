@@ -51,7 +51,7 @@ public class SlimeTest {
                 }
             })) {
                 sent.addAndGet(1);
-                client.swankSend(SwankPacket.sltEval("(+ + 5)", new BigInteger("3")));
+                client.swankSend(SwankPacket.sltEval("(+ + 5)", null, new BigInteger("3")));
 
                 Awaitility.await()
                         .atMost(10, TimeUnit.SECONDS)

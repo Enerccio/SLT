@@ -22,7 +22,8 @@ Unsupported and will not be supported implementations:
 | Debugger                     | ✅    | ✅    | ✅️   | ✅          | ✅     |
 | Debugger Actions             | ✅    | ✅    | ✅️³️ | ✅⁴         | ✅     |
 | Frame REPL                   | ✅    | ❎    | ✅️   | ✅          | ✅     |
-| Stepping Debugger            | ❎    | ❎    | ❎    | ✅          | ✅     |
+| Breakpoints                  | ❎    | ❎    | ❎    | ✅          | ❎     |
+| Stepping Debugger⁵           | ❎    | ❎    | ❎    | ❎          | ❎     |
 | References                   | ✅    | ❎    | ✅️   | ✅️         | ❎     |
 | Inspector                    | ✅¹   | ✅²   | ✅️¹  | ✅️¹        | ✅️¹   |
 | Autocomplete                 | ✅    | ✅    | ✅    | ✅          | ✅     |
@@ -42,3 +43,5 @@ arguments because fuck you that's why.
 
 ⁴Allegro CL restarts have correct arglists so actions work but for some reason all restarts from SWANK have arguments,
 event abort ones... 
+
+⁵No implementation in Slime supports this.

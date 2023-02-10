@@ -12,20 +12,17 @@ import com.en_circle.slt.plugin.lisp.psi.LispList;
 import com.en_circle.slt.plugin.sdk.LispProjectSdk;
 import com.en_circle.slt.plugin.sdk.LispSdk;
 import com.en_circle.slt.plugin.sdk.SdkList;
-import com.en_circle.slt.plugin.services.lisp.components.SltIndentationContainer;
-import com.en_circle.slt.plugin.services.lisp.components.SltLispEnvironmentMacroExpandCache;
-import com.en_circle.slt.plugin.services.lisp.components.SltLispEnvironmentSymbolCache;
-import com.en_circle.slt.plugin.services.lisp.components.SltLispEnvironmentSymbolCache.BatchedSymbolRefreshAction;
 import com.en_circle.slt.plugin.services.lisp.components.*;
+import com.en_circle.slt.plugin.services.lisp.components.SltLispEnvironmentSymbolCache.BatchedSymbolRefreshAction;
 import com.en_circle.slt.plugin.swank.SlimeListener;
 import com.en_circle.slt.plugin.swank.SlimeListener.DebugInterface;
 import com.en_circle.slt.plugin.swank.SlimeListener.RequestResponseLogger;
 import com.en_circle.slt.plugin.swank.SlimeRequest;
 import com.en_circle.slt.plugin.swank.SwankClient;
+import com.en_circle.slt.plugin.ui.debug.SltBreakpointProperties;
+import com.en_circle.slt.plugin.ui.debug.SltSymbolBreakpointType;
 import com.intellij.codeInsight.daemon.DaemonCodeAnalyzer;
 import com.intellij.codeInsight.hints.ParameterHintsPassFactory;
-import com.en_circle.slt.plugin.ui.debug.SltBreakpointProperties;
-import com.en_circle.slt.tools.ProjectUtils;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
@@ -34,7 +31,10 @@ import com.intellij.openapi.wm.ToolWindowManager;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.util.ExceptionUtil;
+import com.intellij.xdebugger.XDebuggerManager;
 import com.intellij.xdebugger.breakpoints.XBreakpoint;
+import com.intellij.xdebugger.breakpoints.XBreakpointManager;
+import com.intellij.xdebugger.breakpoints.XLineBreakpoint;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -201,6 +201,12 @@ public class LispEnvironmentServiceImpl implements LispEnvironmentService {
                 ApplicationManager.getApplication().invokeLaterOnWriteThread(() -> {
                     ParameterHintsPassFactory.forceHintsUpdateOnNextPass();
                     DaemonCodeAnalyzer.getInstance(project).restart();
+
+                    XBreakpointManager breakpointManager = XDebuggerManager.getInstance(project).getBreakpointManager();
+                    for (XLineBreakpoint<SltBreakpointProperties> breakpoint :
+                            breakpointManager.getBreakpoints(SltSymbolBreakpointType.class)) {
+                        addBreakpoint(breakpoint);
+                    }
                 });
             }
         } finally {
@@ -377,6 +383,13 @@ public class LispEnvironmentServiceImpl implements LispEnvironmentService {
             return environment.getType().getDefinition().hasFeature(feature);
         }
         return false;
+    }
+
+    @Override
+    public String getBreakpointsForInstall() {
+        if (hasFeature(LispFeatures.BREAKPOINTS))
+            return breakpointContainer.getInstallBreakpoints();
+        return null;
     }
 
     @Override

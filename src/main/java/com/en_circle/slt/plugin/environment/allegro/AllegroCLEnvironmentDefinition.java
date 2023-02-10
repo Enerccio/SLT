@@ -23,6 +23,7 @@ public class AllegroCLEnvironmentDefinition extends EnvironmentDefinition {
         features.add(LispFeatures.DOCUMENTATION);
         features.add(LispFeatures.MACROEXPAND);
         features.add(LispFeatures.DEBUGGER_ACTION_ARGLIST);
+        features.add(LispFeatures.BREAKPOINTS);
         features.add(LispFeatures.FRAME_EVAL);
         features.add(LispFeatures.INSPECTOR);
         features.add(LispFeatures.INSPECTOR_HISTORY);

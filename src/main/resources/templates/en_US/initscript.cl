@@ -7,6 +7,7 @@
   "Defines current slt interpret.")
 
 (load "~qlpath~")
+(ql:quickload :cl-utilities)
 (ql:quickload :swank)
 (ql:quickload :eclector)
 

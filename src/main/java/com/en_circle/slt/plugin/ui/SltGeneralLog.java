@@ -10,7 +10,6 @@ import com.intellij.openapi.Disposable;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Disposer;
 import com.intellij.ui.tabs.TabInfo;
-import org.apache.commons.lang3.StringUtils;
 
 import javax.swing.*;
 import java.awt.*;
@@ -78,13 +77,11 @@ public class SltGeneralLog implements SltComponent, RequestResponseLogger, Dispo
 
     @Override
     public void logRequest(String request) {
-        request = StringUtils.truncate(request, 0, 4069);
         consoleView.print("\n\n" + request, ConsoleViewContentType.LOG_ERROR_OUTPUT);
     }
 
     @Override
     public void logResponse(String response) {
-        response = StringUtils.truncate(response, 0, 4069);
         consoleView.print("\n\n" + response, ConsoleViewContentType.LOG_INFO_OUTPUT);
     }
 

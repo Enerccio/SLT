@@ -1,6 +1,13 @@
 (eval-when (:execute)
   (format T "SLT Interpret ~S~%" slt:+slt-interpret+))
 
+(defpackage :slt-core
+    (:use :slt :cl :swank)
+    (:export analyze-symbol analyze-symbols read-fix-packages list-package-names
+             initialize-or-get-debug-context debug-context debug-frame-variable register-variable
+             install-breakpoint uninstall-breakpoint uninstall-breakpoints with-breakpoints
+             ))
+
 (defun portable-quit (&optional code)
   (declare (ignorable code))
   ;; This group from "clocc-port/ext.lisp"

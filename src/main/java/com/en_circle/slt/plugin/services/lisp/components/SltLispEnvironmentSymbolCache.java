@@ -165,7 +165,7 @@ public class SltLispEnvironmentSymbolCache extends Thread {
                 String.format(
                         "(slt-core:analyze-symbols (slt-core:read-fix-packages \"%s\"))",
                         request),
-                LispEnvironmentService.getInstance(project).getGlobalPackage(), true, (result, stdout, parsed) -> {
+                LispEnvironmentService.getInstance(project).getGlobalPackage(), false, true, (result, stdout, parsed) -> {
                     if (parsed.size() == 1 && parsed.get(0).getType() == LispElementType.CONTAINER) {
                         int ix = 0;
                         LispContainer data = (LispContainer) parsed.get(0);

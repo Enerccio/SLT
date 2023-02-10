@@ -73,6 +73,8 @@ public interface LispEnvironmentService extends Disposable {
 
     boolean hasFeature(LispFeatures feature);
 
+    String getBreakpointsForInstall();
+
     enum LispEnvironmentState {
         STOPPED, READY, INITIALIZING
     }

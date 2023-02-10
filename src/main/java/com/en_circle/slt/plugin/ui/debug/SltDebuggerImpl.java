@@ -2,8 +2,8 @@ package com.en_circle.slt.plugin.ui.debug;
 
 import com.en_circle.slt.plugin.SltBundle;
 import com.en_circle.slt.plugin.SltUIConstants;
-import com.en_circle.slt.plugin.lisp.lisp.LispElement;
 import com.en_circle.slt.plugin.environment.LispFeatures;
+import com.en_circle.slt.plugin.lisp.lisp.LispElement;
 import com.en_circle.slt.plugin.services.lisp.LispEnvironmentService;
 import com.en_circle.slt.plugin.services.lisp.LispEnvironmentService.LispEnvironmentState;
 import com.en_circle.slt.plugin.swank.debug.SltDebugAction;
@@ -96,14 +96,16 @@ public class SltDebuggerImpl implements SltDebugger, Disposable {
         JPanel content = new JPanel(new BorderLayout());
         this.content.add(content, BorderLayout.CENTER);
 
-        DefaultActionGroup controlGroup = new DefaultActionGroup();
-        controlGroup.add(new StepActivate());
-//        controlGroup.add(new StepIntoAction());
-//        controlGroup.add(new StepNextAction());
-//        controlGroup.add(new StepOutAction());
-        ActionToolbar toolbar = ActionManager.getInstance().createActionToolbar("SltProcessWindowWrapEvent", controlGroup, false);
-        toolbar.setTargetComponent(this.content);
-        this.content.add(toolbar.getComponent(), BorderLayout.WEST);
+        if (LispEnvironmentService.getInstance(parent.getProject()).hasFeature(LispFeatures.BREAKPOINT_STEPPING)) {
+            DefaultActionGroup controlGroup = new DefaultActionGroup();
+            controlGroup.add(new StepActivate());
+            controlGroup.add(new StepIntoAction());
+            controlGroup.add(new StepNextAction());
+            controlGroup.add(new StepOutAction());
+            ActionToolbar toolbar = ActionManager.getInstance().createActionToolbar("SltProcessWindowWrapEvent", controlGroup, false);
+            toolbar.setTargetComponent(this.content);
+            this.content.add(toolbar.getComponent(), BorderLayout.WEST);
+        }
 
         JBSplitter splitter = new JBSplitter(false);
         splitter.setProportion(0.5f);
@@ -268,8 +270,8 @@ public class SltDebuggerImpl implements SltDebugger, Disposable {
                     .sendToLisp(StepperAction.action(ActionType.ENABLE, lastDebug.getThreadId(), result ->
                             ApplicationManager.getApplication().invokeLater(() -> {})));
         } catch (Exception e) {
-            log.warn(SltBundle.message("slt.error.sbclstart"), e);
-            Messages.showErrorDialog(parent.getProject(), e.getMessage(), SltBundle.message("slt.ui.errors.sbcl.start"));
+            log.warn(SltBundle.message("slt.error.start"), e);
+            Messages.showErrorDialog(parent.getProject(), e.getMessage(), SltBundle.message("slt.ui.errors.lisp.start"));
         }
     }
 
@@ -277,10 +279,10 @@ public class SltDebuggerImpl implements SltDebugger, Disposable {
         try {
             LispEnvironmentService.getInstance(parent.getProject())
                     .sendToLisp(StepperAction.action(ActionType.ENABLE, lastDebug.getThreadId(), result ->
-                            ApplicationManager.getApplication().invokeLater(onEnable::run)));
+                            ApplicationManager.getApplication().invokeLater(onEnable)));
         } catch (Exception e) {
-            log.warn(SltBundle.message("slt.error.sbclstart"), e);
-            Messages.showErrorDialog(parent.getProject(), e.getMessage(), SltBundle.message("slt.ui.errors.sbcl.start"));
+            log.warn(SltBundle.message("slt.error.start"), e);
+            Messages.showErrorDialog(parent.getProject(), e.getMessage(), SltBundle.message("slt.ui.errors.lisp.start"));
         }
     }
 
@@ -290,8 +292,8 @@ public class SltDebuggerImpl implements SltDebugger, Disposable {
                     .sendToLisp(StepperAction.action(ActionType.IN, lastDebug.getThreadId(), result ->
                             ApplicationManager.getApplication().invokeLater(() -> processResult(result))));
         } catch (Exception e) {
-            log.warn(SltBundle.message("slt.error.sbclstart"), e);
-            Messages.showErrorDialog(parent.getProject(), e.getMessage(), SltBundle.message("slt.ui.errors.sbcl.start"));
+            log.warn(SltBundle.message("slt.error.start"), e);
+            Messages.showErrorDialog(parent.getProject(), e.getMessage(), SltBundle.message("slt.ui.errors.lisp.start"));
         }
     }
 
@@ -301,8 +303,8 @@ public class SltDebuggerImpl implements SltDebugger, Disposable {
                     .sendToLisp(StepperAction.action(ActionType.OUT, lastDebug.getThreadId(), result ->
                             ApplicationManager.getApplication().invokeLater(() -> processResult(result))));
         } catch (Exception e) {
-            log.warn(SltBundle.message("slt.error.sbclstart"), e);
-            Messages.showErrorDialog(parent.getProject(), e.getMessage(), SltBundle.message("slt.ui.errors.sbcl.start"));
+            log.warn(SltBundle.message("slt.error.start"), e);
+            Messages.showErrorDialog(parent.getProject(), e.getMessage(), SltBundle.message("slt.ui.errors.lisp.start"));
         }
     }
 
@@ -312,8 +314,8 @@ public class SltDebuggerImpl implements SltDebugger, Disposable {
                     .sendToLisp(StepperAction.action(ActionType.NEXT, lastDebug.getThreadId(), result ->
                             ApplicationManager.getApplication().invokeLater(() -> processResult(result))));
         } catch (Exception e) {
-            log.warn(SltBundle.message("slt.error.sbclstart"), e);
-            Messages.showErrorDialog(parent.getProject(), e.getMessage(), SltBundle.message("slt.ui.errors.sbcl.start"));
+            log.warn(SltBundle.message("slt.error.start"), e);
+            Messages.showErrorDialog(parent.getProject(), e.getMessage(), SltBundle.message("slt.ui.errors.lisp.start"));
         }
     }
 

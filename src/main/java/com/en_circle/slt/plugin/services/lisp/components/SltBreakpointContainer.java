@@ -11,6 +11,7 @@ import com.intellij.xdebugger.breakpoints.XBreakpoint;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.Collection;
+import java.util.Set;
 import java.util.TreeSet;
 
 public class SltBreakpointContainer implements LispEnvironmentListener {
@@ -41,11 +42,8 @@ public class SltBreakpointContainer implements LispEnvironmentListener {
         breakpoint.getNativeBreakpoints().remove(nativeBreakpoint);
 
         if (breakpoint.getNativeBreakpoints().isEmpty()) {
-            if (breakpoint.isInstalled())
-                uninstallBreakpoint(breakpoint);
-            breakpoints.remove(breakpoint);
-        } else {
             uninstallBreakpoint(breakpoint);
+            breakpoints.remove(breakpoint);
         }
     }
 
@@ -80,14 +78,8 @@ public class SltBreakpointContainer implements LispEnvironmentListener {
     }
 
     private void updateBreakpoint(SltBreakpoint breakpoint) {
-        if (breakpoint.isInstalled()) {
-            if (!breakpoint.shouldBeInstalled()) {
-                uninstallBreakpoint(breakpoint);
-            }
-        } else {
-            if (breakpoint.shouldBeInstalled()) {
-                installBreakpoint(breakpoint);
-            }
+        if (breakpoint.shouldBeInstalled()) {
+            installBreakpoint(breakpoint);
         }
     }
 
@@ -101,22 +93,8 @@ public class SltBreakpointContainer implements LispEnvironmentListener {
     }
 
     private SlimeRequest installRequest(SltBreakpoint breakpoint) {
-        switch (breakpoint.getType()) {
-            case STANDARD -> {
-                return Eval.eval("(slt-core:install-breakpoint '" + breakpoint.getSymbol() + ")", r -> installResult(r, breakpoint));
-            }
-            case METHOD -> {
-                // TODO
-                return null;
-            }
-        }
-        return null;
-    }
-
-    private void installResult(String s, SltBreakpoint breakpoint) {
-        if ("T".equalsIgnoreCase(s)) {
-            breakpoint.setInstalled(true);
-        }
+        return Eval.eval("(slt-core:install-breakpoint \"" + breakpoint.getSymbol() + "\")",
+                false, r -> {});
     }
 
     private void uninstallBreakpoint(SltBreakpoint breakpoint) {
@@ -129,22 +107,8 @@ public class SltBreakpointContainer implements LispEnvironmentListener {
     }
 
     private SlimeRequest uninstallRequest(SltBreakpoint breakpoint) {
-        switch (breakpoint.getType()) {
-            case STANDARD -> {
-                return Eval.eval("(slt-core:uninstall-breakpoint '" + breakpoint.getSymbol() + ")", r -> uninstallResult(r, breakpoint));
-            }
-            case METHOD -> {
-                // TODO
-                return null;
-            }
-        }
-        return null;
-    }
-
-    private void uninstallResult(String s, SltBreakpoint breakpoint) {
-        if ("T".equalsIgnoreCase(s)) {
-            breakpoint.setInstalled(false);
-        }
+        return Eval.eval("(slt-core:uninstall-breakpoint '" + breakpoint.getSymbol() + ")",
+                false, r -> {});
     }
 
     public Collection<SltBreakpoint> getAllBreakpoints() {
@@ -170,9 +134,7 @@ public class SltBreakpointContainer implements LispEnvironmentListener {
 
     @Override
     public void onPreStop() {
-        for (SltBreakpoint breakpoint : breakpoints) {
-            breakpoint.setInstalled(false);
-        }
+
     }
 
     @Override
@@ -180,4 +142,16 @@ public class SltBreakpointContainer implements LispEnvironmentListener {
 
     }
 
+    public String getInstallBreakpoints() {
+        Set<String> breakpointsToInstall = new TreeSet<>();
+        for (SltBreakpoint breakpoint : breakpoints) {
+            if (breakpoint.shouldBeInstalled()) {
+                breakpointsToInstall.add(breakpoint.getSymbol());
+            }
+        }
+        if (breakpointsToInstall.isEmpty()) {
+            return null;
+        }
+        return String.join(" ", breakpointsToInstall);
+    }
 }

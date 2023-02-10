@@ -44,6 +44,12 @@ public class SltSymbolBreakpointType extends XLineBreakpointType<SltBreakpointPr
         return null;
     }
 
+    @Override
+    @Nullable
+    public SltBreakpointProperties createProperties() {
+        return new SltBreakpointProperties();
+    }
+
     private List<SltBreakpointInfo> getPossiblePsiDebugSymbols(VirtualFile file, int line, Project project) {
         List<SltBreakpointInfo> infoList = new ArrayList<>();
 
@@ -80,29 +86,9 @@ public class SltSymbolBreakpointType extends XLineBreakpointType<SltBreakpointPr
 
                                             if ("defun".equalsIgnoreCase(head.getName())) {
                                                 if (sexprs.size() > 1) {
-                                                    addIfSymbol(sexprs.get(1), infoList, offset, endoffset, SymbolType.FUNCTION, head.getName());
-                                                }
-                                            } else if ("defgeneric".equalsIgnoreCase(head.getName())) {
-                                                if (sexprs.size() > 1) {
-                                                    addIfSymbol(sexprs.get(1), infoList, offset, endoffset, SymbolType.METHOD, head.getName());
-                                                }
-                                            } else if ("defmacro".equalsIgnoreCase(head.getName())) {
-                                                if (sexprs.size() > 1) {
-                                                    addIfSymbol(sexprs.get(1), infoList, offset, endoffset, SymbolType.MACRO, head.getName());
+                                                    addIfSymbol(sexprs.get(1), infoList, offset, endoffset, head.getName());
                                                 }
                                             }
-                                            // TODO
-//                                            } else if ("defmethod".equalsIgnoreCase(head.getName())) {
-//                                                // TODO: handle method special stuff to get tracing working correctly and not just on defgeneric level
-//                                                if (sexprs.size() > 1) {
-//                                                    addIfSymbol(sexprs.get(1), infoList, offset, endoffset, SymbolType.METHOD, head.getName());
-//                                                    if (sexprs.size() > 2) {
-//                                                        addIfSymbol(sexprs.get(2), infoList, offset, endoffset, SymbolType.METHOD, head.getName());
-//                                                    }
-//                                                }
-//                                            }
-
-                                            // TODO: add defclass accessor/setter/getter into the mix!
                                         }
                                     }
                                     list = PsiTreeUtil.getParentOfType(list, LispList.class);
@@ -117,7 +103,7 @@ public class SltSymbolBreakpointType extends XLineBreakpointType<SltBreakpointPr
         return infoList;
     }
 
-    private void addIfSymbol(LispSexpr sexpr, List<SltBreakpointInfo> infoList, int offset, int endoffset, SymbolType symbolType,
+    private void addIfSymbol(LispSexpr sexpr, List<SltBreakpointInfo> infoList, int offset, int endoffset,
                              String headName) {
         if (sexpr.getDatum() != null) {
             if (sexpr.getDatum().getCompoundSymbol() != null) {
@@ -125,7 +111,7 @@ public class SltSymbolBreakpointType extends XLineBreakpointType<SltBreakpointPr
                 int soffset = symbol.getTextOffset();
                 if (soffset >= offset && soffset <= endoffset) {
                     String packageName = LispParserUtil.getPackage(symbol);
-                    SltBreakpointInfo info = new SltBreakpointInfo(symbol, packageName, symbolType);
+                    SltBreakpointInfo info = new SltBreakpointInfo(symbol, packageName);
                     infoList.add(info);
                 }
             }
@@ -161,12 +147,10 @@ public class SltSymbolBreakpointType extends XLineBreakpointType<SltBreakpointPr
 
         private final LispSymbol element;
         private final String packageName;
-        private final SymbolType symbolType;
 
-        private SltBreakpointInfo(@NotNull LispSymbol element, String packageName, SymbolType symbolType) {
+        private SltBreakpointInfo(@NotNull LispSymbol element, String packageName) {
             this.element = element;
             this.packageName = packageName;
-            this.symbolType = symbolType;
         }
 
         @Override
@@ -176,11 +160,7 @@ public class SltSymbolBreakpointType extends XLineBreakpointType<SltBreakpointPr
 
         @Override
         public @Nullable Icon getIcon() {
-            return switch (symbolType) {
-                case FUNCTION -> Nodes.Function;
-                case MACRO -> Nodes.Annotationtype;
-                case METHOD -> Nodes.Method;
-            };
+            return Nodes.Function;
         }
 
         @Override
@@ -194,7 +174,6 @@ public class SltSymbolBreakpointType extends XLineBreakpointType<SltBreakpointPr
 
             properties.symbolName = element.getName();
             properties.packageName = packageName;
-            properties.symbolType = symbolType;
             properties.file = element.getContainingFile().getVirtualFile().getUrl();
             properties.offset = element.getTextOffset();
 
@@ -202,7 +181,4 @@ public class SltSymbolBreakpointType extends XLineBreakpointType<SltBreakpointPr
         }
     }
 
-    public enum SymbolType {
-        FUNCTION, MACRO, METHOD
-    }
 }
