@@ -1,6 +1,8 @@
 # SLT - A Common Lisp Language Plugin for Jetbrains IDE lineup
 
 ![GitHub release (latest by date)](https://img.shields.io/github/v/release/Enerccio/SLT)
+![GitHub Release Date](https://img.shields.io/github/release-date/Enerccio/SLT)
+![OSS Lifecycle](https://img.shields.io/osslifecycle/Enerccio/SLT)
 ![GitHub](https://img.shields.io/github/license/Enerccio/SLT)
 ![GitHub lisp counter](https://img.shields.io/github/search/Enerccio/SLT/lisp)
 [![0.1.0](https://badgen.net/github/milestones/enerccio/SLT/1)](https://github.com/enerccio/SLT/milestone/1)
@@ -9,9 +11,22 @@
 [![0.4.0](https://badgen.net/github/milestones/enerccio/SLT/5)](https://github.com/enerccio/SLT/milestone/5)
 ![GitHub all releases](https://img.shields.io/github/downloads/Enerccio/SLT/total)
 ![GitHub last commit](https://img.shields.io/github/last-commit/Enerccio/SLT)
+![GitHub commit activity](https://img.shields.io/github/commit-activity/m/Enerccio/SLT)
 ![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/Enerccio/SLT)
+![Lines of code](https://img.shields.io/tokei/lines/github/Enerccio/SLT)
+![GitHub top language](https://img.shields.io/github/languages/top/Enerccio/SLT)
 [![(want-to-support-me? T NIL)](https://img.shields.io/liberapay/receives/Enerccio.svg?logo=liberapay)](https://liberapay.com/Enerccio)
+![Liberapay patrons](https://img.shields.io/liberapay/patrons/Enerccio)
+![Maintenance](https://img.shields.io/maintenance/yes/2023)
+![GitHub issues](https://img.shields.io/github/issues/Enerccio/SLT)
+![GitHub branch checks state](https://img.shields.io/github/checks-status/Enerccio/SLT/master)
+
+![Subreddit subscribers](https://img.shields.io/reddit/subreddit-subscribers/SLT_IDE?style=social)
+![GitHub forks](https://img.shields.io/github/forks/Enerccio/SLT?style=social)
+![GitHub Repo stars](https://img.shields.io/github/stars/Enerccio/SLT?style=social)
+![GitHub watchers](https://img.shields.io/github/watchers/Enerccio/SLT?style=social)
 [![Join the chat at https://gitter.im/SLT-Plugin/community](https://badges.gitter.im/SLT-Plugin/Lobby.svg)](https://gitter.im/SLT-Plugin/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+![GitHub Discussions](https://img.shields.io/github/discussions/Enerccio/SLT)
 
 ![Image](src/main/resources/logo/logo.svg)
 
