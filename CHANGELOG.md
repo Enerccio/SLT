@@ -7,6 +7,7 @@
 - CCL Support
 - AllegroCL Support
 - CMUCL Support
+- Breakpoint support
 
 ### Fixes
 
