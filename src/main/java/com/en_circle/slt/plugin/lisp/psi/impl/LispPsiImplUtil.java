@@ -2,9 +2,7 @@ package com.en_circle.slt.plugin.lisp.psi.impl;
 
 import com.en_circle.slt.plugin.SltCommonLispFileType;
 import com.en_circle.slt.plugin.lisp.LispSymbolPresentation;
-import com.en_circle.slt.plugin.lisp.psi.LispFile;
-import com.en_circle.slt.plugin.lisp.psi.LispSymbol;
-import com.en_circle.slt.plugin.lisp.psi.LispTypes;
+import com.en_circle.slt.plugin.lisp.psi.*;
 import com.intellij.lang.ASTNode;
 import com.intellij.navigation.ItemPresentation;
 import com.intellij.openapi.project.Project;
@@ -47,17 +45,6 @@ public class LispPsiImplUtil {
         return identifier.getText();
     }
 
-    private static LispSymbol createSymbol(Project project, String name) {
-        LispFile file = createFile(project, name);
-        return PsiTreeUtil.findChildOfType(file, LispSymbol.class);
-    }
-
-    private static LispFile createFile(Project project, String text) {
-        String name = "dummy.cl";
-        return (LispFile) PsiFileFactory.getInstance(project).createFileFromText(name, SltCommonLispFileType.INSTANCE,
-                String.format("%s", text));
-    }
-
     public static PsiElement setName(LispSymbol element, String newName) {
         ASTNode identifier = element.getNode().findChildByType(LispTypes.SYMBOL_TOKEN);
         if (identifier != null) {
@@ -67,6 +54,67 @@ public class LispPsiImplUtil {
             element.getNode().replaceChild(identifier, newNameNode);
         }
         return element;
+    }
+
+    public static String getName(LispComment element) {
+        return element.getText();
+    }
+
+    public static PsiElement setName(LispComment element, String newName) {
+        ASTNode commentLineNode = element.getNode().findChildByType(LispTypes.LINE_COMMENT);
+        if (commentLineNode != null) {
+            LispComment comment = createComment(element.getProject(), newName);
+            ASTNode newComment = comment.getNode().findChildByType(LispTypes.LINE_COMMENT);
+            assert newComment != null;
+            element.getNode().replaceChild(commentLineNode, newComment);
+            return element;
+        }
+        ASTNode commentBlockNode = element.getNode().findChildByType(LispTypes.BLOCK_COMMENT);
+        if (commentBlockNode != null) {
+            LispComment comment = createComment(element.getProject(), newName);
+            ASTNode newComment = comment.getNode().findChildByType(LispTypes.BLOCK_COMMENT);
+            assert newComment != null;
+            element.getNode().replaceChild(commentBlockNode, newComment);
+            return element;
+        }
+        return element;
+    }
+
+    public static String getName(LispString element) {
+        return element.getText();
+    }
+
+    public static PsiElement setName(LispString element, String newName) {
+        ASTNode stringLineNode = element.getNode().findChildByType(LispTypes.STRING_TOKEN);
+        if (stringLineNode != null) {
+            LispComment comment = createComment(element.getProject(), newName);
+            ASTNode newString = comment.getNode().findChildByType(LispTypes.STRING_TOKEN);
+            assert newString != null;
+            element.getNode().replaceChild(stringLineNode, newString);
+            return element;
+        }
+        return element;
+    }
+
+    private static LispSymbol createSymbol(Project project, String name) {
+        LispFile file = createFile(project, name);
+        return PsiTreeUtil.findChildOfType(file, LispSymbol.class);
+    }
+
+    private static LispComment createComment(Project project, String name) {
+        LispFile file = createFile(project, name);
+        return PsiTreeUtil.findChildOfType(file, LispComment.class);
+    }
+
+    private static LispString createString(Project project, String name) {
+        LispFile file = createFile(project, name);
+        return PsiTreeUtil.findChildOfType(file, LispString.class);
+    }
+
+    private static LispFile createFile(Project project, String text) {
+        String name = "dummy.cl";
+        return (LispFile) PsiFileFactory.getInstance(project).createFileFromText(name, SltCommonLispFileType.INSTANCE,
+                String.format("%s", text));
     }
 
     public static PsiElement getNameIdentifier(LispSymbol element) {

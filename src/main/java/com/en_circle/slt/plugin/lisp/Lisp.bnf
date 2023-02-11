@@ -22,7 +22,11 @@ toplevel ::= sexpr
 
 sexpr ::= (enhancement* datum) | comment
 
-comment ::= LINE_COMMENT | BLOCK_COMMENT
+comment ::= LINE_COMMENT | BLOCK_COMMENT {
+    mixin="com.en_circle.slt.plugin.lisp.psi.impl.LispCommentElementImpl"
+    implements="com.en_circle.slt.plugin.lisp.psi.LispCommentElement"
+    methods=[getName setName]
+}
 
 enhancement ::= REFERENCE_SET | TEST_SUCCESS | UNQUOTE | UNQUOTE_SPLICE | BACKQUOTE | QUOTE | FUNCTION
 
@@ -46,7 +50,9 @@ structure ::= STRUCTURE_TOKEN list
 list ::= LPAREN sexpr* RPAREN { pin = 2 recoverWhile=list_recovery }
 private list_recovery ::= !(sexpr | RPAREN)
 
-string ::= STRING_TOKEN
+string ::= STRING_TOKEN {
+    methods=[getName setName]
+}
 
 number ::= binary_number | octal_number | hex_number | radix_number | integer | ratio | real
 

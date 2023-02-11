@@ -16,7 +16,7 @@ public class LispVisitor extends PsiElementVisitor {
   }
 
   public void visitComment(@NotNull LispComment o) {
-    visitPsiElement(o);
+    visitCommentElement(o);
   }
 
   public void visitCompoundSymbol(@NotNull LispCompoundSymbol o) {
@@ -100,6 +100,10 @@ public class LispVisitor extends PsiElementVisitor {
   }
 
   public void visitVector(@NotNull LispVector o) {
+    visitPsiElement(o);
+  }
+
+  public void visitCommentElement(@NotNull LispCommentElement o) {
     visitPsiElement(o);
   }
 

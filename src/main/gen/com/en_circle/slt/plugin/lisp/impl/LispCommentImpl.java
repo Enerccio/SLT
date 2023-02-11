@@ -3,12 +3,14 @@ package com.en_circle.slt.plugin.lisp.impl;
 
 import com.en_circle.slt.plugin.lisp.psi.LispComment;
 import com.en_circle.slt.plugin.lisp.psi.LispVisitor;
-import com.intellij.extapi.psi.ASTWrapperPsiElement;
+import com.en_circle.slt.plugin.lisp.psi.impl.LispCommentElementImpl;
+import com.en_circle.slt.plugin.lisp.psi.impl.LispPsiImplUtil;
 import com.intellij.lang.ASTNode;
+import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
 import org.jetbrains.annotations.NotNull;
 
-public class LispCommentImpl extends ASTWrapperPsiElement implements LispComment {
+public class LispCommentImpl extends LispCommentElementImpl implements LispComment {
 
   public LispCommentImpl(@NotNull ASTNode node) {
     super(node);
@@ -22,6 +24,16 @@ public class LispCommentImpl extends ASTWrapperPsiElement implements LispComment
   public void accept(@NotNull PsiElementVisitor visitor) {
     if (visitor instanceof LispVisitor) accept((LispVisitor)visitor);
     else super.accept(visitor);
+  }
+
+  @Override
+  public String getName() {
+    return LispPsiImplUtil.getName(this);
+  }
+
+  @Override
+  public PsiElement setName(String newName) {
+    return LispPsiImplUtil.setName(this, newName);
   }
 
 }

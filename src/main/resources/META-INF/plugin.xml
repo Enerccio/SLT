@@ -101,6 +101,8 @@
 
         <xdebugger.breakpointType implementation="com.en_circle.slt.plugin.ui.debug.SltSymbolBreakpointType"/>
 
+        <spellchecker.support language="Common Lisp" implementationClass="com.en_circle.slt.plugin.SltSpellCheckingStrategy"/>
+
         <!-- Highlight annotators -->
         <externalAnnotator language="Common Lisp"
                            implementationClass="com.en_circle.slt.plugin.highlights.annotators.SymbolAnnotator"/>
@@ -112,8 +114,6 @@
         <gotoClassContributor implementation="com.en_circle.slt.plugin.contributors.SltClassContributor"/>
 
         <gotoSymbolContributor implementation="com.en_circle.slt.plugin.contributors.SltSymbolContributor"/>
-
-        <!-- Markers -->
     </extensions>
 
     <actions resource-bundle="messages.SltBundle">
