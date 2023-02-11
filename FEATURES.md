@@ -29,7 +29,7 @@ Unsupported and will not be supported implementations:
 | Autocomplete                 | ✅    | ✅    | ✅    | ✅          | ✅     |
 | Find References              | ✅    | ❎    | ✅️   | ❎          | ❎     |
 | Function Arguments           | ✅    | ✅    | ✅️   | ✅️         | ✅️    |
-| Automatic Download - Windows | ✅    | ❓    | ❓    | ❎          | ❓     |
+| Automatic Download - Windows | ✅    | ❓    | ❓    | ❓          | ❓     |
 
 ¹Only read-only inspector available
 
@@ -44,4 +44,4 @@ arguments because fuck you that's why.
 ⁴Allegro CL restarts have correct arglists so actions work but for some reason all restarts from SWANK have arguments,
 event abort ones... 
 
-⁵No implementation in Slime supports this.
+⁵No implementation in Slime supports this, maybe I will work in custom solutions.
