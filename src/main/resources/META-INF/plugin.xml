@@ -168,17 +168,17 @@
     </projectListeners>
 
     <change-notes><![CDATA[
-<p>0.3.1 New features:</p>
-<p>- Thread list with actions<br />
-- Showing function parameters with ctrl+p</p>
+<p>0.4.0 New features:</p>
+<p>- Support for multiple lisp interprets<br />
+- ABCL Support<br />
+- CCL Support<br />
+- AllegroCL Support<br />
+- CMUCL Support<br />
+- Breakpoint support<br />
+- Spellchecker support<br />
+- Folding support, structure support, navigation bar</p>
 
-<p>0.3.0 New features:</p>
-
-<p>- Current package at editor cursor widget<br />
-- Automatic Indentation<br />
-- SDK support, Automatic download for Windows users<br />
-- References<br />
-- Global class/symbol search</p>
+See CHANGELOG.md for more details
 ]]></change-notes>
 
 </idea-plugin>

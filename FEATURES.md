@@ -29,7 +29,7 @@ Unsupported and will not be supported implementations:
 | Autocomplete                 | ✅    | ✅    | ✅    | ✅          | ✅     |
 | Find References              | ✅    | ❎    | ✅️   | ❎          | ❎     |
 | Function Arguments           | ✅    | ✅    | ✅️   | ✅️         | ✅️    |
-| Automatic Download - Windows | ✅    | ❓    | ❓    | ❓          | ❓     |
+| Automatic Download - Windows | ✅    | ❎    | ❓    | ❓          | ❓     |
 
 ¹Only read-only inspector available
 
