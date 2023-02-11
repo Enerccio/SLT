@@ -1,5 +1,6 @@
 package com.en_circle.slt.plugin.params;
 
+import com.en_circle.slt.plugin.environment.LispFeatures;
 import com.en_circle.slt.plugin.lisp.LispParserUtil;
 import com.en_circle.slt.plugin.lisp.LispParserUtil.QuoteState;
 import com.en_circle.slt.plugin.lisp.psi.LispList;
@@ -26,7 +27,8 @@ public class SltParameterInfoHandler implements ParameterInfoHandler<LispList, L
     public @Nullable LispList findElementForParameterInfo(@NotNull CreateParameterInfoContext context) {
         LispList candidate = findElementAtOffset(context.getFile(), context.getOffset());
         if (candidate != null) {
-            if (LispEnvironmentService.getInstance(context.getProject()).getState() == LispEnvironmentState.READY) {
+            if (LispEnvironmentService.getInstance(context.getProject()).getState() == LispEnvironmentState.READY &&
+                    LispEnvironmentService.getInstance(context.getProject()).hasFeature(LispFeatures.FUNC_ARGS)) {
                 LispSymbol symbol = getHead(candidate);
                 if (symbol == null)
                     return null;
@@ -105,26 +107,5 @@ public class SltParameterInfoHandler implements ParameterInfoHandler<LispList, L
         }
         return null;
     }
-
-//    private LispSexpr @NotNull [] getActualParameters(@NotNull LispList o) {
-//        List<LispSexpr> arguments = new ArrayList<>();
-//        QuoteState quoteState = LispParserUtil.getQuoteState(o);
-//        if (quoteState == QuoteState.ERROR_STATE || quoteState == QuoteState.NO_STATE) {
-//            for (int i=1; i<o.getSexprList().size(); i++) {
-//                LispSexpr element = o.getSexprList().get(i);
-//                LispSymbol symbol = PsiTreeUtil.getChildOfType(element, LispSymbol.class);
-//                LispList list = PsiTreeUtil.getChildOfType(element, LispList.class);
-//                if (list == null && symbol != null) {
-//                    if (symbol.getName() == null || !symbol.getName().startsWith(":")) {
-//                        arguments.add(element);
-//                    }
-//                } else {
-//                    arguments.add(element);
-//                }
-//            }
-//        }
-//
-//        return arguments.toArray(new LispSexpr[0]);
-//    }
 
 }

@@ -20,7 +20,6 @@ public interface LispTypes {
   IElementType LIST = new LispElementType("LIST");
   IElementType NUMBER = new LispElementType("NUMBER");
   IElementType OCTAL_NUMBER = new LispElementType("OCTAL_NUMBER");
-  IElementType PAIR = new LispElementType("PAIR");
   IElementType PATHNAME = new LispElementType("PATHNAME");
   IElementType RADIX_NUMBER = new LispElementType("RADIX_NUMBER");
   IElementType RATIO = new LispElementType("RATIO");
@@ -49,6 +48,7 @@ public interface LispTypes {
   IElementType LINE_COMMENT = new LispTokenType("LINE_COMMENT");
   IElementType LPAREN = new LispTokenType("LPAREN");
   IElementType OCTAL_NUMBER_TOKEN = new LispTokenType("OCTAL_NUMBER_TOKEN");
+  IElementType PAIR = new LispTokenType("pair");
   IElementType PATHNAME_INDICATOR = new LispTokenType("PATHNAME_INDICATOR");
   IElementType QUOTE = new LispTokenType("QUOTE");
   IElementType RADIX_NUMBER_TOKEN = new LispTokenType("RADIX_NUMBER_TOKEN");
@@ -106,9 +106,6 @@ public interface LispTypes {
       }
       else if (type == OCTAL_NUMBER) {
         return new LispOctalNumberImpl(node);
-      }
-      else if (type == PAIR) {
-        return new LispPairImpl(node);
       }
       else if (type == PATHNAME) {
         return new LispPathnameImpl(node);

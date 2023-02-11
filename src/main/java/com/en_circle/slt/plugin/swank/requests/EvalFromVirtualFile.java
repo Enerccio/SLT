@@ -1,7 +1,9 @@
 package com.en_circle.slt.plugin.swank.requests;
 
+import com.en_circle.slt.plugin.services.lisp.LispEnvironmentService;
 import com.en_circle.slt.plugin.swank.SlimeRequest;
 import com.en_circle.slt.plugin.swank.SwankPacket;
+import com.intellij.openapi.project.Project;
 
 import java.math.BigInteger;
 
@@ -34,8 +36,9 @@ public class EvalFromVirtualFile extends SlimeRequest {
     }
 
     @Override
-    public SwankPacket createPacket(BigInteger requestId) {
-        return SwankPacket.swankEvalRegion(code, filename, bufferPosition, module, requestId);
+    public SwankPacket createPacket(BigInteger requestId, Project project) {
+        return SwankPacket.swankEvalRegion(code, LispEnvironmentService.getInstance(project).getBreakpointsForInstall(),
+                filename, bufferPosition, module, requestId);
     }
 
     public interface Callback {

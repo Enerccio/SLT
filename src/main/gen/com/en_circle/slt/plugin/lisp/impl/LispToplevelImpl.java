@@ -4,8 +4,10 @@ package com.en_circle.slt.plugin.lisp.impl;
 import com.en_circle.slt.plugin.lisp.psi.LispSexpr;
 import com.en_circle.slt.plugin.lisp.psi.LispToplevel;
 import com.en_circle.slt.plugin.lisp.psi.LispVisitor;
+import com.en_circle.slt.plugin.lisp.psi.impl.LispPsiImplUtil;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.intellij.lang.ASTNode;
+import com.intellij.navigation.ItemPresentation;
 import com.intellij.psi.PsiElementVisitor;
 import org.jetbrains.annotations.NotNull;
 
@@ -29,6 +31,16 @@ public class LispToplevelImpl extends ASTWrapperPsiElement implements LispToplev
   @NotNull
   public LispSexpr getSexpr() {
     return findNotNullChildByClass(LispSexpr.class);
+  }
+
+  @Override
+  public String getName() {
+    return LispPsiImplUtil.getName(this);
+  }
+
+  @Override
+  public ItemPresentation getPresentation() {
+    return LispPsiImplUtil.getPresentation(this);
   }
 
 }

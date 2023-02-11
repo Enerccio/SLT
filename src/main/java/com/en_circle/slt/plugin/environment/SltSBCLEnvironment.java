@@ -4,6 +4,7 @@ import com.en_circle.slt.plugin.SltLibrary;
 import com.en_circle.slt.plugin.environment.SltProcessStreamGobbler.ProcessInitializationWaiter;
 import com.en_circle.slt.plugin.environment.SltProcessStreamGobbler.WaitForOccurrence;
 import com.en_circle.slt.tools.PluginPath;
+import com.en_circle.slt.tools.SltUtils;
 import com.intellij.openapi.util.io.FileUtil;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -28,6 +29,11 @@ public class SltSBCLEnvironment extends SltLispEnvironmentProcess  {
     @Override
     public SltLispProcessInformation getInformation() {
         return new SltSBCLLispProcessInformation();
+    }
+
+    @Override
+    public Environment getType() {
+        return Environment.SBCL_PROCESS;
     }
 
     @Override
@@ -73,7 +79,7 @@ public class SltSBCLEnvironment extends SltLispEnvironmentProcess  {
         this.port = e.port;
 
         List<String> parameters = new ArrayList<>();
-        parameters.add(c.getExecutablePath());
+        SltUtils.addExecutable(parameters, c.getExecutablePath());
         if (StringUtils.isNotBlank(c.getCorePath())) {
             parameters.add("--core");
             parameters.add(c.getCorePath());
@@ -152,7 +158,7 @@ public class SltSBCLEnvironment extends SltLispEnvironmentProcess  {
             add("qlpath", quicklispPath);
             add("port", "" + port);
             add("cwd", cwd);
-            add("sbclcorefile", sltCoreScript);
+            add("corefile", sltCoreScript);
             add("interpret", LispInterpret.SBCL.symbolName);
         }
 

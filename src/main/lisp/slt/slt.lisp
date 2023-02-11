@@ -1,11 +1,13 @@
-(defpackage :slt-core
-    (:use :slt :cl :swank)
-    (:export analyze-symbol analyze-symbols read-fix-packages list-package-names
-             initialize-or-get-debug-context debug-context debug-frame-variable register-variable
-             ))
-
 (when (eq slt:+slt-interpret+ :sbcl)
   (load (merge-pathnames "slt-sbcl.lisp" *load-truename*)))
+(when (eq slt:+slt-interpret+ :abcl)
+  (load (merge-pathnames "slt-abcl.lisp" *load-truename*)))
+(when (eq slt:+slt-interpret+ :ccl)
+  (load (merge-pathnames "slt-ccl.lisp" *load-truename*)))
+(when (eq slt:+slt-interpret+ :allegro)
+  (load (merge-pathnames "slt-allegro.lisp" *load-truename*)))
+(when (eq slt:+slt-interpret+ :cmucl)
+  (load (merge-pathnames "slt-cmucl.lisp" *load-truename*)))
 
 (in-package :slt-core)
 
@@ -82,7 +84,7 @@
             (ECLECTOR.READER:TWO-PACKAGE-MARKERS-MUST-BE-ADJACENT
                 #'reader-recover)
             (error (lambda (c)
-                   (format *error-output* "general error: ~S ~%" c))))
+                   (format *error-output* "general error: ~A ~%" c))))
        (eclector.reader:read-from-string str)))
 
 (defun list-package-names ()

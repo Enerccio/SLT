@@ -45,3 +45,4 @@ bin/
 
 .idea
 /.run/Build Release.run.xml
+/temporary/

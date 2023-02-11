@@ -60,7 +60,7 @@ public class PackageSelectorComponent {
 
     public void refresh() {
         try {
-            LispEnvironmentService.getInstance(project).sendToLisp(EvalAndGrab.eval("(slt-core:list-package-names)", true, (result, stdout, parsed) -> {
+            LispEnvironmentService.getInstance(project).sendToLisp(EvalAndGrab.eval("(slt-core:list-package-names)", false, true, (result, stdout, parsed) -> {
                 resolvePackages(parsed);
             }), false);
         } catch (Exception e) {

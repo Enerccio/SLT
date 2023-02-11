@@ -2,6 +2,7 @@ package com.en_circle.slt.plugin.services.lisp;
 
 import com.en_circle.slt.plugin.SltBundle;
 import com.en_circle.slt.plugin.SymbolState;
+import com.en_circle.slt.plugin.environment.LispFeatures;
 import com.en_circle.slt.plugin.environment.SltLispEnvironment;
 import com.en_circle.slt.plugin.environment.SltLispEnvironment.SltOutput;
 import com.en_circle.slt.plugin.environment.SltLispEnvironmentConfiguration;
@@ -11,15 +12,15 @@ import com.en_circle.slt.plugin.lisp.psi.LispList;
 import com.en_circle.slt.plugin.sdk.LispProjectSdk;
 import com.en_circle.slt.plugin.sdk.LispSdk;
 import com.en_circle.slt.plugin.sdk.SdkList;
-import com.en_circle.slt.plugin.services.lisp.components.SltIndentationContainer;
-import com.en_circle.slt.plugin.services.lisp.components.SltLispEnvironmentMacroExpandCache;
-import com.en_circle.slt.plugin.services.lisp.components.SltLispEnvironmentSymbolCache;
+import com.en_circle.slt.plugin.services.lisp.components.*;
 import com.en_circle.slt.plugin.services.lisp.components.SltLispEnvironmentSymbolCache.BatchedSymbolRefreshAction;
 import com.en_circle.slt.plugin.swank.SlimeListener;
 import com.en_circle.slt.plugin.swank.SlimeListener.DebugInterface;
 import com.en_circle.slt.plugin.swank.SlimeListener.RequestResponseLogger;
 import com.en_circle.slt.plugin.swank.SlimeRequest;
 import com.en_circle.slt.plugin.swank.SwankClient;
+import com.en_circle.slt.plugin.ui.debug.SltBreakpointProperties;
+import com.en_circle.slt.plugin.ui.debug.SltSymbolBreakpointType;
 import com.intellij.codeInsight.daemon.DaemonCodeAnalyzer;
 import com.intellij.codeInsight.hints.ParameterHintsPassFactory;
 import com.intellij.openapi.application.ApplicationManager;
@@ -29,12 +30,19 @@ import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ToolWindowManager;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
+import com.intellij.util.ExceptionUtil;
+import com.intellij.xdebugger.XDebuggerManager;
+import com.intellij.xdebugger.breakpoints.XBreakpoint;
+import com.intellij.xdebugger.breakpoints.XBreakpointManager;
+import com.intellij.xdebugger.breakpoints.XLineBreakpoint;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Supplier;
 
 public class LispEnvironmentServiceImpl implements LispEnvironmentService {
@@ -49,12 +57,14 @@ public class LispEnvironmentServiceImpl implements LispEnvironmentService {
     private RequestResponseLogger logger;
     private DebugInterface debugInterface;
     private final List<LispEnvironmentListener> serverListeners = Collections.synchronizedList(new ArrayList<>());
+    private LispSltOverrides overrides;
     private volatile boolean starting = false;
 
     private final Project project;
     private final SltIndentationContainer indentationContainer;
     private final SltLispEnvironmentSymbolCache symbolCache;
     private final SltLispEnvironmentMacroExpandCache macroExpandCache;
+    private final SltBreakpointContainer breakpointContainer;
 
     public LispEnvironmentServiceImpl(Project project) {
         this.project = project;
@@ -62,12 +72,17 @@ public class LispEnvironmentServiceImpl implements LispEnvironmentService {
         indentationContainer.init(project);
         symbolCache = new SltLispEnvironmentSymbolCache(project);
         macroExpandCache = new SltLispEnvironmentMacroExpandCache();
+        breakpointContainer = new SltBreakpointContainer(project);
         symbolCache.start();
+
+        addServerListener(breakpointContainer);
     }
 
     @Override
     public void resetConfiguration() {
         this.configurationBuilder = null;
+        this.environmentProvider = null;
+        this.configuration = null;
     }
 
     public boolean configured() {
@@ -106,15 +121,18 @@ public class LispEnvironmentServiceImpl implements LispEnvironmentService {
 
     @Override
     public void start() {
-        starting = true;
-        ApplicationManager.getApplication().invokeLater(() -> {
-            try {
-                ensureToolWindowIsOpen();
-                doStart();
-            } catch (Exception e) {
-                log.warn(SltBundle.message("slt.error.start"), e);
-                Messages.showErrorDialog(project, e.getMessage(), SltBundle.message("slt.ui.errors.lisp.start"));
-            }
+        ApplicationManager.getApplication().executeOnPooledThread(() -> {
+            starting = true;
+            ApplicationManager.getApplication().invokeAndWait(this::ensureToolWindowIsOpen);
+            ApplicationManager.getApplication().executeOnPooledThread(() -> {
+                try {
+                    doStart();
+                } catch (Exception e) {
+                    log.warn(SltBundle.message("slt.error.start"), e);
+                    ApplicationManager.getApplication().invokeLater(() ->
+                            Messages.showErrorDialog(project, e.getMessage(), SltBundle.message("slt.ui.errors.lisp.start")));
+                }
+            });
         });
     }
 
@@ -138,12 +156,19 @@ public class LispEnvironmentServiceImpl implements LispEnvironmentService {
     private boolean doStart() throws Exception {
         try {
             if (configurationBuilder == null) {
-                if (!configured()) {
-                    log.warn(SltBundle.message("slt.error.start"));
-                    Messages.showErrorDialog(project,
-                            SltBundle.message("slt.ui.errors.lisp.start.noconf"),
-                            SltBundle.message("slt.ui.errors.lisp.start"));
-                    return false;
+                AtomicBoolean state = new AtomicBoolean(false);
+                ApplicationManager.getApplication().invokeAndWait(() -> {
+                    if (!configured()) {
+                        log.warn(SltBundle.message("slt.error.start"));
+                        Messages.showErrorDialog(project,
+                                SltBundle.message("slt.ui.errors.lisp.start.noconf"),
+                                SltBundle.message("slt.ui.errors.lisp.start"));
+                        return;
+                    }
+                    state.set(true);
+                });
+                if (!state.get()) {
+                    return state.get();
                 }
             }
 
@@ -158,16 +183,32 @@ public class LispEnvironmentServiceImpl implements LispEnvironmentService {
             }
             environment = environmentProvider.get();
             environment.start(configuration);
+            if (environment != null) {
+                overrides = environment.getType().getDefinition().getOverrides();
 
-            slimeListener = new SlimeListener(project, true, logger, debugInterface);
-            client = new SwankClient("127.0.0.1", environment.getSwankPort(), slimeListener);
+                slimeListener = new SlimeListener(project, true, e -> {
+                    for (LispEnvironmentListener listener : serverListeners) {
+                        String text = ExceptionUtil.getThrowableText(e);
+                        listener.onOutputChanged(SltOutput.STDERR, text);
+                    }
+                }, logger, debugInterface);
+                client = new SwankClient("127.0.0.1", environment.getSwankPort(), slimeListener);
 
-            for (LispEnvironmentListener listener : serverListeners) {
-                listener.onPostStart();
+                for (LispEnvironmentListener listener : serverListeners) {
+                    listener.onPostStart();
+                }
+
+                ApplicationManager.getApplication().invokeLaterOnWriteThread(() -> {
+                    ParameterHintsPassFactory.forceHintsUpdateOnNextPass();
+                    DaemonCodeAnalyzer.getInstance(project).restart();
+
+                    XBreakpointManager breakpointManager = XDebuggerManager.getInstance(project).getBreakpointManager();
+                    for (XLineBreakpoint<SltBreakpointProperties> breakpoint :
+                            breakpointManager.getBreakpoints(SltSymbolBreakpointType.class)) {
+                        addBreakpoint(breakpoint);
+                    }
+                });
             }
-
-            ParameterHintsPassFactory.forceHintsUpdateOnNextPass();
-            DaemonCodeAnalyzer.getInstance(project).restart();
         } finally {
             starting = false;
         }
@@ -185,8 +226,10 @@ public class LispEnvironmentServiceImpl implements LispEnvironmentService {
             listener.onPreStop();
         }
         try {
-            client.close();
+            if (client != null)
+                client.close();
         } finally {
+            overrides = null;
             indentationContainer.clear();
             indentationContainer.clear();
             symbolCache.clear();
@@ -195,6 +238,11 @@ public class LispEnvironmentServiceImpl implements LispEnvironmentService {
                 environment = null;
             }
         }
+
+        ApplicationManager.getApplication().invokeLaterOnWriteThread(() -> {
+            ParameterHintsPassFactory.forceHintsUpdateOnNextPass();
+            DaemonCodeAnalyzer.getInstance(project).restart();
+        });
 
         for (LispEnvironmentListener listener : serverListeners) {
             listener.onPostStop();
@@ -213,13 +261,13 @@ public class LispEnvironmentServiceImpl implements LispEnvironmentService {
 
     @Override
     public void sendToLisp(SlimeRequest request, boolean startServer, Runnable onFailureServerState) throws Exception {
-        if (environment == null || !environment.isActive()) {
-            if (startServer) {
-                ApplicationManager.getApplication().invokeLater(() -> {
+        ApplicationManager.getApplication().executeOnPooledThread(() -> {
+            if (environment == null || !environment.isActive()) {
+                if (startServer) {
                     starting = true;
-                    ApplicationManager.getApplication().invokeLater(() -> {
+                    ApplicationManager.getApplication().invokeAndWait(this::ensureToolWindowIsOpen);
+                    ApplicationManager.getApplication().executeOnPooledThread(() -> {
                         try {
-                            ensureToolWindowIsOpen();
                             if (!doStart()) {
                                 if (onFailureServerState != null)
                                     onFailureServerState.run();
@@ -229,17 +277,18 @@ public class LispEnvironmentServiceImpl implements LispEnvironmentService {
                             doSend(request);
                         } catch (Exception e) {
                             log.warn(SltBundle.message("slt.error.start"), e);
-                            Messages.showErrorDialog(project, e.getMessage(), SltBundle.message("slt.ui.errors.lisp.start"));
+                            ApplicationManager.getApplication().invokeLater(() ->
+                                    Messages.showErrorDialog(project, e.getMessage(), SltBundle.message("slt.ui.errors.lisp.start")));
                         }
                     });
-                });
-            } else {
-                if (onFailureServerState != null)
-                    onFailureServerState.run();
+                } else {
+                    if (onFailureServerState != null)
+                        onFailureServerState.run();
+                }
+            } else if (!starting) {
+                doSend(request);
             }
-        } else {
-            doSend(request);
-        }
+        });
     }
 
     private void doSend(SlimeRequest request) {
@@ -301,6 +350,46 @@ public class LispEnvironmentServiceImpl implements LispEnvironmentService {
     @Override
     public Integer calculateOffset(PsiElement element, PsiFile file, boolean wasAfter, String text, int offset, String packageOverride) {
         return indentationContainer.calculateIndent(element, file, wasAfter, text, offset, packageOverride);
+    }
+
+    @Override
+    public void addBreakpoint(XBreakpoint<SltBreakpointProperties> nativeBreakpoint) {
+        breakpointContainer.addBreakpoint(nativeBreakpoint);
+    }
+
+    @Override
+    public void removeBreakpoint(XBreakpoint<SltBreakpointProperties> nativeBreakpoint) {
+        breakpointContainer.removeBreakpoint(nativeBreakpoint);
+    }
+
+    @Override
+    public void nativeBreakpointUpdated(XBreakpoint<SltBreakpointProperties> nativeBreakpoint) {
+        breakpointContainer.onUpdate(nativeBreakpoint);
+    }
+
+    @Override
+    public Collection<SltBreakpoint> getAllBreakpoints() {
+        return breakpointContainer.getAllBreakpoints();
+    }
+
+    @Override
+    public LispSltOverrides getOverrides() {
+        return overrides;
+    }
+
+    @Override
+    public boolean hasFeature(LispFeatures feature) {
+        if (environment != null) {
+            return environment.getType().getDefinition().hasFeature(feature);
+        }
+        return false;
+    }
+
+    @Override
+    public String getBreakpointsForInstall() {
+        if (hasFeature(LispFeatures.BREAKPOINTS))
+            return breakpointContainer.getInstallBreakpoints();
+        return null;
     }
 
     @Override

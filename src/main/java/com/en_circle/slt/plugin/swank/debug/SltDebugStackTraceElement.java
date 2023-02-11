@@ -14,11 +14,11 @@ public class SltDebugStackTraceElement {
     private final SourceLocation location;
 
     public SltDebugStackTraceElement(LispContainer source) {
-        String text = source.getItems().get(2).toString();
+        String text = source.getItems().get(2).nativeString();
         this.line = LispUtils.unescape(text);
         text = source.getItems().get(1).toString();
         this.detailedCall = LispUtils.unescape(text);
-        this.location = new SourceLocation((LispContainer) source.getItems().get(3));
+        this.location = new SourceLocation(source.getItems().get(3));
         LispElement packageInfo = source.getItems().get(4);
         if (packageInfo instanceof LispString) {
             framePackage = ((LispString) packageInfo).getValue();

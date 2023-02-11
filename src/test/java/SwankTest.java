@@ -1,14 +1,11 @@
 import com.en_circle.slt.plugin.SltCommonLispFileType;
 import com.en_circle.slt.plugin.SltCommonLispLanguage;
 import com.en_circle.slt.plugin.SltCommonLispParserDefinition;
-import com.en_circle.slt.plugin.environment.SltLispEnvironment;
-import com.en_circle.slt.plugin.environment.SltLispEnvironment.SltOutput;
-import com.en_circle.slt.plugin.environment.SltSBCLEnvironment;
-import com.en_circle.slt.plugin.environment.SltSBCLEnvironmentConfiguration;
 import com.en_circle.slt.plugin.lisp.lisp.LispElement;
 import com.en_circle.slt.plugin.lisp.lisp.LispUtils;
 import com.en_circle.slt.plugin.lisp.psi.LispCoreProjectEnvironment;
 import com.en_circle.slt.plugin.swank.SwankClient;
+import com.en_circle.slt.plugin.swank.SwankClient.SwankReply;
 import com.en_circle.slt.plugin.swank.SwankPacket;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiFileFactory;
@@ -19,30 +16,29 @@ public class SwankTest {
 
     public static void main(String[] args) throws Exception {
         try {
-            SltSBCLEnvironmentConfiguration c = new SltSBCLEnvironmentConfiguration.Builder()
-                    .setListener((output, newData) -> {
-                        if (output == SltOutput.STDERR) {
-                            System.err.print(newData);
-                        }
-                    })
-                    .build();
-            SltLispEnvironment environment = new SltSBCLEnvironment();
-            environment.start(c);
-            try (SwankClient client = new SwankClient("127.0.0.1", 4005, packet -> {
-                LispCoreProjectEnvironment projectEnvironment = new LispCoreProjectEnvironment();
-                projectEnvironment.getEnvironment()
-                        .registerParserDefinition(SltCommonLispLanguage.INSTANCE, new SltCommonLispParserDefinition());
-                PsiFileFactory factory = PsiFileFactory.getInstance(projectEnvironment.getProject());
-                PsiFile source = factory.createFileFromText("swank-reply.cl", SltCommonLispFileType.INSTANCE, packet.getSentData());
-                List<LispElement> elements = LispUtils.convertAst(source);
-                for (LispElement e : elements) {
-                    System.out.println(e.toPrettyString() + "\n");
+            try (SwankClient client = new SwankClient("127.0.0.1", 12345, new SwankReply() {
+                @Override
+                public void onSwankMessage(SwankPacket packet) {
+                    LispCoreProjectEnvironment projectEnvironment = new LispCoreProjectEnvironment();
+                    projectEnvironment.getEnvironment()
+                            .registerParserDefinition(SltCommonLispLanguage.INSTANCE, new SltCommonLispParserDefinition());
+                    PsiFileFactory factory = PsiFileFactory.getInstance(projectEnvironment.getProject());
+                    PsiFile source = factory.createFileFromText("swank-reply.cl", SltCommonLispFileType.INSTANCE, packet.getSentData());
+                    List<LispElement> elements = LispUtils.convertAst(source);
+                    for (LispElement e : elements) {
+                        System.out.println(e.toPrettyString() + "\n");
+                    }
+                }
+
+                @Override
+                public void onReadError(Exception e) {
+                    e.printStackTrace();
                 }
             })) {
 
 //                client.swankSend(SlimePacket.swankInteractiveEval("(+ 1 1)", "cl-user", 1));
 //                client.swankSend(new SlimePacket("(:emacs-rex (swank:describe-definition-for-emacs \"XAXA\" :function) \"cl-user\" T 2)"));
-                  client.swankSend(new SwankPacket("(:emacs-rex (swank:eval-and-grab-output \"(special-operator-p 'if)\") \"cl-user\" T 1)"));
+                  client.swankSend(new SwankPacket("(:emacs-rex (swank:interactive-eval \"(error \"1\")\") \"cl-user\" T 1)"));
                 // - finding symbols!
 //                client.swankSend(new SlimePacket("(:emacs-rex (swank:apropos-list-for-emacs \"defun\") \"cl-user\" T 2)"));
 //                client.swankSend(new SlimePacket("(:emacs-rex (swank:apropos-list-for-emacs \"defun\") \"cl-user\" T 2)"));
@@ -52,7 +48,6 @@ public class SwankTest {
 
                 Thread.sleep(10000);
             }
-            environment.stop();
         } catch (Exception e) {
             e.printStackTrace();
         }

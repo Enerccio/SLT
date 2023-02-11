@@ -37,6 +37,18 @@ public class LispUtils {
         return elements;
     }
 
+    public static List<LispElement> convertAst(LispToplevel source) {
+        return convertAst(source, null, null);
+    }
+
+    public static List<LispElement> convertAst(LispToplevel source, Map<LispElement, OffsetInfo> lineOffsets, String offsetText) {
+        List<LispElement> elements = new ArrayList<>();
+
+        source.accept(new LispVisitorImpl(elements, lineOffsets, offsetText));
+
+        return elements;
+    }
+
     public static String unescape(String text) {
         text = StringUtils.replace(text, "\\\"", "\"");
         return text;
@@ -186,7 +198,7 @@ public class LispUtils {
             stack.peek().add(new com.en_circle.slt.plugin.lisp.lisp.LispSymbol("defstructure"));
             super.visitStructure(o);
             List<LispElement> self = stack.pop();
-            LispContainer container = new LispContainer(self, ContainerType.PAIR);
+            LispContainer container = new LispContainer(self, ContainerType.LIST);
             stack.peek().add(container);
             addOffset(o, container);
         }
@@ -205,16 +217,6 @@ public class LispUtils {
             super.visitVector(o);
             List<LispElement> self = stack.pop();
             LispContainer container = new LispContainer(self, ContainerType.VECTOR);
-            stack.peek().add(container);
-            addOffset(o, container);
-        }
-
-        @Override
-        public void visitPair(@NotNull LispPair o) {
-            stack.push(new ArrayList<>());
-            super.visitPair(o);
-            List<LispElement> self = stack.pop();
-            LispContainer container = new LispContainer(self, ContainerType.PAIR);
             stack.peek().add(container);
             addOffset(o, container);
         }

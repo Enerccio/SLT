@@ -2,7 +2,11 @@ package com.en_circle.slt.plugin.environment;
 
 public enum LispInterpret {
 
-    SBCL(":sbcl")
+    ABCL(":abcl"),
+    SBCL(":sbcl"),
+    CCL(":ccl"),
+    ALLEGRO(":allegro"),
+    CMUCL(":cmucl")
 
     ;
 

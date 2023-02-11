@@ -1,10 +1,19 @@
 (load (merge-pathnames "swank-backend.lisp" *load-truename*))
-(when (eq +slt-interpret+ :sbcl)
-  (load (merge-pathnames "swank-sbcl.lisp" *load-truename*)))
 
-(in-package swank/source-file-cache)
-
-(setf *SOURCE-SNIPPET-SIZE* 0)
+(when (eq slt:+slt-interpret+ :sbcl)
+  (load (merge-pathnames "swank-sbcl.lisp" *load-truename*))
+  (in-package swank/source-file-cache)
+  (setf *source-snippet-size* 0))
+(when (eq slt:+slt-interpret+ :abcl)
+  (load (merge-pathnames "swank-abcl.lisp" *load-truename*)))
+(when (eq slt:+slt-interpret+ :ccl)
+  (load (merge-pathnames "swank-ccl.lisp" *load-truename*)))
+(when (eq slt:+slt-interpret+ :allegro)
+  (load (merge-pathnames "swank-allegro.lisp" *load-truename*)))
+(when (eq slt:+slt-interpret+ :cmucl)
+  (load (merge-pathnames "swank-cmucl.lisp" *load-truename*))
+  (in-package swank/source-file-cache)
+  (setf *source-snippet-size* 0))
 
 (in-package :swank)
 
@@ -41,20 +50,11 @@ format suitable for Emacs."
                                             :stream stream
                                             :msg "<<error printing restart>>")
                     (princ restart stream)))
-                (swank-backend:arglist (slot-value restart 'function))))))
+                (swank-backend::get-restart-function-args restart)))))
 
-(defslimefun backtrace (start end)
-  (loop for frame in (compute-backtrace start end)
-        for i from start collect
-        (list i (frame-to-string frame)
-                (format NIL "~S" (print-frame-call-place frame))
-                (frame-source-location i)
-                (let ((pkg (frame-package i)))
-                    (cond
-                        (pkg (package-name pkg))
-                        (T NIL))))))
-
-(defslimefun compile-string-region-slt (string buffer offset filename package)
+(defslimefun compile-string-region-slt (string breakpoints buffer offset filename package)
+    (when breakpoints
+        (slt-core:with-breakpoints breakpoints))
     (with-buffer-syntax ()
       (collect-notes
        (lambda ()
@@ -77,6 +77,7 @@ format suitable for Emacs."
                             collect data-pair)))
 
 (defun find-reference-class-filter (symbol package)
+    (declare (ignorable package))
     (find-class symbol NIL))
 
 (defun get-reference-prefix (prefix type)
@@ -90,7 +91,7 @@ format suitable for Emacs."
         (let* ((symbol (second data-pair))
                (str (first data-pair))
                (package (third data-pair))
-               (strpackage (format NIL "~S" package)))
+               (strpackage (package-name package)))
           (cond
             ((not symbol) (list str strpackage NIL NIL))
             ((macro-function symbol) (list str strpackage :macro (find-source-location (symbol-function symbol))))
@@ -112,7 +113,13 @@ format suitable for Emacs."
       (cond ((eq args :not-available) nil)
 	    (t args)))))
 
+(defslimefun load-file-breakpoints (filename breakpoints)
+  (when breakpoints
+    (slt-core:with-breakpoints breakpoints))
+  (to-string (load (filename-to-pathname filename))))
+
 (export 'slt-eval)
 (export 'compile-string-region-slt)
 (export 'find-reference-prefix)
 (export 'operator-arglist-list)
+(export 'load-file-breakpoints)

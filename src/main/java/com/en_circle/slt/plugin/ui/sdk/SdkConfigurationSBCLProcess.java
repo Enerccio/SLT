@@ -2,6 +2,7 @@ package com.en_circle.slt.plugin.ui.sdk;
 
 import com.en_circle.slt.plugin.SltBundle;
 import com.en_circle.slt.plugin.sdk.LispSdk;
+import com.en_circle.slt.plugin.ui.SltGlobalUIService;
 import com.en_circle.slt.plugin.ui.sdk.SdkDialogProvider.OnSave;
 import com.en_circle.slt.tools.SBCLUtils;
 import com.intellij.openapi.Disposable;
@@ -28,7 +29,6 @@ import javax.swing.event.CaretListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.io.File;
-import java.util.Objects;
 
 public class SdkConfigurationSBCLProcess extends DialogWrapper {
 
@@ -45,7 +45,7 @@ public class SdkConfigurationSBCLProcess extends DialogWrapper {
     public SdkConfigurationSBCLProcess(@NotNull Component parent, LispSdk instance, String title, OnSave onSave) {
         super(parent, true);
 
-        this.parentDisposable = Objects.requireNonNull(DialogWrapper.findInstanceFromFocus()).getDisposable();
+        this.parentDisposable = SltGlobalUIService.getInstance();
         this.instance = instance;
         this.onSave = onSave;
 
@@ -60,7 +60,7 @@ public class SdkConfigurationSBCLProcess extends DialogWrapper {
         name.addCaretListener(createChangeListener());
         name.setText(instance.userName);
         if (StringUtils.isBlank(instance.userName)) {
-            name.setText(SltBundle.message("slt.ui.settings.sdk.editor.name.default"));
+            name.setText(SltBundle.message("slt.ui.settings.sdk.editor.name.sbcl.default"));
         }
 
         FileChooserDescriptor descriptor = new FileChooserDescriptor(true, false, false,
@@ -81,10 +81,10 @@ public class SdkConfigurationSBCLProcess extends DialogWrapper {
 
         TextFieldWithBrowseButton sbclExecutablePicker = new TextFieldWithBrowseButton(sbclExecutable.getField());
         sbclExecutablePicker.addBrowseFolderListener(
-                SltBundle.message("slt.ui.settings.sdk.editor.executable.select"), "", null, descriptor);
+                SltBundle.message("slt.ui.settings.sdk.editor.sbcl.executable.select"), "", null, descriptor);
         TextFieldWithBrowseButton sbclCorePicker = new TextFieldWithBrowseButton(sbclCore.getField());
         sbclCorePicker.addBrowseFolderListener(
-                SltBundle.message("slt.ui.settings.sdk.editor.core.select"), "", null, descriptor);
+                SltBundle.message("slt.ui.settings.sdk.editor.sbcl.core.select"), "", null, descriptor);
         TextFieldWithBrowseButton quicklispPathPicker = new TextFieldWithBrowseButton(quicklispPath.getField());
         //noinspection DialogTitleCapitalization
         quicklispPathPicker.addBrowseFolderListener(
@@ -152,7 +152,7 @@ public class SdkConfigurationSBCLProcess extends DialogWrapper {
         quicklispPath.getField().repaint();
 
         if (verified)
-            verified = checkAndLoadSbclCore(executable, core, quicklisp);
+            verified = checkAndLoadSbcl(executable, core, quicklisp);
         if (!verified) {
             Messages.showErrorDialog(SltBundle.message("slt.ui.settings.sdk.editor.sbcl.process.verifying.error"),
                     SltBundle.message("slt.ui.settings.sdk.editor.verifying.error.title"));
@@ -161,10 +161,10 @@ public class SdkConfigurationSBCLProcess extends DialogWrapper {
         isVerified = verified;
     }
 
-    private boolean checkAndLoadSbclCore(String executable, String core, String quicklisp) {
+    private boolean checkAndLoadSbcl(String executable, String core, String quicklisp) {
         ProgressWindow verifyWindow = new ProgressWindow(true, false, null,
                 getRootPane(), SltBundle.message("slt.ui.settings.sdk.editor.verifying.cancel"));
-        verifyWindow.setTitle(SltBundle.message("slt.ui.settings.sdk.editor.verifying"));
+        verifyWindow.setTitle(SltBundle.message("slt.ui.settings.sdk.editor.verifying.sbcl"));
         Disposer.register(parentDisposable, verifyWindow);
 
         ProgressResult<Boolean> result = new ProgressRunner<>(pi -> verifySbcl(pi, executable, core, quicklisp))

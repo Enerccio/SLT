@@ -2,6 +2,7 @@ package com.en_circle.slt.plugin.ui.console;
 
 import com.en_circle.slt.plugin.SltBundle;
 import com.en_circle.slt.plugin.SltCommonLispLanguage;
+import com.en_circle.slt.plugin.environment.LispFeatures;
 import com.en_circle.slt.plugin.environment.SltLispEnvironment.SltOutput;
 import com.en_circle.slt.plugin.services.lisp.LispEnvironmentService;
 import com.en_circle.slt.plugin.services.lisp.LispEnvironmentService.LispEnvironmentState;
@@ -99,7 +100,11 @@ public abstract class SltConsole implements SltComponent {
 
     @Override
     public void onPostStart() {
-
+        if (!LispEnvironmentService.getInstance(project).hasFeature(LispFeatures.REPL)) {
+            languageConsole.setEditable(false);
+        } else {
+            languageConsole.setEditable(true);
+        }
     }
 
     @Override

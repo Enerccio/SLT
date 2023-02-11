@@ -2,20 +2,23 @@ package com.en_circle.slt.plugin.ui.debug;
 
 import com.en_circle.slt.plugin.SltBundle;
 import com.en_circle.slt.plugin.SltUIConstants;
+import com.en_circle.slt.plugin.environment.LispFeatures;
+import com.en_circle.slt.plugin.lisp.lisp.LispElement;
 import com.en_circle.slt.plugin.services.lisp.LispEnvironmentService;
+import com.en_circle.slt.plugin.services.lisp.LispEnvironmentService.LispEnvironmentState;
 import com.en_circle.slt.plugin.swank.debug.SltDebugAction;
 import com.en_circle.slt.plugin.swank.debug.SltDebugArgument;
 import com.en_circle.slt.plugin.swank.debug.SltDebugInfo;
 import com.en_circle.slt.plugin.swank.debug.SltDebugStackTraceElement;
 import com.en_circle.slt.plugin.swank.requests.FrameLocalsAndCatchTags;
 import com.en_circle.slt.plugin.swank.requests.InvokeNthRestart;
+import com.en_circle.slt.plugin.swank.requests.StepperAction;
+import com.en_circle.slt.plugin.swank.requests.StepperAction.ActionType;
 import com.en_circle.slt.plugin.swank.requests.ThrowToToplevel;
 import com.intellij.icons.AllIcons.Actions;
+import com.intellij.icons.AllIcons.Debugger;
 import com.intellij.openapi.Disposable;
-import com.intellij.openapi.actionSystem.ActionPlaces;
-import com.intellij.openapi.actionSystem.AnAction;
-import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.actionSystem.DefaultActionGroup;
+import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.fileEditor.OpenFileDescriptor;
@@ -55,6 +58,7 @@ public class SltDebuggerImpl implements SltDebugger, Disposable {
     private final TabInfo tabInfo;
     private final SltDebuggers parent;
     private BigInteger lastDebugId;
+    private SltDebugInfo lastDebug;
     private JPanel singleFrameComponent;
     private final List<JPanel> stackframes = new ArrayList<>();
     private BigInteger debugContext;
@@ -87,10 +91,25 @@ public class SltDebuggerImpl implements SltDebugger, Disposable {
 
         this.content.removeAll();
         this.lastDebugId = debugInfo.getThreadId();
+        this.lastDebug = debugInfo;
+
+        JPanel content = new JPanel(new BorderLayout());
+        this.content.add(content, BorderLayout.CENTER);
+
+        if (LispEnvironmentService.getInstance(parent.getProject()).hasFeature(LispFeatures.BREAKPOINT_STEPPING)) {
+            DefaultActionGroup controlGroup = new DefaultActionGroup();
+            controlGroup.add(new StepActivate());
+            controlGroup.add(new StepIntoAction());
+            controlGroup.add(new StepNextAction());
+            controlGroup.add(new StepOutAction());
+            ActionToolbar toolbar = ActionManager.getInstance().createActionToolbar("SltProcessWindowWrapEvent", controlGroup, false);
+            toolbar.setTargetComponent(this.content);
+            this.content.add(toolbar.getComponent(), BorderLayout.WEST);
+        }
 
         JBSplitter splitter = new JBSplitter(false);
         splitter.setProportion(0.5f);
-        this.content.add(splitter, BorderLayout.CENTER);
+        content.add(splitter, BorderLayout.CENTER);
 
         JBTextField errorName = new JBTextField();
         errorName.setEditable(false);
@@ -113,37 +132,89 @@ public class SltDebuggerImpl implements SltDebugger, Disposable {
         splitter.setFirstComponent(splitter2);
 
         JPanel actionsPanel = new JPanel();
-        actionsPanel.setLayout(new BoxLayout(actionsPanel, BoxLayout.Y_AXIS));
+        actionsPanel.setLayout(new GridBagLayout());
 
         for (SltDebugAction action : debugInfo.getActions()) {
-            JLabel label = new JLabel(getText(action.getActionName()));
-            label.setCursor(new Cursor(Cursor.HAND_CURSOR));
-            Map<TextAttribute, Object> attributes = new HashMap<>(label.getFont().getAttributes());
-            attributes.put(TextAttribute.UNDERLINE, TextAttribute.UNDERLINE_ON);
-            label.setFont(label.getFont().deriveFont(attributes));
-            label.setForeground(SltUIConstants.HYPERLINK_COLOR);
-            label.addMouseListener(new MouseAdapter() {
-                @Override
-                public void mouseClicked(MouseEvent e) {
-                    actionAccepted(action, debugInfo);
+            JPanel actionInfo = new JPanel();
+            actionInfo.setLayout(new BoxLayout(actionInfo, BoxLayout.Y_AXIS));
+
+            if (LispEnvironmentService.getInstance(parent.getProject()).hasFeature(LispFeatures.DEBUGGER_ACTION_ARGLIST)) {
+                JLabel label = new JLabel(getText(action.getActionName()));
+                label.setCursor(new Cursor(Cursor.HAND_CURSOR));
+                Map<TextAttribute, Object> attributes = new HashMap<>(label.getFont().getAttributes());
+                attributes.put(TextAttribute.UNDERLINE, TextAttribute.UNDERLINE_ON);
+                label.setFont(label.getFont().deriveFont(attributes));
+                label.setForeground(SltUIConstants.HYPERLINK_COLOR);
+                label.addMouseListener(new MouseAdapter() {
+                    @Override
+                    public void mouseClicked(MouseEvent e) {
+                        actionAccepted(action, debugInfo);
+                    }
+                });
+                JPanel labelPanel = new JPanel(new BorderLayout());
+                labelPanel.add(label, BorderLayout.CENTER);
+                actionInfo.add(labelPanel);
+            } else {
+                JLabel label = new JLabel(getText(action.getActionName()));
+                JPanel labelPanel = new JPanel(new BorderLayout());
+                labelPanel.add(label, BorderLayout.CENTER);
+                actionInfo.add(labelPanel);
+
+                {
+                    JLabel actionNoArg = new JLabel(SltBundle.message("slt.ui.debugger.actions.invoke.noarg"));
+                    actionNoArg.setCursor(new Cursor(Cursor.HAND_CURSOR));
+                    Map<TextAttribute, Object> attributes = new HashMap<>(actionNoArg.getFont().getAttributes());
+                    attributes.put(TextAttribute.UNDERLINE, TextAttribute.UNDERLINE_ON);
+                    actionNoArg.setFont(actionNoArg.getFont().deriveFont(attributes));
+                    actionNoArg.setForeground(SltUIConstants.HYPERLINK_COLOR);
+                    actionNoArg.addMouseListener(new MouseAdapter() {
+                        @Override
+                        public void mouseClicked(MouseEvent e) {
+                            actionAcceptedNoArg(action, debugInfo);
+                        }
+                    });
+                    labelPanel = new JPanel(new BorderLayout());
+                    labelPanel.add(actionNoArg, BorderLayout.CENTER);
+                    actionInfo.add(labelPanel);
                 }
-            });
-            JPanel labelPanel = new JPanel(new BorderLayout());
-            labelPanel.add(label, BorderLayout.CENTER);
+
+                {
+                    JLabel actionNoArg = new JLabel(SltBundle.message("slt.ui.debugger.actions.invoke.arg"));
+                    actionNoArg.setCursor(new Cursor(Cursor.HAND_CURSOR));
+                    Map<TextAttribute, Object> attributes = new HashMap<>(actionNoArg.getFont().getAttributes());
+                    attributes.put(TextAttribute.UNDERLINE, TextAttribute.UNDERLINE_ON);
+                    actionNoArg.setFont(actionNoArg.getFont().deriveFont(attributes));
+                    actionNoArg.setForeground(SltUIConstants.HYPERLINK_COLOR);
+                    actionNoArg.addMouseListener(new MouseAdapter() {
+                        @Override
+                        public void mouseClicked(MouseEvent e) {
+                            actionAcceptedArg(action, debugInfo);
+                        }
+                    });
+                    labelPanel = new JPanel(new BorderLayout());
+                    labelPanel.add(actionNoArg, BorderLayout.CENTER);
+                    actionInfo.add(labelPanel);
+                }
+            }
 
             JBTextArea textArea = new JBTextArea(action.getActionDescription());
             textArea.setEditable(false);
             textArea.setWrapStyleWord(true);
             textArea.setLineWrap(true);
 
-            JPanel actionInfo = new JPanel();
-            actionInfo.setLayout(new BoxLayout(actionInfo, BoxLayout.Y_AXIS));
-
-            actionInfo.add(labelPanel);
             actionInfo.add(new JScrollPane(textArea));
 
-            actionsPanel.add(actionInfo);
+            GridBagConstraints cons = new GridBagConstraints();
+            cons.fill = GridBagConstraints.HORIZONTAL;
+            cons.weightx = 1;
+            cons.gridx = 0;
+            actionsPanel.add(actionInfo, cons);
         }
+        GridBagConstraints cons = new GridBagConstraints();
+        cons.fill = GridBagConstraints.HORIZONTAL;
+        cons.weighty = 1;
+        cons.gridx = 0;
+        actionsPanel.add(Box.createVerticalGlue(), cons);
 
         JBScrollPane pane = new JBScrollPane(actionsPanel);
         JPanel actionsPanelDecorator = new JPanel(new BorderLayout());
@@ -152,7 +223,7 @@ public class SltDebuggerImpl implements SltDebugger, Disposable {
         splitter2.setFirstComponent(actionsPanelDecorator);
 
         JPanel stackframes = new JPanel();
-        stackframes.setLayout(new BoxLayout(stackframes, BoxLayout.Y_AXIS));
+        stackframes.setLayout(new GridBagLayout());
         for (SltDebugStackTraceElement element : debugInfo.getStacktrace()) {
             JLabel label = new JLabel(element.getLine());
             label.setCursor(new Cursor(Cursor.HAND_CURSOR));
@@ -165,9 +236,19 @@ public class SltDebuggerImpl implements SltDebugger, Disposable {
             JPanel p = new JPanel(new BorderLayout());
             p.setBackground(SltUIConstants.DEBUG_FRAMES_COLOR);
             p.add(label, BorderLayout.CENTER);
-            stackframes.add(p);
+
+            cons = new GridBagConstraints();
+            cons.fill = GridBagConstraints.HORIZONTAL;
+            cons.weightx = 1;
+            cons.gridx = 0;
+            stackframes.add(p, cons);
             this.stackframes.add(p);
         }
+        cons = new GridBagConstraints();
+        cons.fill = GridBagConstraints.HORIZONTAL;
+        cons.weighty = 1;
+        cons.gridx = 0;
+        stackframes.add(Box.createVerticalGlue(), cons);
 
         JPanel stackframesContainer = new JPanel(new BorderLayout());
         stackframesContainer.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(),
@@ -181,6 +262,65 @@ public class SltDebuggerImpl implements SltDebugger, Disposable {
         JBTabsImpl singleFrameParent = new JBTabsImpl(parent.getProject());
         singleFrameParent.addTab(singleFrame);
         splitter.setSecondComponent(singleFrameParent);
+    }
+
+    private void enableStepping() {
+        try {
+            LispEnvironmentService.getInstance(parent.getProject())
+                    .sendToLisp(StepperAction.action(ActionType.ENABLE, lastDebug.getThreadId(), result ->
+                            ApplicationManager.getApplication().invokeLater(() -> {})));
+        } catch (Exception e) {
+            log.warn(SltBundle.message("slt.error.start"), e);
+            Messages.showErrorDialog(parent.getProject(), e.getMessage(), SltBundle.message("slt.ui.errors.lisp.start"));
+        }
+    }
+
+    private void enableStepping(Runnable onEnable) {
+        try {
+            LispEnvironmentService.getInstance(parent.getProject())
+                    .sendToLisp(StepperAction.action(ActionType.ENABLE, lastDebug.getThreadId(), result ->
+                            ApplicationManager.getApplication().invokeLater(onEnable)));
+        } catch (Exception e) {
+            log.warn(SltBundle.message("slt.error.start"), e);
+            Messages.showErrorDialog(parent.getProject(), e.getMessage(), SltBundle.message("slt.ui.errors.lisp.start"));
+        }
+    }
+
+    private void stepIn() {
+        try {
+            LispEnvironmentService.getInstance(parent.getProject())
+                    .sendToLisp(StepperAction.action(ActionType.IN, lastDebug.getThreadId(), result ->
+                            ApplicationManager.getApplication().invokeLater(() -> processResult(result))));
+        } catch (Exception e) {
+            log.warn(SltBundle.message("slt.error.start"), e);
+            Messages.showErrorDialog(parent.getProject(), e.getMessage(), SltBundle.message("slt.ui.errors.lisp.start"));
+        }
+    }
+
+    private void stepOut() {
+        try {
+            LispEnvironmentService.getInstance(parent.getProject())
+                    .sendToLisp(StepperAction.action(ActionType.OUT, lastDebug.getThreadId(), result ->
+                            ApplicationManager.getApplication().invokeLater(() -> processResult(result))));
+        } catch (Exception e) {
+            log.warn(SltBundle.message("slt.error.start"), e);
+            Messages.showErrorDialog(parent.getProject(), e.getMessage(), SltBundle.message("slt.ui.errors.lisp.start"));
+        }
+    }
+
+    private void stepNext() {
+        try {
+            LispEnvironmentService.getInstance(parent.getProject())
+                    .sendToLisp(StepperAction.action(ActionType.NEXT, lastDebug.getThreadId(), result ->
+                            ApplicationManager.getApplication().invokeLater(() -> processResult(result))));
+        } catch (Exception e) {
+            log.warn(SltBundle.message("slt.error.start"), e);
+            Messages.showErrorDialog(parent.getProject(), e.getMessage(), SltBundle.message("slt.ui.errors.lisp.start"));
+        }
+    }
+
+    private void processResult(LispElement ignored) {
+        // ignored
     }
 
     private String getText(String text) {
@@ -222,7 +362,34 @@ public class SltDebuggerImpl implements SltDebugger, Disposable {
                 Messages.showErrorDialog(parent.getProject(), e.getMessage(), SltBundle.message("slt.ui.errors.lisp.start"));
             }
         }
+    }
 
+    private void actionAcceptedNoArg(SltDebugAction action, SltDebugInfo debugInfo) {
+        int ix = debugInfo.getActions().indexOf(action);
+        try {
+            LispEnvironmentService.getInstance(parent.getProject()).sendToLisp(InvokeNthRestart.nthRestart(debugInfo.getThreadId(),
+                    BigInteger.valueOf(ix), debugInfo.getDebugLevel(), "NIL", "NIL", () -> {}));
+        } catch (Exception e) {
+            log.warn(SltBundle.message("slt.error.start"), e);
+            Messages.showErrorDialog(parent.getProject(), e.getMessage(), SltBundle.message("slt.ui.errors.lisp.start"));
+        }
+    }
+
+    private void actionAcceptedArg(SltDebugAction action, SltDebugInfo debugInfo) {
+        int ix = debugInfo.getActions().indexOf(action);
+        String rest = "NIL";
+        String arg = Messages.showInputDialog(SltBundle.message("slt.ui.debugger.args.text"),
+                SltBundle.message("slt.ui.debugger.args.title"),null);
+        if (StringUtils.isNotBlank(arg)) {
+            rest = "(" + arg + ")";
+        }
+        try {
+            LispEnvironmentService.getInstance(parent.getProject()).sendToLisp(InvokeNthRestart.nthRestart(debugInfo.getThreadId(),
+                    BigInteger.valueOf(ix), debugInfo.getDebugLevel(), "NIL", rest, () -> {}));
+        } catch (Exception e) {
+            log.warn(SltBundle.message("slt.error.start"), e);
+            Messages.showErrorDialog(parent.getProject(), e.getMessage(), SltBundle.message("slt.ui.errors.lisp.start"));
+        }
     }
 
     private void stackframeClicked(SltDebugStackTraceElement element, SltDebugInfo debugInfo) {
@@ -235,17 +402,19 @@ public class SltDebuggerImpl implements SltDebugger, Disposable {
                 p.setBackground(SltUIConstants.DEBUG_FRAMES_COLOR);
             }
         }
-        if (element.isFile() && element.getPosition() >= 0) {
+        if (element.isFile()) {
             Project project = parent.getProject();
             ProjectFileIndex index = ProjectFileIndex.getInstance(project);
             VirtualFile vf = LocalFileSystem.getInstance().findFileByIoFile(new File(element.getLocation()));
             if (vf != null) {
                 if (index.isInSource(vf)) {
                     FileEditorManager.getInstance(project)
-                            .openTextEditor(new OpenFileDescriptor(project, vf, element.getPosition()), true);
+                            .openTextEditor(new OpenFileDescriptor(project, vf,
+                                    element.getPosition() >= 0 ? element.getPosition() : -1), true);
                 } else {
                     FileEditorManager.getInstance(project)
-                            .openEditor(new OpenFileDescriptor(project, vf, element.getPosition()), true);
+                            .openEditor(new OpenFileDescriptor(project, vf,
+                                    element.getPosition() >= 0 ? element.getPosition() : -1), true);
                 }
             }
         }
@@ -279,10 +448,111 @@ public class SltDebuggerImpl implements SltDebugger, Disposable {
     @Override
     public void activate() {
         this.tabInfo.fireAlert();
+        if (lastDebug != null) {
+            if (lastDebug.getStacktrace() != null && lastDebug.getStacktrace().size() > 0) {
+                stackframeClicked(lastDebug.getStacktrace().get(0), lastDebug);
+            }
+        }
     }
 
     @Override
     public void dispose() {
 
+    }
+
+    private class StepActivate extends AnAction {
+
+        private StepActivate() {
+            super(SltBundle.message("slt.ui.debugger.stepper.activate"), "", Debugger.ShowCurrentFrame);
+        }
+
+        @Override
+        public void actionPerformed(@NotNull AnActionEvent e) {
+            enableStepping();
+        }
+
+        @Override
+        public @NotNull ActionUpdateThread getActionUpdateThread() {
+            return ActionUpdateThread.EDT;
+        }
+
+        @Override
+        public void update(@NotNull AnActionEvent e) {
+            super.update(e);
+
+            e.getPresentation().setEnabled(LispEnvironmentService.getInstance(parent.getProject()).getState() == LispEnvironmentState.READY);
+        }
+    }
+
+    private class StepIntoAction extends AnAction {
+
+        private StepIntoAction() {
+            super(SltBundle.message("slt.ui.debugger.stepper.into"), "", Actions.TraceInto);
+        }
+
+        @Override
+        public void actionPerformed(@NotNull AnActionEvent e) {
+            enableStepping(SltDebuggerImpl.this::stepIn);
+        }
+
+        @Override
+        public @NotNull ActionUpdateThread getActionUpdateThread() {
+            return ActionUpdateThread.EDT;
+        }
+
+        @Override
+        public void update(@NotNull AnActionEvent e) {
+            super.update(e);
+
+            e.getPresentation().setEnabled(LispEnvironmentService.getInstance(parent.getProject()).getState() == LispEnvironmentState.READY);
+        }
+    }
+
+    private class StepOutAction extends AnAction {
+
+        private StepOutAction() {
+            super(SltBundle.message("slt.ui.debugger.stepper.out"), "", Actions.StepOut);
+        }
+
+        @Override
+        public void actionPerformed(@NotNull AnActionEvent e) {
+            enableStepping(SltDebuggerImpl.this::stepOut);
+        }
+
+        @Override
+        public @NotNull ActionUpdateThread getActionUpdateThread() {
+            return ActionUpdateThread.EDT;
+        }
+
+        @Override
+        public void update(@NotNull AnActionEvent e) {
+            super.update(e);
+
+            e.getPresentation().setEnabled(LispEnvironmentService.getInstance(parent.getProject()).getState() == LispEnvironmentState.READY);
+        }
+    }
+
+    private class StepNextAction extends AnAction {
+
+        private StepNextAction() {
+            super(SltBundle.message("slt.ui.debugger.stepper.next"), "", Actions.TraceOver);
+        }
+
+        @Override
+        public void actionPerformed(@NotNull AnActionEvent e) {
+            enableStepping(SltDebuggerImpl.this::stepNext);
+        }
+
+        @Override
+        public @NotNull ActionUpdateThread getActionUpdateThread() {
+            return ActionUpdateThread.EDT;
+        }
+
+        @Override
+        public void update(@NotNull AnActionEvent e) {
+            super.update(e);
+
+            e.getPresentation().setEnabled(LispEnvironmentService.getInstance(parent.getProject()).getState() == LispEnvironmentState.READY);
+        }
     }
 }

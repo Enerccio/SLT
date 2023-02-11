@@ -1,10 +1,11 @@
 package com.en_circle.slt.plugin.contributors;
 
-import com.en_circle.slt.plugin.lisp.LispSymbolPresentation;
+import com.en_circle.slt.plugin.environment.LispFeatures;
+import com.en_circle.slt.plugin.lisp.LispPotentialSymbolPresentation;
 import com.en_circle.slt.plugin.lisp.lisp.LispContainer;
 import com.en_circle.slt.plugin.lisp.lisp.LispElement;
 import com.en_circle.slt.plugin.lisp.lisp.LispString;
-import com.en_circle.slt.plugin.lisp.psi.LispSymbol;
+import com.en_circle.slt.plugin.services.lisp.LispEnvironmentService;
 import com.en_circle.slt.plugin.swank.components.SourceLocation;
 import com.en_circle.slt.plugin.swank.requests.CompleteSearch;
 import com.en_circle.slt.plugin.swank.requests.CompleteSearch.SearchFilter;
@@ -14,15 +15,14 @@ import com.intellij.navigation.ChooseByNameContributor;
 import com.intellij.navigation.ItemPresentation;
 import com.intellij.navigation.NavigationItem;
 import com.intellij.navigation.PsiElementNavigationItem;
-import com.intellij.openapi.fileEditor.FileEditorManager;
-import com.intellij.openapi.fileEditor.OpenFileDescriptor;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ProjectFileIndex;
 import com.intellij.openapi.util.NlsSafe;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileManager;
+import com.intellij.psi.NavigatablePsiElement;
 import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiFile;
+import com.intellij.psi.PsiNamedElement;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -39,13 +39,15 @@ public class SltSymbolContributor implements ChooseByNameContributor {
 
     @Override
     public String @NotNull [] getNames(Project project, boolean includeNonProjectItems) {
-        String[] names;
-        try {
-            names = SltApplicationUtils.getAsyncResultCheckCancellation(project,
-                    finishRequest -> CompleteSearch.search("", getFilter(), form ->
-                            finishRequest.accept(getNames(form, includeNonProjectItems, project))), false);
-        } catch (Exception e) {
-            return new String[0];
+        String[] names = null;
+        if (LispEnvironmentService.getInstance(project).hasFeature(LispFeatures.SEARCH)) {
+            try {
+                names = SltApplicationUtils.getAsyncResultCheckCancellation(project,
+                        finishRequest -> CompleteSearch.search("", getFilter(), form ->
+                                finishRequest.accept(getNames(form, includeNonProjectItems, project))), false);
+            } catch (Exception e) {
+                return new String[0];
+            }
         }
 
         if (names == null) {
@@ -132,17 +134,21 @@ public class SltSymbolContributor implements ChooseByNameContributor {
 
     private NavigationItem createNavigationElement(Project project, LispContainer c) {
         String name = ((LispString) c.getItems().get(0)).getValue();
+        String packageName = null;
+        if (c.getItems().get(1) instanceof LispString pkgName)
+            packageName = pkgName.getValue();
+        final String packageNameFinal = packageName;
         LispElement location = c.getItems().get(3);
         if (location instanceof LispContainer loc) {
             SourceLocation l = new SourceLocation(loc);
             return LocationUtils.convertFromLocationToSymbol(project, l, name,
-                    s -> mkElement(project, s));
+                    s -> mkElement(project, s, packageNameFinal, l.getPosition()));
         }
 
         return null;
     }
 
-    private NavigationItem mkElement(Project project, LispSymbol symbol) {
+    private NavigationItem mkElement(Project project, PsiNamedElement symbol, String packageName, int offset) {
         return new PsiElementNavigationItem() {
             @Override
             public @Nullable PsiElement getTargetElement() {
@@ -156,28 +162,18 @@ public class SltSymbolContributor implements ChooseByNameContributor {
 
             @Override
             public @Nullable ItemPresentation getPresentation() {
-                return new LispSymbolPresentation(symbol);
+                return new LispPotentialSymbolPresentation(project, symbol.getContainingFile(),
+                        symbol.getName(), packageName, offset);
             }
 
             @Override
             public void navigate(boolean requestFocus) {
-                ProjectFileIndex index = ProjectFileIndex.getInstance(project);
-                PsiFile psiFile = symbol.getContainingFile();
-                VirtualFile vf = psiFile.getVirtualFile();
-                if (vf != null) {
-                    if (index.isInSource(vf)) {
-                        FileEditorManager.getInstance(project)
-                                .openTextEditor(new OpenFileDescriptor(project, vf, symbol.getTextOffset()), true);
-                    } else {
-                        FileEditorManager.getInstance(project)
-                                .openEditor(new OpenFileDescriptor(project, vf, symbol.getTextOffset()), true);
-                    }
-                }
+                ((NavigatablePsiElement) symbol).navigate(requestFocus);
             }
 
             @Override
             public boolean canNavigate() {
-                return true;
+                return ((NavigatablePsiElement) symbol).canNavigate();
             }
 
             @Override

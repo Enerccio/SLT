@@ -8,6 +8,7 @@ public interface SltLispEnvironment {
 
     boolean isActive();
     SltLispProcessInformation getInformation();
+    Environment getType();
 
     interface SltLispOutputChangedListener {
 

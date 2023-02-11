@@ -11,8 +11,8 @@ import java.util.regex.Pattern;
 
 public class LispLexerUtils {
 
-    // keep in sycn with flex!
-    private static final Pattern whitespace = Pattern.compile("[\\r\\n\\t \\x0c\\x0a]");
+    // keep in sync with flex!
+    public static final Pattern whitespace = Pattern.compile("[\\r\\n\\t \\x0c\\x0a]");
 
     public static IElementType processToken(LispNumberLexerAdapter lexer, String token) {
         if (StringUtils.containsOnly(token, ".")) {

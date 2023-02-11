@@ -4,8 +4,10 @@ import com.en_circle.slt.plugin.lisp.lisp.LispContainer;
 import com.en_circle.slt.plugin.lisp.lisp.LispElement;
 import com.en_circle.slt.plugin.lisp.lisp.LispString;
 import com.en_circle.slt.plugin.lisp.lisp.LispSymbol;
+import com.en_circle.slt.plugin.services.lisp.LispEnvironmentService;
 import com.en_circle.slt.plugin.swank.SlimeRequest;
 import com.en_circle.slt.plugin.swank.SwankPacket;
+import com.intellij.openapi.project.Project;
 import org.apache.commons.lang3.StringUtils;
 
 import java.math.BigInteger;
@@ -14,24 +16,26 @@ import java.util.function.Function;
 
 public class EvalAndGrab extends SlimeRequest {
 
-    public static SlimeRequest eval(String code, String module, boolean parse, Callback callback) {
-        return new EvalAndGrab(code, module, parse, callback);
+    public static SlimeRequest eval(String code, String module, boolean includeDebugger, boolean parse, Callback callback) {
+        return new EvalAndGrab(code, module, includeDebugger, parse, callback);
     }
 
-    public static SlimeRequest eval(String code, boolean parse, Callback callback) {
-        return new EvalAndGrab(code, "cl-user", parse, callback);
+    public static SlimeRequest eval(String code, boolean includeDebugger, boolean parse, Callback callback) {
+        return new EvalAndGrab(code, "cl-user", includeDebugger, parse, callback);
     }
 
     protected final Callback callback;
     protected final String module;
     protected final String code;
+    protected final boolean includeDebugger;
     protected final boolean parse;
 
-    protected EvalAndGrab(String code, String module, boolean parse, Callback callback) {
+    protected EvalAndGrab(String code, String module, boolean includeDebugger, boolean parse, Callback callback) {
         this.callback = callback;
         this.module = module;
         this.code = code;
         this.parse = parse;
+        this.includeDebugger = includeDebugger;
     }
 
     public void processReply(LispContainer data, Function<String, List<LispElement>> parser) {
@@ -56,8 +60,10 @@ public class EvalAndGrab extends SlimeRequest {
     }
 
     @Override
-    public SwankPacket createPacket(BigInteger requestId) {
-        return SwankPacket.swankEvalAndGrab(code, module, requestId);
+    public SwankPacket createPacket(BigInteger requestId, Project project) {
+        return SwankPacket.swankEvalAndGrab(code,
+                includeDebugger ? LispEnvironmentService.getInstance(project).getBreakpointsForInstall() : null,
+                module, requestId);
     }
 
     public interface Callback {

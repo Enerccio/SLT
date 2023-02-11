@@ -22,6 +22,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import javax.swing.event.TableModelListener;
+import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 import java.awt.*;
 import java.math.BigInteger;
@@ -176,7 +177,7 @@ public class ThreadList implements InstanceInfoPanelComponent {
 
     @Override
     public void onPreStop() {
-        tableContainer.removeAll();
+        table.setModel(new DefaultTableModel());
     }
 
     @Override

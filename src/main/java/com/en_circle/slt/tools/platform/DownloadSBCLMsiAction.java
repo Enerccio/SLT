@@ -214,7 +214,7 @@ public class DownloadSBCLMsiAction implements DownloadSBCLAction {
     private void verifySBCL(String executable, String core, String quicklisp, String installUuid) {
         ProgressWindow verifyWindow = new ProgressWindow(true, false, null,
                 rootPane, SltBundle.message("slt.ui.settings.sdk.editor.verifying.cancel"));
-        verifyWindow.setTitle(SltBundle.message("slt.ui.settings.sdk.editor.verifying"));
+        verifyWindow.setTitle(SltBundle.message("slt.ui.settings.sdk.editor.verifying.sbcl"));
         Disposer.register(parentDisposable, verifyWindow);
 
         ProgressResult<Boolean> result = new ProgressRunner<>(pi -> verifySbcl(pi, executable, core, quicklisp))

@@ -3,6 +3,10 @@ package com.en_circle.slt.plugin.lisp.psi;
 
 import com.intellij.psi.PsiElement;
 
-public interface LispComment extends PsiElement {
+public interface LispComment extends LispCommentElement {
+
+  String getName();
+
+  PsiElement setName(String newName);
 
 }

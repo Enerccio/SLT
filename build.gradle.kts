@@ -1,10 +1,10 @@
 plugins {
     id("java")
-    id("org.jetbrains.intellij") version "1.12.0"
+    id("org.jetbrains.intellij") version "1.13.0"
 }
 
 group = "com.en_circle.slt"
-version = "0.3.1"
+version = "0.4.0"
 
 repositories {
     mavenCentral()
@@ -15,6 +15,7 @@ dependencies {
     implementation("org.watertemplate:watertemplate-engine:1.2.2")
     implementation("com.google.guava:guava:31.1-jre")
     implementation("org.rauschig:jarchivelib:1.2.0")
+    implementation("org.abcl:abcl:1.8.0")
 
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.9.2")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.9.2")

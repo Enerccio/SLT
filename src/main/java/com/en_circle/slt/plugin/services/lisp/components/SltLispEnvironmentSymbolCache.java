@@ -165,7 +165,7 @@ public class SltLispEnvironmentSymbolCache extends Thread {
                 String.format(
                         "(slt-core:analyze-symbols (slt-core:read-fix-packages \"%s\"))",
                         request),
-                LispEnvironmentService.getInstance(project).getGlobalPackage(), true, (result, stdout, parsed) -> {
+                LispEnvironmentService.getInstance(project).getGlobalPackage(), false, true, (result, stdout, parsed) -> {
                     if (parsed.size() == 1 && parsed.get(0).getType() == LispElementType.CONTAINER) {
                         int ix = 0;
                         LispContainer data = (LispContainer) parsed.get(0);
@@ -180,47 +180,51 @@ public class SltLispEnvironmentSymbolCache extends Thread {
 
                             SymbolState state = refreshStates.get(ix++);
                             if (state != null) {
-                                String symValue = ((LispSymbol) list.getItems().get(1)).getValue().toUpperCase();
-                                state.timestamp = System.currentTimeMillis();
-                                switch (symValue) {
-                                    case ":CLASS":
-                                        state.binding = SymbolBinding.CLASS;
-                                        break;
-                                    case ":METHOD":
-                                        state.binding = SymbolBinding.METHOD;
-                                        break;
-                                    case ":SPECIAL-FORM":
-                                        state.binding = SymbolBinding.SPECIAL_FORM;
-                                        break;
-                                    case ":MACRO":
-                                        state.binding = SymbolBinding.MACRO;
-                                        break;
-                                    case ":FUNCTION":
-                                        state.binding = SymbolBinding.FUNCTION;
-                                        break;
-                                    case ":CONSTANT":
-                                        state.binding = SymbolBinding.CONSTANT;
-                                        break;
-                                    case ":KEYWORD":
-                                        state.binding = SymbolBinding.KEYWORD;
-                                        break;
-                                    case ":SPECIAL":
-                                        state.binding = SymbolBinding.SPECIAL_VARIABLE;
-                                        break;
-                                    default:
-                                        state.binding = SymbolBinding.NONE;
-                                        break;
-                                }
-                                state.documentation = null;
-                                if (list.getItems().get(2) instanceof LispString) {
-                                    state.documentation = ((LispString) list.getItems().get(2)).getValue();
-                                }
-
-                                if (list.getItems().get(3) instanceof LispContainer) {
-                                    SourceLocation location = new SourceLocation((LispContainer) list.getItems().get(3));
-                                    if (!state.location.equals(location)) {
-                                        state.location = location;
+                                if (list.getItems().get(1) instanceof LispSymbol symbolBack) {
+                                    String symValue = symbolBack.getValue().toUpperCase();
+                                    state.timestamp = System.currentTimeMillis();
+                                    switch (symValue) {
+                                        case ":CLASS":
+                                            state.binding = SymbolBinding.CLASS;
+                                            break;
+                                        case ":METHOD":
+                                            state.binding = SymbolBinding.METHOD;
+                                            break;
+                                        case ":SPECIAL-FORM":
+                                            state.binding = SymbolBinding.SPECIAL_FORM;
+                                            break;
+                                        case ":MACRO":
+                                            state.binding = SymbolBinding.MACRO;
+                                            break;
+                                        case ":FUNCTION":
+                                            state.binding = SymbolBinding.FUNCTION;
+                                            break;
+                                        case ":CONSTANT":
+                                            state.binding = SymbolBinding.CONSTANT;
+                                            break;
+                                        case ":KEYWORD":
+                                            state.binding = SymbolBinding.KEYWORD;
+                                            break;
+                                        case ":SPECIAL":
+                                            state.binding = SymbolBinding.SPECIAL_VARIABLE;
+                                            break;
+                                        default:
+                                            state.binding = SymbolBinding.NONE;
+                                            break;
                                     }
+                                    state.documentation = null;
+                                    if (list.getItems().get(2) instanceof LispString) {
+                                        state.documentation = ((LispString) list.getItems().get(2)).getValue();
+                                    }
+
+                                    if (list.getItems().get(3) instanceof LispContainer) {
+                                        SourceLocation location = new SourceLocation((LispContainer) list.getItems().get(3));
+                                        if (!state.location.equals(location)) {
+                                            state.location = location;
+                                        }
+                                    }
+                                } else {
+                                    System.out.println(list.getItems().get(1).toPrettyString());
                                 }
                             }
                         }

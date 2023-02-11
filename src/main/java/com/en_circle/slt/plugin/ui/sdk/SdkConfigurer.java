@@ -14,6 +14,7 @@ import com.intellij.openapi.options.Configurable;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.ui.Messages;
+import com.intellij.openapi.ui.SelectFromListDialog;
 import com.intellij.openapi.util.NlsContexts.ConfigurableName;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.table.JBTable;
@@ -102,8 +103,11 @@ public class SdkConfigurer implements Configurable {
         newSdk.uuid = UUID.randomUUID().toString();
 
 
-        // TODO: Environment selector
-        Environment environment = Environment.SBCL_PROCESS;
+        Environment environment = selectEnvironment();
+        if (environment == null) {
+            return;
+        }
+
         DialogWrapper configuration = environment.getDefinition().getDialogProvider().createSdkConfiguration(
                 root, newSdk, SltBundle.message("slt.ui.settings.sdk.editor.title.new"),
                 sdk -> {
@@ -120,8 +124,7 @@ public class SdkConfigurer implements Configurable {
         LispSdk copy = new LispSdk();
         copy.loadState(sdk);
 
-        // TODO: Environment selector
-        Environment environment = Environment.SBCL_PROCESS;
+        Environment environment = copy.environment;
         DialogWrapper configuration = environment.getDefinition().getDialogProvider().createSdkConfiguration(
                 root, copy, SltBundle.message("slt.ui.settings.sdk.editor.title.edit"),
                 sdkModified -> {
@@ -145,8 +148,17 @@ public class SdkConfigurer implements Configurable {
 
     @SuppressWarnings("IncorrectParentDisposable")
     private void downloadSdk() {
-        // TODO: Use Environment
-        Environment environment = Environment.SBCL_PROCESS;
+        List<Environment> downloadable = new ArrayList<>();
+        for (Environment environment : Environment.values()) {
+            if (environment.getDefinition().getDownloadActionDef() != null) {
+                downloadable.add(environment);
+            }
+        }
+
+        Environment environment = selectEnvironment(downloadable.toArray(new Environment[0]));
+        if (environment == null) {
+            return;
+        }
 
         Objects.requireNonNull(PlatformActionsContainer.getAction(environment.getDefinition().getDownloadActionDef()))
                 .downloadSdk(ApplicationManager.getApplication(), root,
@@ -161,6 +173,26 @@ public class SdkConfigurer implements Configurable {
                         SltBundle.message("slt.ui.settings.sdk.download.failed.title"));
             }
         });
+    }
+
+    private Environment selectEnvironment() {
+        return selectEnvironment(Environment.values());
+    }
+
+    private Environment selectEnvironment(Environment[] environments) {
+
+        SelectFromListDialog selectFromListDialog = new SelectFromListDialog(null,
+                environments, e -> ((Environment)e).getDefinition().getName(),
+                SltBundle.message("slt.ui.settings.sdk.select"),
+                ListSelectionModel.SINGLE_SELECTION);
+        selectFromListDialog.setSize(450, 250);
+        if (selectFromListDialog.showAndGet()) {
+            Object[] selection = selectFromListDialog.getSelection();
+            if (selection.length > 0) {
+                return (Environment) selection[0];
+            }
+        }
+        return null;
     }
 
     private class EditSdkAction extends AnAction {

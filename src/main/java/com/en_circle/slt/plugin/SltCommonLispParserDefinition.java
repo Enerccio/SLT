@@ -19,9 +19,13 @@ import org.jetbrains.annotations.NotNull;
 public class SltCommonLispParserDefinition implements ParserDefinition {
 
     public static final IFileElementType FILE = new IFileElementType(SltCommonLispLanguage.INSTANCE);
-    public static TokenSet STRINGS = TokenSet.create(LispTypes.STRING);
+    public static final TokenSet STRINGS = TokenSet.create(LispTypes.STRING_TOKEN);
 
-    public static TokenSet COMMENTS = TokenSet.create(LispTypes.COMMENT);
+    public static final TokenSet COMMENTS = TokenSet.create(LispTypes.LINE_COMMENT,  LispTypes.BLOCK_COMMENT);
+    public static final TokenSet SYMBOLS = TokenSet.create(LispTypes.SYMBOL_TOKEN);
+    public static final TokenSet LITERALS = TokenSet.create(LispTypes.STRING_TOKEN, LispTypes.BIT_ARRAY,
+            LispTypes.BINARY_NUMBER_TOKEN, LispTypes.HEX_NUMBER_TOKEN, LispTypes.RADIX_NUMBER_TOKEN,
+            LispTypes.REAL_NUMBER, LispTypes.INTEGER_NUMBER, LispTypes.RATIO_NUMBER);
 
 
     @Override

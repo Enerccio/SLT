@@ -1,6 +1,7 @@
 // This is a generated file. Not intended for manual editing.
 package com.en_circle.slt.plugin.lisp.psi;
 
+import com.intellij.psi.NavigatablePsiElement;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
 import org.jetbrains.annotations.NotNull;
@@ -16,7 +17,7 @@ public class LispVisitor extends PsiElementVisitor {
   }
 
   public void visitComment(@NotNull LispComment o) {
-    visitPsiElement(o);
+    visitCommentElement(o);
   }
 
   public void visitCompoundSymbol(@NotNull LispCompoundSymbol o) {
@@ -52,10 +53,6 @@ public class LispVisitor extends PsiElementVisitor {
   }
 
   public void visitOctalNumber(@NotNull LispOctalNumber o) {
-    visitPsiElement(o);
-  }
-
-  public void visitPair(@NotNull LispPair o) {
     visitPsiElement(o);
   }
 
@@ -100,15 +97,23 @@ public class LispVisitor extends PsiElementVisitor {
   }
 
   public void visitToplevel(@NotNull LispToplevel o) {
-    visitPsiElement(o);
+    visitNavigatablePsiElement(o);
   }
 
   public void visitVector(@NotNull LispVector o) {
     visitPsiElement(o);
   }
 
+  public void visitCommentElement(@NotNull LispCommentElement o) {
+    visitPsiElement(o);
+  }
+
   public void visitNamedElement(@NotNull LispNamedElement o) {
     visitPsiElement(o);
+  }
+
+  public void visitNavigatablePsiElement(@NotNull NavigatablePsiElement o) {
+    visitElement(o);
   }
 
   public void visitPsiElement(@NotNull PsiElement o) {

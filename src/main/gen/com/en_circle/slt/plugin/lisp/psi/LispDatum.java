@@ -22,9 +22,6 @@ public interface LispDatum extends PsiElement {
   LispNumber getNumber();
 
   @Nullable
-  LispPair getPair();
-
-  @Nullable
   LispPathname getPathname();
 
   @Nullable
