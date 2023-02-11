@@ -16,7 +16,7 @@ import javax.swing.*;
 public class LispPotentialSymbolPresentation implements ItemPresentation {
 
     private final Project project;
-    private PsiFile file;
+    private final PsiFile file;
     private final String symbol;
     private final String packageName;
     private final int offset;

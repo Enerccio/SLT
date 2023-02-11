@@ -1,5 +1,6 @@
 package com.en_circle.slt.plugin.autocomplete;
 
+import com.en_circle.slt.plugin.SltIconProvider;
 import com.en_circle.slt.plugin.SymbolState;
 import com.en_circle.slt.plugin.SymbolState.SymbolBinding;
 import com.en_circle.slt.plugin.environment.LispFeatures;
@@ -15,7 +16,6 @@ import com.intellij.codeInsight.completion.CompletionParameters;
 import com.intellij.codeInsight.completion.CompletionProvider;
 import com.intellij.codeInsight.completion.CompletionResultSet;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
-import com.intellij.icons.AllIcons.Nodes;
 import com.intellij.openapi.project.Project;
 import com.intellij.util.ProcessingContext;
 import org.jetbrains.annotations.NotNull;
@@ -45,13 +45,13 @@ public class HeadCompletionProvider extends CompletionProvider<CompletionParamet
                                                     .refreshSymbolFromServer(null, str.getValue());
                                             LookupElementBuilder builder = LookupElementBuilder.create(str.getValue());
                                             if (state.binding == SymbolBinding.MACRO) {
-                                                builder = builder.withIcon(Nodes.Template);
+                                                builder = builder.withIcon(SltIconProvider.MACRO);
                                             } else if (state.binding == SymbolBinding.FUNCTION) {
-                                                builder = builder.withIcon(Nodes.Function);
+                                                builder = builder.withIcon(SltIconProvider.FUNCTION);
                                             } else if (state.binding == SymbolBinding.METHOD) {
-                                                builder = builder.withIcon(Nodes.Method);
+                                                builder = builder.withIcon(SltIconProvider.METHOD);
                                             } else {
-                                                builder = builder.withIcon(Nodes.Lambda);
+                                                builder = builder.withIcon(SltIconProvider.LAMBDA);
                                             }
                                             builders.add(builder);
                                         }

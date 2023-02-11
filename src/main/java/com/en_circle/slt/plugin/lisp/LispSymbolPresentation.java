@@ -1,8 +1,8 @@
 package com.en_circle.slt.plugin.lisp;
 
+import com.en_circle.slt.plugin.SltIconProvider;
 import com.en_circle.slt.plugin.SymbolState;
 import com.en_circle.slt.plugin.services.lisp.LispEnvironmentService;
-import com.intellij.icons.AllIcons.Nodes;
 import com.intellij.navigation.ItemPresentation;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.util.NlsSafe;
@@ -53,12 +53,12 @@ public class LispSymbolPresentation implements ItemPresentation {
 
         return switch (state.binding) {
             case NONE, SPECIAL_FORM -> null;
-            case FUNCTION -> Nodes.Function;
-            case MACRO -> Nodes.Annotationtype;
-            case CONSTANT, KEYWORD -> Nodes.Constant;
-            case SPECIAL_VARIABLE -> Nodes.Gvariable;
-            case CLASS -> Nodes.Class;
-            case METHOD -> Nodes.Method;
+            case FUNCTION -> SltIconProvider.FUNCTION;
+            case MACRO -> SltIconProvider.MACRO;
+            case CONSTANT, KEYWORD -> SltIconProvider.CONSTANT;
+            case SPECIAL_VARIABLE -> SltIconProvider.SPECIAL;
+            case CLASS -> SltIconProvider.CLASS;
+            case METHOD -> SltIconProvider.METHOD;
         };
     }
 }

@@ -18,7 +18,10 @@
 
 lispFile ::= toplevel*
 
-toplevel ::= sexpr
+toplevel ::= sexpr {
+    implements="com.intellij.psi.NavigatablePsiElement"
+    methods=[getName getPresentation]
+}
 
 sexpr ::= (enhancement* datum) | comment
 

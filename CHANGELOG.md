@@ -9,7 +9,7 @@
 - CMUCL Support
 - Breakpoint support
 - Spellchecker support
-- Folding support
+- Folding support, structure support, navigation bar
 
 ### Fixes
 

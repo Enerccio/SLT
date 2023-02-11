@@ -1,17 +1,23 @@
 package com.en_circle.slt.plugin.lisp.psi.impl;
 
 import com.en_circle.slt.plugin.SltCommonLispFileType;
+import com.en_circle.slt.plugin.lisp.LispParserUtil;
+import com.en_circle.slt.plugin.lisp.LispParserUtil.LispSexpressionInfo;
 import com.en_circle.slt.plugin.lisp.LispSymbolPresentation;
 import com.en_circle.slt.plugin.lisp.psi.*;
 import com.intellij.lang.ASTNode;
 import com.intellij.navigation.ItemPresentation;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.NlsSafe;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFileFactory;
 import com.intellij.psi.PsiReference;
 import com.intellij.psi.PsiReferenceService.Hints;
 import com.intellij.psi.impl.source.resolve.reference.ReferenceProvidersRegistry;
 import com.intellij.psi.util.PsiTreeUtil;
+import org.jetbrains.annotations.Nullable;
+
+import javax.swing.*;
 
 public class LispPsiImplUtil {
 
@@ -58,6 +64,10 @@ public class LispPsiImplUtil {
 
     public static String getName(LispComment element) {
         return element.getText();
+    }
+
+    public static String getName(LispToplevel element) {
+        return LispParserUtil.determineTopLevelType(element.getSexpr()).getShortForm();
     }
 
     public static PsiElement setName(LispComment element, String newName) {
@@ -132,6 +142,21 @@ public class LispPsiImplUtil {
 
     public static ItemPresentation getPresentation(LispSymbol symbol) {
         return new LispSymbolPresentation(symbol);
+    }
+
+    public static ItemPresentation getPresentation(LispToplevel toplevel) {
+        LispSexpressionInfo type = LispParserUtil.determineTopLevelType(toplevel.getSexpr());
+        return new ItemPresentation() {
+            @Override
+            public @NlsSafe @Nullable String getPresentableText() {
+                return type.getShortForm();
+            }
+
+            @Override
+            public @Nullable Icon getIcon(boolean unused) {
+                return type.getIcon();
+            }
+        };
     }
 
 }

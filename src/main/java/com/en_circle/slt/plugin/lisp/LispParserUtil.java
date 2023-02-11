@@ -1,5 +1,6 @@
 package com.en_circle.slt.plugin.lisp;
 
+import com.en_circle.slt.plugin.SltIconProvider;
 import com.en_circle.slt.plugin.lisp.lisp.LispUtils;
 import com.en_circle.slt.plugin.lisp.psi.*;
 import com.en_circle.slt.plugin.services.lisp.LispEnvironmentService;
@@ -13,8 +14,10 @@ import com.intellij.psi.PsiWhiteSpace;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.containers.Stack;
 
+import javax.swing.*;
 import java.util.List;
 import java.util.function.Function;
+import java.util.regex.Pattern;
 
 public class LispParserUtil extends GeneratedParserUtilBase {
 
@@ -326,7 +329,175 @@ public class LispParserUtil extends GeneratedParserUtilBase {
         return quoteState;
     }
 
+    public static LispSexpressionInfo determineTopLevelType(LispSexpr sexpr) {
+        LispSexpressionInfo info = new LispSexpressionInfo();
+        info.type = SexpressionType.EXPRESSION;
+        info.shortForm = "...";
+
+        if (sexpr.getDatum() != null && sexpr.getDatum().getList() != null) {
+            LispList list = sexpr.getDatum().getList();
+            List<LispSexpr> elements = list.getSexprList();
+            if (elements.size() > 0) {
+                LispSexpr head = elements.get(0);
+                if (head.getDatum() != null && head.getDatum().getCompoundSymbol() != null) {
+                    String headName = head.getText().toLowerCase();
+                    headName = getSymbolName(headName);
+                    info.shortForm = headName;
+                    if ("defclass".equals(headName)) {
+                        info.type = SexpressionType.DEFCLASS;
+                        info.icon = SltIconProvider.CLASS;
+                        String secondElement = getSecondElement(elements);
+                        info.shortForm += secondElement;
+                        info.identification = secondElement.trim();
+                    } else if ("defconstant".equals(headName)) {
+                        info.type = SexpressionType.DEFCONSTANT;
+                        info.icon = SltIconProvider.CONSTANT;
+                        String secondElement = getSecondElement(elements);
+                        info.shortForm += secondElement;
+                        info.identification = secondElement.trim();
+                    } else if ("defgeneric".equals(headName)) {
+                        info.type = SexpressionType.DEFGENERIC;
+                        info.icon = SltIconProvider.METHOD;
+                        String secondElement = getSecondElement(elements);
+                        info.shortForm += secondElement;
+                        info.identification = secondElement.trim();
+                        info.longForm = getLongForm(elements, 2);
+                    } else if ("defmacro".equals(headName)) {
+                        info.type = SexpressionType.DEFMACRO;
+                        info.icon = SltIconProvider.MACRO;
+                        String secondElement = getSecondElement(elements);
+                        info.shortForm += secondElement;
+                        info.identification = secondElement.trim();
+                        info.longForm = getLongForm(elements, 2);
+                    } else if ("defmethod".equals(headName)) {
+                        info.type = SexpressionType.DEFMETHOD;
+                        info.icon = SltIconProvider.METHOD;
+                        String secondElement = getSecondElement(elements);
+                        info.shortForm += secondElement;
+                        info.identification = secondElement.trim();
+                        if (elements.size() > 2) {
+                            LispSexpr potentialArgs = elements.get(2);
+                            if (potentialArgs.getDatum() != null && potentialArgs.getDatum().getCompoundSymbol() != null) {
+                                info.shortForm += " " + potentialArgs.getText();
+                                info.identification = potentialArgs.getText();
+                                info.longForm = getLongForm(elements, 3);
+                            } else {
+                                info.longForm = getLongForm(elements, 2);
+                            }
+                        }
+                    } else if ("defpackage".equals(headName)) {
+                        info.type = SexpressionType.DEFPACKAGE;
+                        info.icon = SltIconProvider.PACKAGE;
+                        String secondElement = getSecondElement(elements);
+                        info.shortForm += secondElement;
+                        info.identification = secondElement.trim();
+                    } else if ("defsetf".equals(headName)) {
+                        info.type = SexpressionType.DEFSETF;
+                        info.icon = SltIconProvider.FUNCTION;
+                        String secondElement = getSecondElement(elements);
+                        info.shortForm += secondElement;
+                        info.identification = secondElement.trim();
+                    } else if ("defstruct".equals(headName)) {
+                        info.type = SexpressionType.DEFSTRUCT;
+                        info.icon = SltIconProvider.STRUCTURE;
+                        String secondElement = getSecondElement(elements);
+                        info.shortForm += secondElement;
+                        info.identification = secondElement.trim();
+                    } else if ("deftype".equals(headName)) {
+                        info.type = SexpressionType.DEFTYPE;
+                        info.icon = SltIconProvider.STRUCTURE;
+                        String secondElement = getSecondElement(elements);
+                        info.shortForm += secondElement;
+                        info.identification = secondElement.trim();
+                        info.longForm = getLongForm(elements, 2);
+                    } else if ("defun".equals(headName)) {
+                        info.type = SexpressionType.DEFUN;
+                        info.icon = SltIconProvider.FUNCTION;
+                        String secondElement = getSecondElement(elements);
+                        info.shortForm += secondElement;
+                        info.identification = secondElement.trim();
+                        info.longForm = getLongForm(elements, 2);
+                    } else if ("defparameter".equals(headName)) {
+                        info.type = SexpressionType.DEFPARAMETER;
+                        info.icon = SltIconProvider.SPECIAL;
+                        String secondElement = getSecondElement(elements);
+                        info.shortForm += secondElement;
+                        info.identification = secondElement.trim();
+                    } else if ("defvar".equals(headName)) {
+                        info.type = SexpressionType.DEFVAR;
+                        info.icon = SltIconProvider.SPECIAL;
+                        String secondElement = getSecondElement(elements);
+                        info.shortForm += secondElement;
+                        info.identification = secondElement.trim();
+                    }
+                }
+            }
+        }
+
+        return info;
+    }
+
+    private static String getLongForm(List<LispSexpr> elements, int i) {
+        if (elements.size() > i) {
+            String text = elements.get(i).getText();
+            return text.replaceAll(LispLexerUtils.whitespace.pattern() + "+", " ");
+        }
+        return null;
+    }
+
+    private static String getSymbolName(String symbol) {
+        if (symbol.contains("::")) {
+            return symbol.split(Pattern.quote("::"))[1];
+        } else if (symbol.contains(":")) {
+            return symbol.split(Pattern.quote(":"))[1];
+        }
+        return symbol;
+    }
+
+    private static String getSecondElement(List<LispSexpr> elements) {
+        if (elements.size() > 1) {
+            return " " + elements.get(1).getText();
+        }
+        return "";
+    }
+
     public enum QuoteState {
         BACKQUOTE, QUOTE, UNQUOTE, UNQUOTE_SPLICE, NO_STATE, ERROR_STATE
+    }
+
+    public enum SexpressionType {
+        EXPRESSION,
+        DEFCLASS, DEFCONSTANT, DEFGENERIC,
+        DEFMACRO, DEFMETHOD, DEFPACKAGE, DEFPARAMETER, DEFSETF, DEFSTRUCT,
+        DEFTYPE, DEFUN, DEFVAR
+    }
+
+    public static class LispSexpressionInfo {
+
+        private SexpressionType type;
+        private String shortForm;
+        private String identification;
+        private String longForm;
+        private Icon icon;
+
+        public SexpressionType getType() {
+            return type;
+        }
+
+        public String getShortForm() {
+            return shortForm == null ? "" : shortForm;
+        }
+
+        public Icon getIcon() {
+            return icon;
+        }
+
+        public String getIdentification() {
+            return identification;
+        }
+
+        public String getLongForm() {
+            return identification + (longForm == null ? "" : ": " + longForm);
+        }
     }
 }

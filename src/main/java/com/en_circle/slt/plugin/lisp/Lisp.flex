@@ -49,7 +49,7 @@ IElementType processBuffer(boolean unget) {
 %state STEP9
 %state STEP9ESCAPE
 
-// keep in since with LispLexerUtils!
+// keep in sinc with LispLexerUtils!
 WHITESPACE_CHARACTER=[\r\n\t\ \x0c\x0a]
 CONSTITUENT_CHARACTER=[!$%&*+\-\./0-9:<=>?@A-Za-z\[\]\^_{}~]
 TERMINATING_MACRO_CHAR=[\"'\(\),;`]
