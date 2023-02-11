@@ -8,6 +8,8 @@
 - AllegroCL Support
 - CMUCL Support
 - Breakpoint support
+- Spellchecker support
+- Folding support
 
 ### Fixes
 

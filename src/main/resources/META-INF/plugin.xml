@@ -103,6 +103,8 @@
 
         <spellchecker.support language="Common Lisp" implementationClass="com.en_circle.slt.plugin.SltSpellCheckingStrategy"/>
 
+        <lang.foldingBuilder language="Common Lisp" implementationClass="com.en_circle.slt.plugin.SltFoldingBuilder"/>
+
         <!-- Highlight annotators -->
         <externalAnnotator language="Common Lisp"
                            implementationClass="com.en_circle.slt.plugin.highlights.annotators.SymbolAnnotator"/>
