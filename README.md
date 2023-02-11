@@ -9,6 +9,7 @@
 [![0.2.0](https://badgen.net/github/milestones/enerccio/SLT/2)](https://github.com/enerccio/SLT/milestone/2)
 [![0.3.0](https://badgen.net/github/milestones/enerccio/SLT/4)](https://github.com/enerccio/SLT/milestone/4)
 [![0.4.0](https://badgen.net/github/milestones/enerccio/SLT/5)](https://github.com/enerccio/SLT/milestone/5)
+[![0.5.0](https://badgen.net/github/milestones/enerccio/SLT/6)](https://github.com/enerccio/SLT/milestone/6)
 ![GitHub all releases](https://img.shields.io/github/downloads/Enerccio/SLT/total)
 ![GitHub last commit](https://img.shields.io/github/last-commit/Enerccio/SLT)
 ![GitHub commit activity](https://img.shields.io/github/commit-activity/m/Enerccio/SLT)
