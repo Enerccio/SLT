@@ -1,6 +1,9 @@
-## 0.4.1
+## 0.4.1 230218
 
 ### Fixes
+
+- fixed error with breakpoints in other subsystems
+- fixed error with project closure causing listener to be called even after project was dead
 
 ## 0.4.0 230211
 
