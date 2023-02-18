@@ -6,6 +6,7 @@ import com.intellij.xdebugger.breakpoints.XBreakpointListener;
 import com.intellij.xdebugger.breakpoints.XLineBreakpoint;
 import org.jetbrains.annotations.NotNull;
 
+@SuppressWarnings("DataFlowIssue")
 public class SltBreakpointListener implements XBreakpointListener<XLineBreakpoint<SltBreakpointProperties>> {
 
     private final Project project;
@@ -16,18 +17,24 @@ public class SltBreakpointListener implements XBreakpointListener<XLineBreakpoin
 
     @Override
     public void breakpointAdded(@NotNull XLineBreakpoint<SltBreakpointProperties> breakpoint) {
-        LispEnvironmentService.getInstance(project)
-                .addBreakpoint(breakpoint);
+        if (breakpoint.getProperties() instanceof SltBreakpointProperties) {
+            LispEnvironmentService.getInstance(project)
+                    .addBreakpoint(breakpoint);
+        }
     }
 
     @Override
     public void breakpointRemoved(@NotNull XLineBreakpoint<SltBreakpointProperties> breakpoint) {
-        LispEnvironmentService.getInstance(project)
-                .removeBreakpoint(breakpoint);
+        if (breakpoint.getProperties() instanceof SltBreakpointProperties) {
+            LispEnvironmentService.getInstance(project)
+                    .removeBreakpoint(breakpoint);
+        }
     }
 
     @Override
     public void breakpointChanged(@NotNull XLineBreakpoint<SltBreakpointProperties> breakpoint) {
-        LispEnvironmentService.getInstance(project).nativeBreakpointUpdated(breakpoint);
+        if (breakpoint.getProperties() instanceof SltBreakpointProperties) {
+            LispEnvironmentService.getInstance(project).nativeBreakpointUpdated(breakpoint);
+        }
     }
 }

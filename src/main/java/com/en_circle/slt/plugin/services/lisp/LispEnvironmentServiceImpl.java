@@ -240,8 +240,10 @@ public class LispEnvironmentServiceImpl implements LispEnvironmentService {
         }
 
         ApplicationManager.getApplication().invokeLaterOnWriteThread(() -> {
-            ParameterHintsPassFactory.forceHintsUpdateOnNextPass();
-            DaemonCodeAnalyzer.getInstance(project).restart();
+            if (!project.isDisposed()) {
+                ParameterHintsPassFactory.forceHintsUpdateOnNextPass();
+                DaemonCodeAnalyzer.getInstance(project).restart();
+            }
         });
 
         for (LispEnvironmentListener listener : serverListeners) {

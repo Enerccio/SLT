@@ -168,7 +168,7 @@
     </projectListeners>
 
     <change-notes><![CDATA[
-<p>0.4.0 New features:</p>
+<p>0.4.1 New features:</p>
 <p>- Support for multiple lisp interprets<br />
 - ABCL Support<br />
 - CCL Support<br />
