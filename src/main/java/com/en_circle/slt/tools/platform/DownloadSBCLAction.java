@@ -20,12 +20,17 @@ public interface DownloadSBCLAction extends DownloadLispAction {
         setDisposable(disposable);
         setRootPane(rootPane);
 
-        run(() -> {
-            try {
-                acceptor.accept(getConfiguredSdk());
-            } catch (Exception e) {
-                log.error(e.getLocalizedMessage());
-                log.debug(e.getLocalizedMessage(), e);
+        //noinspection Convert2Lambda
+        run(new Runnable() {
+            @Override
+            public void run() {
+
+                try {
+                    acceptor.accept(getConfiguredSdk());
+                } catch (Exception e) {
+                    log.error(e.getLocalizedMessage());
+                    log.debug(e.getLocalizedMessage(), e);
+                }
             }
         });
     }

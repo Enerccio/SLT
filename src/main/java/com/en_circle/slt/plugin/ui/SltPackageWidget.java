@@ -20,7 +20,6 @@ import com.intellij.openapi.wm.StatusBarWidget;
 import com.intellij.openapi.wm.impl.status.EditorBasedWidget;
 import com.intellij.psi.PsiDocumentManager;
 import com.intellij.psi.PsiFile;
-import com.intellij.util.Alarm;
 import com.intellij.util.Consumer;
 import com.intellij.util.ui.update.MergingUpdateQueue;
 import com.intellij.util.ui.update.Update;
@@ -37,13 +36,14 @@ public class SltPackageWidget extends EditorBasedWidget
 
     public static final Key<Object> DISABLE_FOR_EDITOR = new Key<>("positionPanel.disableForEditor");
 
-    private Alarm alarm;
+    private Project project;
     private MergingUpdateQueue queue;
     private String packageName;
     private StatusBar statusBar;
 
     public SltPackageWidget(@NotNull Project project) {
         super(project);
+        this.project = project;
     }
 
     @Override
@@ -69,8 +69,8 @@ public class SltPackageWidget extends EditorBasedWidget
 
     private String getPackage() {
         if (packageName == null) {
-            if (LispEnvironmentService.getInstance(myProject).getState() == LispEnvironmentState.READY) {
-                return LispEnvironmentService.getInstance(myProject).getGlobalPackage();
+            if (LispEnvironmentService.getInstance(project).getState() == LispEnvironmentState.READY) {
+                return LispEnvironmentService.getInstance(project).getGlobalPackage();
             }
             return "CL-USER";
         }
@@ -95,7 +95,6 @@ public class SltPackageWidget extends EditorBasedWidget
     @Override
     public void install(@NotNull StatusBar statusBar) {
         super.install(statusBar);
-        alarm = new Alarm(Alarm.ThreadToUse.POOLED_THREAD, this);
         queue = new MergingUpdateQueue("CommonLispPackage", 100, true, null, this);
         EditorEventMulticaster multicaster = EditorFactory.getInstance().getEventMulticaster();
         multicaster.addCaretListener(this, this);
@@ -153,7 +152,7 @@ public class SltPackageWidget extends EditorBasedWidget
 
             packageName = null;
             Document document = editor.getDocument();
-            PsiFile psiFile = PsiDocumentManager.getInstance(myProject).getPsiFile(document);
+            PsiFile psiFile = PsiDocumentManager.getInstance(project).getPsiFile(document);
             if (psiFile != null) {
                 if (psiFile.getFileType() == SltCommonLispFileType.INSTANCE) {
                     int caretOffset = ex.getExpectedCaretOffset();
