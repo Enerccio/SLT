@@ -1,6 +1,8 @@
 # SLT - A Common Lisp Language Plugin for Jetbrains IDE lineup
 
 ![GitHub release (latest by date)](https://img.shields.io/github/v/release/Enerccio/SLT)
+[![Version](https://img.shields.io/jetbrains/plugin/v/21132-slt.svg)](https://plugins.jetbrains.com/plugin/21132-slt)
+![JetBrains plugins](https://img.shields.io/jetbrains/plugin/d/21132)
 ![GitHub Release Date](https://img.shields.io/github/release-date/Enerccio/SLT)
 ![OSS Lifecycle](https://img.shields.io/osslifecycle/Enerccio/SLT)
 ![GitHub](https://img.shields.io/github/license/Enerccio/SLT)
@@ -38,6 +40,8 @@ Using modified SLIME/Swank protocol to communicate with lisp interpret providing
 IDE capabilities for Common Lisp.
 
 # (Somewhat) Detailed Installation and Usage Guide
+
+You can now download the plugin from marketplace! https://plugins.jetbrains.com/plugin/21132-slt
 
 https://github.com/Enerccio/SLT/wiki/User-Guide
 
