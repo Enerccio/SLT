@@ -1,7 +1,8 @@
 ## 0.5.0
 
 ### Changes
-
+- support for definitions under other expressions
+- SltPlainTextSymbolCompletionContributor - to be used with git and such
 
 ## 0.4.1 230218
 

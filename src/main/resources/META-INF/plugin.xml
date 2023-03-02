@@ -64,12 +64,14 @@
 
         <!-- Language configuration -->
 
-        <lang.commenter language="Common Lisp" implementationClass="com.en_circle.slt.plugin.SltCommenter"/>
+        <lang.commenter language="Common Lisp"
+                        implementationClass="com.en_circle.slt.plugin.SltCommenter"/>
 
         <lang.parserDefinition language="Common Lisp"
                                implementationClass="com.en_circle.slt.plugin.SltCommonLispParserDefinition"/>
 
-        <lang.documentationProvider language="Common Lisp" implementationClass="com.en_circle.slt.plugin.SltDocumentationProvider"/>
+        <lang.documentationProvider language="Common Lisp"
+                                    implementationClass="com.en_circle.slt.plugin.SltDocumentationProvider"/>
 
         <toolWindow factoryClass="com.en_circle.slt.plugin.SltWindowFactory" id="Common Lisp"
                     anchor="bottom" icon="/icons/fileicon.svg" />
@@ -80,34 +82,41 @@
         <colorSettingsPage implementation="com.en_circle.slt.plugin.highlights.SltColorSettingsPage"/>
 
         <lang.syntaxHighlighterFactory language="Common Lisp"
-                implementationClass="com.en_circle.slt.plugin.highlights.SltStaticHighlighterFactory"/>
+                                       implementationClass="com.en_circle.slt.plugin.highlights.SltStaticHighlighterFactory"/>
 
         <psi.referenceContributor language="Common Lisp"
-                implementation="com.en_circle.slt.plugin.references.SltReferenceContributor"/>
+                                  implementation="com.en_circle.slt.plugin.references.SltReferenceContributor"/>
 
         <lang.elementManipulator forClass="com.en_circle.slt.plugin.lisp.psi.LispSymbol"
                                  implementationClass="com.en_circle.slt.plugin.references.SltSymbolManipulator"/>
 
-        <completion.contributor language="Common Lisp" implementationClass="com.en_circle.slt.plugin.SltCompletionContributor"/>
+        <completion.contributor language="Common Lisp"
+                                implementationClass="com.en_circle.slt.plugin.SltCompletionContributor"/>
 
         <postStartupActivity implementation="com.en_circle.slt.plugin.highlights.SltBraceHighlighter"
                              id="SLT_BRACE_MATCHER" />
 
-        <statusBarWidgetFactory id="Common Lisp" implementation="com.en_circle.slt.plugin.SltStatusBarWidgetFactory"/>
+        <statusBarWidgetFactory id="Common Lisp"
+                                implementation="com.en_circle.slt.plugin.SltStatusBarWidgetFactory"/>
 
         <enterHandlerDelegate implementation="com.en_circle.slt.plugin.indentation.SltIndentator"/>
 
-        <codeInsight.parameterInfo language="Common Lisp" implementationClass="com.en_circle.slt.plugin.params.SltParameterInfoHandler" />
+        <codeInsight.parameterInfo language="Common Lisp"
+                                   implementationClass="com.en_circle.slt.plugin.params.SltParameterInfoHandler" />
 
         <xdebugger.breakpointType implementation="com.en_circle.slt.plugin.ui.debug.SltSymbolBreakpointType"/>
 
-        <spellchecker.support language="Common Lisp" implementationClass="com.en_circle.slt.plugin.SltSpellCheckingStrategy"/>
+        <spellchecker.support language="Common Lisp"
+                              implementationClass="com.en_circle.slt.plugin.SltSpellCheckingStrategy"/>
 
-        <lang.foldingBuilder language="Common Lisp" implementationClass="com.en_circle.slt.plugin.SltFoldingBuilder"/>
+        <lang.foldingBuilder language="Common Lisp"
+                             implementationClass="com.en_circle.slt.plugin.SltFoldingBuilder"/>
 
         <externalAnnotator language="Common Lisp"
                            implementationClass="com.en_circle.slt.plugin.highlights.annotators.SymbolAnnotator"/>
-        <annotator language="Common Lisp" implementationClass="com.en_circle.slt.plugin.highlights.annotators.StaticHighlightAnnotator"/>
+
+        <annotator language="Common Lisp"
+                   implementationClass="com.en_circle.slt.plugin.highlights.annotators.StaticHighlightAnnotator"/>
 
         <gotoClassContributor implementation="com.en_circle.slt.plugin.contributors.SltClassContributor"/>
 
@@ -117,6 +126,9 @@
                                       implementationClass="com.en_circle.slt.plugin.SltStructureViewExtension"/>
 
         <navbar implementation="com.en_circle.slt.plugin.SltStructureAwareNavbar"/>
+
+        <completion.plainTextSymbol language="Common Lisp"
+                                    implementationClass="com.en_circle.slt.plugin.SltPlainTextSymbolCompletionContributor"/>
     </extensions>
 
     <actions resource-bundle="messages.SltBundle">
