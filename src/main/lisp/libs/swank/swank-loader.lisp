@@ -16,6 +16,8 @@
 ;;   (load ".../swank-loader.lisp")
 ;;   (setq swank-loader::*fasl-directory* "/tmp/fasl/")
 ;;   (swank-loader:init)
+(format T "Loading swank from slt override~%")
+
 (require "asdf")
 
 (cl:defpackage :swank-loader

@@ -1,6 +1,4 @@
-(format T "OVERRIDE~%")
-
-  ;;; -*- lisp -*-
+;;; -*- lisp -*-
 
 ;; ASDF system definition for loading the Swank server independently
 ;; of Emacs.

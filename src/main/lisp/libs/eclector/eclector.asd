@@ -1,3 +1,5 @@
+(format T "Loading eclector from slt override~%")
+
 (defsystem "eclector"
   :description "A portable, extensible Common Lisp reader."
   :license     "BSD"

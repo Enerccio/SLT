@@ -2,8 +2,7 @@
 
 (when (eq slt:+slt-interpret+ :sbcl)
   (load (merge-pathnames "swank-sbcl.lisp" *load-truename*))
-  (in-package swank/source-file-cache)
-  (setf *source-snippet-size* 0))
+  (setf swank/source-file-cache::*source-snippet-size* 0))
 (when (eq slt:+slt-interpret+ :abcl)
   (load (merge-pathnames "swank-abcl.lisp" *load-truename*)))
 (when (eq slt:+slt-interpret+ :ccl)
@@ -12,8 +11,7 @@
   (load (merge-pathnames "swank-allegro.lisp" *load-truename*)))
 (when (eq slt:+slt-interpret+ :cmucl)
   (load (merge-pathnames "swank-cmucl.lisp" *load-truename*))
-  (in-package swank/source-file-cache)
-  (setf *source-snippet-size* 0))
+  (setf swank/source-file-cache::*source-snippet-size* 0))
 
 (in-package :swank)
 

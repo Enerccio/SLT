@@ -1,7 +1,5 @@
 package com.en_circle.slt.plugin.lisp.lisp.components;
 
-public class LispArguments {
-
-
+public class LispArgument {
 
 }

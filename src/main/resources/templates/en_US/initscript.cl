@@ -7,9 +7,17 @@
   "Defines current slt interpret.")
 
 (load "~qlpath~")
+
 (ql:quickload :cl-utilities)
-(ql:quickload :swank)
-(ql:quickload :eclector)
+
+(load "~swankPath~/swank-loader.lisp")
+(setq swank-loader::*source-directory* "~swankPath~/")
+(setq swank-loader::*fasl-directory* "~swankPath~/../fasl/")
+(swank-loader:init)
+
+(let ((ql:*local-project-directories*
+        (append (list #P"~eclectorPath~") ql:*local-project-directories*)))
+  (ql:quickload :eclector))
 
 (setf *default-pathname-defaults* #P"~cwd~")
 

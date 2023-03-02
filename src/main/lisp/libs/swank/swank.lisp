@@ -25,8 +25,6 @@
 (defvar *swank-debug-p* t
   "When true, print extra debugging information.")
 
-(defvar *xxxx* 10)
-
 (defvar *backtrace-pprint-dispatch-table*
   (let ((table (copy-pprint-dispatch nil)))
     (flet ((print-string (stream string)

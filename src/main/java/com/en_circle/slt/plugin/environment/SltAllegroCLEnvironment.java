@@ -54,7 +54,9 @@ public class SltAllegroCLEnvironment extends SltLispEnvironmentProcess  {
             e.serverStartSetup = new File(tempDir, "startServer.cl");
             e.serverStartSetup.deleteOnExit();
             String sltCorePath = e.sltCore.getAbsolutePath();
-            String startScriptTemplate = new AllegroCLInitScriptTemplate(c, sltCorePath, e.port).render();
+            String swankPath = new File(new File(SltLibrary.getSltPath(), "libs"), "swank").getAbsolutePath();
+            String eclectorPath = new File(new File(SltLibrary.getSltPath(), "libs"), "eclector").getAbsolutePath();
+            String startScriptTemplate = new AllegroCLInitScriptTemplate(c, sltCorePath, swankPath, eclectorPath, e.port).render();
             FileUtils.write(e.serverStartSetup, startScriptTemplate, StandardCharsets.UTF_8);
 
             tempDir.deleteOnExit();
@@ -144,7 +146,8 @@ public class SltAllegroCLEnvironment extends SltLispEnvironmentProcess  {
 
     private static class AllegroCLInitScriptTemplate extends Template {
 
-        public AllegroCLInitScriptTemplate(SltAllegroCLEnvironmentConfiguration configuration, String sltCoreScript, int port) {
+        public AllegroCLInitScriptTemplate(SltAllegroCLEnvironmentConfiguration configuration, String sltCoreScript,
+                                           String swankPath, String eclectorPath, int port) {
             String quicklispPath = configuration.getQuicklispStartScript();
             if (quicklispPath.contains("\\")) {
                 quicklispPath = StringUtils.replace(quicklispPath, "\\", "\\\\");
@@ -156,10 +159,18 @@ public class SltAllegroCLEnvironment extends SltLispEnvironmentProcess  {
             if (sltCoreScript.contains("\\")) {
                 sltCoreScript = StringUtils.replace(sltCoreScript, "\\", "\\\\");
             }
+            if (swankPath.contains("\\")) {
+                swankPath = StringUtils.replace(swankPath, "\\", "\\\\");
+            }
+            if (eclectorPath.contains("\\")) {
+                eclectorPath = StringUtils.replace(eclectorPath, "\\", "\\\\");
+            }
             add("qlpath", quicklispPath);
             add("port", "" + port);
             add("cwd", cwd);
             add("corefile", sltCoreScript);
+            add("swankPath", swankPath);
+            add("eclectorPath", eclectorPath);
             add("interpret", LispInterpret.ALLEGRO.symbolName);
         }
 

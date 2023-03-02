@@ -14,7 +14,13 @@ public class SltLibrary {
 
     private static boolean loaded = false;
 
-    public static synchronized File getLibraryInitFile() throws IOException {
+    public static File getLibraryInitFile() throws IOException {
+        File sltPath = getSltPath();
+
+        return new File(sltPath, "load.lisp");
+    }
+
+    public static synchronized File getSltPath() throws IOException {
         File pluginPath = PluginPath.getPluginFolder();
         File sltPath = new File(pluginPath, "slt");
         if (!sltPath.exists()) {
@@ -28,11 +34,10 @@ public class SltLibrary {
         if (!loaded) {
             extractAndCopy(sltPath);
         }
-
-        return new File(sltPath, "load.lisp");
+        return sltPath;
     }
 
-    private static void extractAndCopy(File sltPath) throws IOException {
+    private static synchronized void extractAndCopy(File sltPath) throws IOException {
         InputStream is = SltLibrary.class.getResourceAsStream("/slt.zip");
         assert is != null;
 
