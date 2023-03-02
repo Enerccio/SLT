@@ -1,5 +1,6 @@
 package com.en_circle.slt.plugin.structure;
 
+import com.en_circle.slt.plugin.lisp.psi.LispList;
 import com.en_circle.slt.plugin.lisp.psi.LispToplevel;
 import com.intellij.ide.structureView.StructureViewModel;
 import com.intellij.ide.structureView.StructureViewModelBase;
@@ -23,7 +24,7 @@ public class LispStructureViewModel extends StructureViewModelBase implements
 
     @Override
     public boolean isAlwaysLeaf(StructureViewTreeElement element) {
-        return element.getValue() instanceof LispToplevel;
+        return !((LispStructureViewElement) element).isDefinition();
     }
 
     @Override
@@ -33,6 +34,6 @@ public class LispStructureViewModel extends StructureViewModelBase implements
 
     @Override
     protected Class<?> @NotNull [] getSuitableClasses() {
-        return new Class[]{ LispToplevel.class };
+        return new Class[]{ LispToplevel.class, LispList.class };
     }
 }

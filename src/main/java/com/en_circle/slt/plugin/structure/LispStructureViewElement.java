@@ -5,6 +5,8 @@ import com.en_circle.slt.plugin.lisp.LispParserUtil;
 import com.en_circle.slt.plugin.lisp.LispParserUtil.LispSexpressionInfo;
 import com.en_circle.slt.plugin.lisp.LispParserUtil.SexpressionType;
 import com.en_circle.slt.plugin.lisp.psi.LispFile;
+import com.en_circle.slt.plugin.lisp.psi.LispList;
+import com.en_circle.slt.plugin.lisp.psi.LispSexpr;
 import com.en_circle.slt.plugin.lisp.psi.LispToplevel;
 import com.intellij.ide.structureView.StructureViewTreeElement;
 import com.intellij.ide.util.treeView.smartTree.SortableTreeElement;
@@ -80,10 +82,24 @@ public class LispStructureViewElement implements StructureViewTreeElement, Sorta
                     LispSexpressionInfo sexpressionInfo = LispParserUtil.determineTopLevelType(toplevel.getSexpr());
                     if (sexpressionInfo.getType() != SexpressionType.EXPRESSION) {
                         elementList.add(new LispStructureViewElement(toplevel, sexpressionInfo));
+                    } else {
+                        LispSexpr sexpr = toplevel.getSexpr();
+                        if (sexpr.getDatum() != null) {
+                            if (sexpr.getDatum().getList() != null) {
+                                for (LispSexpr element : sexpr.getDatum().getList().getSexprList()) {
+                                    if (element.getDatum() != null && element.getDatum().getList() != null) {
+                                        LispList sublist = element.getDatum().getList();
+                                        LispSexpressionInfo subInfo = LispParserUtil.determineTopLevelType(element);
+                                        if (subInfo.getType() != SexpressionType.EXPRESSION) {
+                                            elementList.add(new LispStructureViewElement(sublist, subInfo));
+                                        }
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             }
-
             return elementList.toArray(new TreeElement[0]);
         }
         return EMPTY_ARRAY;
@@ -102,5 +118,11 @@ public class LispStructureViewElement implements StructureViewTreeElement, Sorta
     @Override
     public boolean canNavigateToSource() {
         return psiElement.canNavigateToSource();
+    }
+
+    public boolean isDefinition() {
+        if (psiElement instanceof LispFile)
+            return true;
+        return false;
     }
 }

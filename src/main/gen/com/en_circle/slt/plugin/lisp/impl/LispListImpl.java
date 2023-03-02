@@ -1,16 +1,18 @@
 // This is a generated file. Not intended for manual editing.
 package com.en_circle.slt.plugin.lisp.impl;
 
-import java.util.List;
-import org.jetbrains.annotations.*;
+import com.en_circle.slt.plugin.lisp.psi.LispList;
+import com.en_circle.slt.plugin.lisp.psi.LispSexpr;
+import com.en_circle.slt.plugin.lisp.psi.LispVisitor;
+import com.en_circle.slt.plugin.lisp.psi.impl.LispPsiImplUtil;
+import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.intellij.lang.ASTNode;
-import com.intellij.psi.PsiElement;
+import com.intellij.navigation.ItemPresentation;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.util.PsiTreeUtil;
-import static com.en_circle.slt.plugin.lisp.psi.LispTypes.*;
-import com.intellij.extapi.psi.ASTWrapperPsiElement;
-import com.en_circle.slt.plugin.lisp.psi.*;
-import com.en_circle.slt.plugin.lisp.psi.impl.LispPsiImplUtil;
+import org.jetbrains.annotations.NotNull;
+
+import java.util.List;
 
 public class LispListImpl extends ASTWrapperPsiElement implements LispList {
 
@@ -32,6 +34,16 @@ public class LispListImpl extends ASTWrapperPsiElement implements LispList {
   @NotNull
   public List<LispSexpr> getSexprList() {
     return PsiTreeUtil.getChildrenOfTypeAsList(this, LispSexpr.class);
+  }
+
+  @Override
+  public String getName() {
+    return LispPsiImplUtil.getName(this);
+  }
+
+  @Override
+  public ItemPresentation getPresentation() {
+    return LispPsiImplUtil.getPresentation(this);
   }
 
 }

@@ -3,6 +3,7 @@ package com.en_circle.slt.plugin.lisp.psi.impl;
 import com.en_circle.slt.plugin.SltCommonLispFileType;
 import com.en_circle.slt.plugin.lisp.LispParserUtil;
 import com.en_circle.slt.plugin.lisp.LispParserUtil.LispSexpressionInfo;
+import com.en_circle.slt.plugin.lisp.LispParserUtil.SexpressionType;
 import com.en_circle.slt.plugin.lisp.LispSymbolPresentation;
 import com.en_circle.slt.plugin.lisp.psi.*;
 import com.intellij.lang.ASTNode;
@@ -68,6 +69,16 @@ public class LispPsiImplUtil {
 
     public static String getName(LispToplevel element) {
         return LispParserUtil.determineTopLevelType(element.getSexpr()).getShortForm();
+    }
+
+    public static String getName(LispList element) {
+        if (element.getParent() instanceof LispDatum && element.getParent().getParent() instanceof LispSexpr) {
+            LispSexpressionInfo type =  LispParserUtil.determineTopLevelType((LispSexpr) element.getParent().getParent());
+            if (type.getType() != SexpressionType.EXPRESSION)
+                return type.getShortForm();
+            return null;
+        }
+        return null;
     }
 
     public static PsiElement setName(LispComment element, String newName) {
@@ -157,6 +168,26 @@ public class LispPsiImplUtil {
                 return type.getIcon();
             }
         };
+    }
+
+    public static ItemPresentation getPresentation(LispList list) {
+        if (list.getParent() instanceof LispDatum && list.getParent().getParent() instanceof LispSexpr) {
+            LispSexpressionInfo type = LispParserUtil.determineTopLevelType((LispSexpr) list.getParent().getParent());
+            if (type.getType() != SexpressionType.EXPRESSION) {
+                return new ItemPresentation() {
+                    @Override
+                    public @NlsSafe @Nullable String getPresentableText() {
+                        return type.getShortForm();
+                    }
+
+                    @Override
+                    public @Nullable Icon getIcon(boolean unused) {
+                        return type.getIcon();
+                    }
+                };
+            }
+        }
+        return null;
     }
 
 }

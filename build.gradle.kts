@@ -4,7 +4,7 @@ plugins {
 }
 
 group = "com.en_circle.slt"
-version = "0.4.1-rev1"
+version = "0.5.0"
 
 repositories {
     mavenCentral()

@@ -50,7 +50,12 @@ array ::= ARRAY_START list
 
 structure ::= STRUCTURE_TOKEN list
 
-list ::= LPAREN sexpr* RPAREN { pin = 2 recoverWhile=list_recovery }
+list ::= LPAREN sexpr* RPAREN {
+    pin = 2
+    recoverWhile=list_recovery
+    implements="com.intellij.psi.NavigatablePsiElement"
+    methods=[getName getPresentation]
+}
 private list_recovery ::= !(sexpr | RPAREN)
 
 string ::= STRING_TOKEN {

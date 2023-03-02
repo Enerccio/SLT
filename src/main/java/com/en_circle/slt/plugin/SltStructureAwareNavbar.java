@@ -8,6 +8,8 @@ import com.en_circle.slt.plugin.lisp.psi.LispSexpr;
 import com.en_circle.slt.plugin.lisp.psi.LispToplevel;
 import com.intellij.ide.navigationToolbar.StructureAwareNavBarModelExtension;
 import com.intellij.lang.Language;
+import com.intellij.psi.PsiElement;
+import com.intellij.psi.util.PsiTreeUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -26,19 +28,14 @@ public class SltStructureAwareNavbar extends StructureAwareNavBarModelExtension 
         if (object instanceof LispFile) {
             return SltIconProvider.getFileIcon();
         }
-        if (object instanceof LispToplevel toplevel) {
-            LispSexpressionInfo info =  LispParserUtil.determineTopLevelType(toplevel.getSexpr());
-            if (info.getType() != SexpressionType.EXPRESSION) {
-                return info.getIcon();
-            }
-            return SltIconProvider.getFileIcon();
+        LispSexpressionInfo topLevelInfo = getTopLevelForObject(object);
+        if (topLevelInfo != null) {
+            return topLevelInfo.getIcon();
         }
-        if (object instanceof LispSexpr sexpr) {
-            LispSexpressionInfo info =  LispParserUtil.determineTopLevelType(sexpr);
-            if (info.getType() != SexpressionType.EXPRESSION) {
-                return info.getIcon();
+        if (object instanceof PsiElement psiElement) {
+            if (psiElement.getContainingFile() instanceof LispFile) {
+                return SltIconProvider.getFileIcon();
             }
-            return SltIconProvider.getFileIcon();
         }
         return null;
     }
@@ -48,20 +45,33 @@ public class SltStructureAwareNavbar extends StructureAwareNavBarModelExtension 
         if (object instanceof LispFile file) {
             return file.getName();
         }
-        if (object instanceof LispToplevel toplevel) {
-            LispSexpressionInfo info =  LispParserUtil.determineTopLevelType(toplevel.getSexpr());
-            if (info.getType() != SexpressionType.EXPRESSION) {
-                return info.getLongForm();
-            }
-            return toplevel.getContainingFile().getName();
+        LispSexpressionInfo topLevelInfo = getTopLevelForObject(object);
+        if (topLevelInfo != null) {
+            return topLevelInfo.getLongForm();
         }
-        if (object instanceof LispSexpr sexpr) {
-            LispSexpressionInfo info =  LispParserUtil.determineTopLevelType(sexpr);
-            if (info.getType() != SexpressionType.EXPRESSION) {
-                return info.getLongForm();
+        if (object instanceof PsiElement psiElement) {
+            if (psiElement.getContainingFile() instanceof LispFile file) {
+                return file.getName();
             }
-            return sexpr.getContainingFile().getName();
         }
         return null;
     }
+
+    private LispSexpressionInfo getTopLevelForObject(Object object) {
+        if (object instanceof LispToplevel toplevel) {
+            return LispParserUtil.determineTopLevelType(toplevel.getSexpr());
+        }
+        if (object instanceof LispSexpr sexpr) {
+            LispSexpressionInfo info = LispParserUtil.determineTopLevelType(sexpr);
+            if (info != null && info.getType() != SexpressionType.EXPRESSION) {
+                return info;
+            }
+        }
+        if (object instanceof PsiElement psiElement) {
+            LispSexpr sexpr = PsiTreeUtil.getParentOfType(psiElement, LispSexpr.class);
+            return getTopLevelForObject(sexpr);
+        }
+        return null;
+    }
+
 }

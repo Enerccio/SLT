@@ -1,13 +1,19 @@
 // This is a generated file. Not intended for manual editing.
 package com.en_circle.slt.plugin.lisp.psi;
 
-import java.util.List;
-import org.jetbrains.annotations.*;
-import com.intellij.psi.PsiElement;
+import com.intellij.navigation.ItemPresentation;
+import com.intellij.psi.NavigatablePsiElement;
+import org.jetbrains.annotations.NotNull;
 
-public interface LispList extends PsiElement {
+import java.util.List;
+
+public interface LispList extends NavigatablePsiElement {
 
   @NotNull
   List<LispSexpr> getSexprList();
+
+  String getName();
+
+  ItemPresentation getPresentation();
 
 }

@@ -45,7 +45,7 @@ public class LispVisitor extends PsiElementVisitor {
   }
 
   public void visitList(@NotNull LispList o) {
-    visitPsiElement(o);
+    visitNavigatablePsiElement(o);
   }
 
   public void visitNumber(@NotNull LispNumber o) {
