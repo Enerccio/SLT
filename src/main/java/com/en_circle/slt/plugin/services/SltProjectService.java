@@ -72,12 +72,14 @@ public class SltProjectService implements DumbAware {
                         hyperspecView.showUrl(url);
                     }
                 });
-                return;
+            } else {
+                Messages.showInfoMessage(String.format(SltBundle.message("slt.ui.clhs.nosymbol.message"), symbolName),
+                        SltBundle.message("slt.ui.clhs.nosymbol.title"));
             }
+        } else {
+            Messages.showInfoMessage(String.format(SltBundle.message("slt.ui.clhs.loading.message"), symbolName),
+                    SltBundle.message("slt.ui.clhs.loading.title"));
         }
-
-        Messages.showInfoMessage(String.format(SltBundle.message("slt.ui.clhs.nosymbol.message"), symbolName),
-                SltBundle.message("slt.ui.clhs.nosymbol.title"));
     }
 
     public void setHyperspecView(SltHyperspecView hyperspecView) {

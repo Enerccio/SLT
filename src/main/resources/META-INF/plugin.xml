@@ -190,6 +190,8 @@
     <projectListeners>
         <listener class="com.en_circle.slt.plugin.ui.debug.SltBreakpointListener"
                   topic="com.intellij.xdebugger.breakpoints.XBreakpointListener" />
+        <listener class="com.en_circle.slt.plugin.SltProjectListener"
+                  topic="com.intellij.openapi.project.ProjectManagerListener" />
     </projectListeners>
 
     <change-notes><![CDATA[
