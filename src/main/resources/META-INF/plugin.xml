@@ -194,7 +194,11 @@
 
     <change-notes><![CDATA[
 <p>0.5.0 New features:</p><br />
-<p></p>
+<p>Hyperspec embedded in the tool window (requires internet connection to see obviously)</p><br />
+<br />
+<p>0.5.0 Changes and fixes:</p><br />
+<p>Support for definitions under other expressions</p><br />
+<p>SltPlainTextSymbolCompletionContributor - to be used with git and such</p><br />
 
 See CHANGELOG.md for more details
 ]]></change-notes>
