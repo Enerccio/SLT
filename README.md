@@ -80,17 +80,18 @@ You can also open this as a project in Intellij Idea.
 
 ## Planned features / goals
 
-* [ ] Upload to marketplace when it has enough features
+* [x] Upload to marketplace when it has enough features
 * [x] Automatic indentation
 * [x] REPL
 * [x] Interactive debugging
 * [x] Argument help (Ctrl+P)
 * [x] Inspection
   * [x] Basic inspection
-  * [ ] Actions
+  * [x] Actions
   * [ ] Inspection eval
 * [x] Breakpoints
 * [x] Documentation 
+  * [x] Hyperspec intergration
 * [x] Macro expand in documentation
   * Macro expand requires you to hover element twice for now
 * [x] Find function by symbol name

@@ -10,12 +10,12 @@ import com.en_circle.slt.plugin.swank.requests.EvalAndGrab;
 import com.en_circle.slt.tools.SltApplicationUtils;
 import com.google.common.collect.Lists;
 import com.intellij.openapi.project.Project;
-import com.intellij.util.Consumer;
 import com.intellij.util.concurrency.FutureResult;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -96,10 +96,10 @@ public class SltLispEnvironmentSymbolCache extends Thread {
             if (LispEnvironmentService.getInstance(project).getState() == LispEnvironmentState.READY) {
                 refreshSymbolsBatched(withoutDuplicity, onFinish);
             } else {
-                onFinish.consume(true);
+                onFinish.accept(true);
             }
         } catch (Exception e) {
-            onFinish.consume(false);
+            onFinish.accept(false);
         }
     }
 
@@ -231,11 +231,11 @@ public class SltLispEnvironmentSymbolCache extends Thread {
                     }
 
                     if (requestFinished != null) {
-                        requestFinished.consume(true);
+                        requestFinished.accept(true);
                     }
                 }), false, () -> {
             if (requestFinished != null) {
-                requestFinished.consume(false);
+                requestFinished.accept(false);
             }
         });
     }

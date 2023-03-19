@@ -51,6 +51,9 @@
         <projectService serviceImplementation="com.en_circle.slt.plugin.services.lisp.LispEnvironmentServiceImpl"
                             serviceInterface="com.en_circle.slt.plugin.services.lisp.LispEnvironmentService" />
 
+        <!-- SLT Service -->
+        <projectService serviceImplementation="com.en_circle.slt.plugin.services.SltProjectService" />
+
         <!-- Templates -->
 
         <internalFileTemplate name="Common Lisp CL File.cl"/>
@@ -75,6 +78,9 @@
 
         <toolWindow factoryClass="com.en_circle.slt.plugin.SltWindowFactory" id="Common Lisp"
                     anchor="bottom" icon="/icons/fileicon.svg" />
+
+        <toolWindow factoryClass="com.en_circle.slt.plugin.SltHyperspecWindowFactory" id="CLHS"
+                    anchor="right" icon="/icons/fileicon.svg" />
 
         <lang.syntaxHighlighter language="Common Lisp"
                                 implementationClass="com.en_circle.slt.plugin.highlights.SltStaticHighlighter"/>
@@ -165,6 +171,13 @@
                 class="com.en_circle.slt.plugin.actions.EvalFileFromEditor">
             <add-to-group group-id="EditorPopupMenu" anchor="after" relative-to-action="slt.actions.eval.next" />
             <keyboard-shortcut keymap="$default" first-keystroke="ctrl alt T"/>
+        </action>
+
+        <action id="slt.actions.clhs.open"
+                icon="/icons/fileicon.svg"
+                class="com.en_circle.slt.plugin.actions.OpenCLHSAction">
+            <add-to-group group-id="EditorPopupMenu" anchor="after" relative-to-action="slt.actions.eval.file.editor" />
+            <keyboard-shortcut keymap="$default" first-keystroke="ctrl alt H"/>
         </action>
 
         <action id="slt.actions.eval.file"

@@ -1,5 +1,8 @@
 ## 0.5.0
 
+### Added
+- Hyperspec embedded in the tool window (requires internet connection to see obviously)
+
 ### Changes
 - support for definitions under other expressions
 - SltPlainTextSymbolCompletionContributor - to be used with git and such
