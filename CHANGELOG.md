@@ -1,4 +1,4 @@
-## 0.5.0
+## 0.5.0 230319
 
 ### Added
 - Hyperspec embedded in the tool window (requires internet connection to see obviously)
