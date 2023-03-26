@@ -124,6 +124,9 @@
         <annotator language="Common Lisp"
                    implementationClass="com.en_circle.slt.plugin.highlights.annotators.StaticHighlightAnnotator"/>
 
+        <annotator language="Common Lisp"
+                   implementationClass="com.en_circle.slt.plugin.highlights.annotators.QuoteAnnotator"/>
+
         <gotoClassContributor implementation="com.en_circle.slt.plugin.contributors.SltClassContributor"/>
 
         <gotoSymbolContributor implementation="com.en_circle.slt.plugin.contributors.SltSymbolContributor"/>

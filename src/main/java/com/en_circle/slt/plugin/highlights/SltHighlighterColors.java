@@ -6,6 +6,9 @@ import com.intellij.openapi.editor.DefaultLanguageHighlighterColors;
 import com.intellij.openapi.editor.colors.EditorColorsManager;
 import com.intellij.openapi.editor.colors.TextAttributesKey;
 import com.intellij.psi.PsiElement;
+import com.intellij.ui.JBColor;
+
+import java.awt.*;
 
 public class SltHighlighterColors {
 
@@ -23,6 +26,14 @@ public class SltHighlighterColors {
     public static TextAttributesKey MACRO = TextAttributesKey.createTextAttributesKey("CL.MACRO", DefaultLanguageHighlighterColors.KEYWORD);
     public static TextAttributesKey CLASS = TextAttributesKey.createTextAttributesKey("CL.CLASS", DefaultLanguageHighlighterColors.CLASS_NAME);
     public static TextAttributesKey METHOD = TextAttributesKey.createTextAttributesKey("CL.METHOD", DefaultLanguageHighlighterColors.INSTANCE_METHOD);
+
+    public static TextAttributesKey QUOTED;
+
+    static {
+        QUOTED = TextAttributesKey.createTextAttributesKey("CL.QUOTED");
+        QUOTED.getDefaultAttributes().setBackgroundColor(new JBColor(new Color(122, 68, 20, 160),
+                new Color(122, 68, 20, 160)));
+    }
 
     public static void setHighlighting(PsiElement element, AnnotationHolder holder, TextAttributesKey key) {
         holder.newSilentAnnotation(HighlightSeverity.INFORMATION)

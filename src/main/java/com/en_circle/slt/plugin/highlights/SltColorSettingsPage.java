@@ -40,6 +40,7 @@ public class SltColorSettingsPage implements ColorSettingsPage {
             new AttributesDescriptor(SltBundle.message("slt.ui.colorsettings.reader"), SltHighlighterColors.SUGAR),
             new AttributesDescriptor(SltBundle.message("slt.ui.colorsettings.class"), SltHighlighterColors.CLASS),
             new AttributesDescriptor(SltBundle.message("slt.ui.colorsettings.method"), SltHighlighterColors.METHOD),
+            new AttributesDescriptor(SltBundle.message("slt.ui.colorsettings.quoted"), SltHighlighterColors.QUOTED),
     };
 
     @Override

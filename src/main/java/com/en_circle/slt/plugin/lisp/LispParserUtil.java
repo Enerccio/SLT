@@ -162,15 +162,15 @@ public class LispParserUtil extends GeneratedParserUtilBase {
                 return quoteState;
             }
 
-            quoteState = getQuoteState(plist);
-            if (o instanceof PsiWhiteSpace) {
-                return quoteState;
-            }
+            quoteState = getQuoteState(plist, parent);
+//            if (o instanceof PsiWhiteSpace) {
+//                return quoteState;
+//            }
             return getQuoteState(parent, quoteState);
         }
     }
 
-    public static QuoteState getQuoteState(LispList o) {
+    public static QuoteState getQuoteState(LispList o, LispSexpr self) {
         QuoteState quoteState = QuoteState.NO_STATE;
         LispSexpr sexpr = PsiTreeUtil.getParentOfType(o, LispSexpr.class);
         if (sexpr == null) {
@@ -181,11 +181,13 @@ public class LispParserUtil extends GeneratedParserUtilBase {
             return quoteState;
         } else {
             if (parent instanceof LispList list) {
-                QuoteState parentState = getQuoteState(list);
+                QuoteState parentState = getQuoteState(list, self);
                 quoteState = combineQuoteStates(quoteState, parentState);
             }
         }
-
+        if (sexpr == self) {
+            return quoteState;
+        }
         return getQuoteState(sexpr, quoteState);
     }
 
@@ -233,6 +235,8 @@ public class LispParserUtil extends GeneratedParserUtilBase {
                 quoteState = combineQuoteStates(QuoteState.UNQUOTE, quoteState);
             } else if (text.equals(",@")) {
                 quoteState = combineQuoteStates(QuoteState.UNQUOTE_SPLICE, quoteState);
+            } else if (text.equals("'")) {
+                quoteState = combineQuoteStates(QuoteState.QUOTE, quoteState);
             }
         }
         return quoteState;
@@ -275,6 +279,9 @@ public class LispParserUtil extends GeneratedParserUtilBase {
         }
         if (quoteState == QuoteState.UNQUOTE || quoteState == QuoteState.UNQUOTE_SPLICE)
             return QuoteState.NO_STATE;
+        if (quoteState == QuoteState.NO_STATE && parentState == QuoteState.NO_STATE)
+            return QuoteState.NO_STATE;
+
         return QuoteState.ERROR_STATE;
     }
 
@@ -462,7 +469,11 @@ public class LispParserUtil extends GeneratedParserUtilBase {
     }
 
     public enum QuoteState {
-        BACKQUOTE, QUOTE, UNQUOTE, UNQUOTE_SPLICE, NO_STATE, ERROR_STATE
+        BACKQUOTE, QUOTE, UNQUOTE, UNQUOTE_SPLICE, NO_STATE, ERROR_STATE;
+
+        public static boolean isQuoted(QuoteState quoteState) {
+            return quoteState == BACKQUOTE || quoteState == QUOTE;
+        }
     }
 
     public enum SexpressionType {
