@@ -76,7 +76,11 @@ public class SltDebuggerImpl implements SltDebugger, Disposable {
                 close();
             }
 
-        }), ActionPlaces.EDITOR_TAB);
+                    @Override
+                    public @NotNull ActionUpdateThread getActionUpdateThread() {
+                        return ActionUpdateThread.EDT;
+                    }
+                }), ActionPlaces.EDITOR_TAB);
     }
 
     @Override
