@@ -146,28 +146,21 @@ public class LispParserUtil extends GeneratedParserUtilBase {
     }
 
     public static QuoteState getQuoteState(PsiElement o) {
-        if (o instanceof LispList list) {
-            return getQuoteState(list);
-        } else {
-            QuoteState quoteState = QuoteState.NO_STATE;
+        QuoteState quoteState = QuoteState.NO_STATE;
 
-            LispSexpr parent = PsiTreeUtil.getParentOfType(o, LispSexpr.class);
-            if (parent == null) {
-                return quoteState;
-            }
-
-            LispList plist = PsiTreeUtil.getParentOfType(o, LispList.class);
-
-            if (plist == null) {
-                return quoteState;
-            }
-
-            quoteState = getQuoteState(plist, parent);
-//            if (o instanceof PsiWhiteSpace) {
-//                return quoteState;
-//            }
-            return getQuoteState(parent, quoteState);
+        LispSexpr parent = PsiTreeUtil.getParentOfType(o, LispSexpr.class);
+        if (parent == null) {
+            return quoteState;
         }
+
+        LispList plist = PsiTreeUtil.getParentOfType(o, LispList.class);
+
+        if (plist == null) {
+            return quoteState;
+        }
+
+        quoteState = getQuoteState(plist, parent);
+        return getQuoteState(parent, quoteState);
     }
 
     public static QuoteState getQuoteState(LispList o, LispSexpr self) {

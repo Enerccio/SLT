@@ -3,6 +3,7 @@ package com.en_circle.slt.plugin.highlights;
 import com.en_circle.slt.plugin.SltCommonLispFileType;
 import com.en_circle.slt.plugin.SltCommonLispLanguage;
 import com.en_circle.slt.plugin.lisp.psi.LispTypes;
+import com.en_circle.slt.plugin.services.SltProjectService;
 import com.intellij.codeInsight.daemon.impl.IdentifierHighlighterPassFactory;
 import com.intellij.codeInsight.highlighting.BraceHighlightingHandler;
 import com.intellij.codeInsight.template.impl.TemplateManagerImpl;
@@ -65,7 +66,7 @@ public class SltBraceHighlighter implements StartupActivity.DumbAware {
             return;
         }
 
-        Disposable activityDisposable = BraceHighlightService.getService(project);
+        Disposable activityDisposable = SltProjectService.getInstance(project);
         registerListeners(project, activityDisposable);
     }
 

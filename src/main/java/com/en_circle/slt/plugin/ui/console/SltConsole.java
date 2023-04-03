@@ -79,7 +79,8 @@ public abstract class SltConsole implements SltComponent {
     protected void eval(String data) {
         try {
             if (StringUtils.isNotBlank(data)) {
-                LispEnvironmentService.getInstance(project).sendToLisp(Eval.eval(data, currentPackage,
+                String setToStar = String.format("(setf * %s)", data);
+                LispEnvironmentService.getInstance(project).sendToLisp(Eval.eval(setToStar, currentPackage,
                         result -> languageConsole.print(result + "\n", ConsoleViewContentType.NORMAL_OUTPUT)));
             }
         } catch (Exception e) {

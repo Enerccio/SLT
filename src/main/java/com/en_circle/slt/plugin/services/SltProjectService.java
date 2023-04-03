@@ -2,6 +2,7 @@ package com.en_circle.slt.plugin.services;
 
 import com.en_circle.slt.plugin.SltBundle;
 import com.en_circle.slt.plugin.ui.SltHyperspecView;
+import com.intellij.openapi.Disposable;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.DumbAware;
 import com.intellij.openapi.project.Project;
@@ -21,7 +22,7 @@ import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
 
-public class SltProjectService implements DumbAware {
+public class SltProjectService implements DumbAware, Disposable {
     private static final Logger log = LoggerFactory.getLogger(SltProjectService.class);
 
     public static SltProjectService getInstance(Project project) {
@@ -84,5 +85,10 @@ public class SltProjectService implements DumbAware {
 
     public void setHyperspecView(SltHyperspecView hyperspecView) {
         this.hyperspecView = hyperspecView;
+    }
+
+    @Override
+    public void dispose() {
+
     }
 }

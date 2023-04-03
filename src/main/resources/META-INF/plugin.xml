@@ -41,8 +41,6 @@
         <projectConfigurable groupId="editor"
                                  instance="com.en_circle.slt.plugin.ui.indentation.SltProjectIndentationConfiguration"/>
 
-        <projectService serviceImplementation="com.en_circle.slt.plugin.highlights.BraceHighlightService" />
-
         <applicationService serviceImplementation="com.en_circle.slt.plugin.ui.SltGlobalUIService" />
 
         <projectService serviceImplementation="com.en_circle.slt.plugin.ui.SltUIService" />
