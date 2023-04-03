@@ -118,7 +118,11 @@ public class SltCoreWindow implements LispEnvironmentListener, Disposable {
                 console.close();
             }
 
-        }), ActionPlaces.EDITOR_TAB);
+                    @Override
+                    public @NotNull ActionUpdateThread getActionUpdateThread() {
+                        return ActionUpdateThread.EDT;
+                    }
+                }), ActionPlaces.EDITOR_TAB);
         tabs.select(console.getTabInfo(), true);
     }
 
