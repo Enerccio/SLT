@@ -168,7 +168,7 @@ public class SwankPacket {
         packageName = StringUtils.replace(packageName, "\\", "\\\\");
         packageName = StringUtils.replace(packageName, "\"", "\\\"");
         String formatted = String.format("(:emacs-rex (swank:frame-locals-and-catch-tags %s) \":%s\" %s %s)",
-                frame, packageName, threadId, continuation);
+                frame, packageName, threadId == null ? "T" : threadId, continuation);
         return new SwankPacket(formatted);
     }
 
@@ -176,7 +176,7 @@ public class SwankPacket {
         packageName = StringUtils.replace(packageName, "\\", "\\\\");
         packageName = StringUtils.replace(packageName, "\"", "\\\"");
         String formatted = String.format("(:emacs-rex (swank:inspect-frame-var %s %s) \":%s\" %s %s)",
-                frameId, ix, packageName, threadId, continuation);
+                frameId, ix, packageName, threadId == null ? "T" : threadId, continuation);
         return new SwankPacket(formatted);
     }
 
@@ -184,7 +184,7 @@ public class SwankPacket {
         packageName = StringUtils.replace(packageName, "\\", "\\\\");
         packageName = StringUtils.replace(packageName, "\"", "\\\"");
         String formatted = String.format("(:emacs-rex (swank:inspect-nth-part %s) \":%s\" %s %s)",
-                ix, packageName, threadId, continuation);
+                ix, packageName, threadId == null ? "T" : threadId, continuation);
         return new SwankPacket(formatted);
     }
 
@@ -192,7 +192,7 @@ public class SwankPacket {
         packageName = StringUtils.replace(packageName, "\\", "\\\\");
         packageName = StringUtils.replace(packageName, "\"", "\\\"");
         String formatted = String.format("(:emacs-rex (swank:inspector-pop) \":%s\" %s %s)",
-                packageName, threadId, continuation);
+                packageName, threadId == null ? "T" : threadId, continuation);
         return new SwankPacket(formatted);
     }
 
@@ -200,7 +200,7 @@ public class SwankPacket {
         packageName = StringUtils.replace(packageName, "\\", "\\\\");
         packageName = StringUtils.replace(packageName, "\"", "\\\"");
         String formatted = String.format("(:emacs-rex (swank:inspector-next) \":%s\" %s %s)",
-                packageName, threadId, continuation);
+                packageName, threadId == null ? "T" : threadId, continuation);
         return new SwankPacket(formatted);
     }
 
@@ -208,7 +208,17 @@ public class SwankPacket {
         packageName = StringUtils.replace(packageName, "\\", "\\\\");
         packageName = StringUtils.replace(packageName, "\"", "\\\"");
         String formatted = String.format("(:emacs-rex (swank:inspector-reinspect) \":%s\" %s %s)",
-                packageName, threadId, continuation);
+                packageName, threadId == null ? "T" : threadId, continuation);
+        return new SwankPacket(formatted);
+    }
+
+    public static SwankPacket inspectSymbol(String symbol, BigInteger threadId, String packageName, BigInteger continuation) {
+        packageName = StringUtils.replace(packageName, "\\", "\\\\");
+        packageName = StringUtils.replace(packageName, "\"", "\\\"");
+        symbol = StringUtils.replace(symbol, "\\", "\\\\");
+        symbol = StringUtils.replace(symbol, "\"", "\\\"");
+        String formatted = String.format("(:emacs-rex (swank:init-inspector \"%s\") \":%s\" %s %s)",
+                symbol, packageName, threadId == null ? "T" : threadId, continuation);
         return new SwankPacket(formatted);
     }
 

@@ -4,15 +4,20 @@ import com.en_circle.slt.plugin.SltBundle;
 import com.en_circle.slt.plugin.SltCommonLispLanguage;
 import com.en_circle.slt.plugin.environment.LispFeatures;
 import com.en_circle.slt.plugin.environment.SltLispEnvironment.SltOutput;
+import com.en_circle.slt.plugin.services.SltProjectService;
 import com.en_circle.slt.plugin.services.lisp.LispEnvironmentService;
 import com.en_circle.slt.plugin.services.lisp.LispEnvironmentService.LispEnvironmentState;
 import com.en_circle.slt.plugin.swank.requests.Eval;
 import com.en_circle.slt.plugin.ui.SltComponent;
+import com.en_circle.slt.plugin.ui.SltUIService;
 import com.intellij.execution.console.ConsoleExecuteAction;
 import com.intellij.execution.console.ConsoleHistoryController;
 import com.intellij.execution.console.LanguageConsoleBuilder;
 import com.intellij.execution.console.LanguageConsoleBuilder.MyConsoleRootType;
 import com.intellij.execution.console.LanguageConsoleView;
+import com.intellij.execution.filters.Filter.Result;
+import com.intellij.execution.filters.Filter.ResultItem;
+import com.intellij.execution.filters.HyperlinkInfo;
 import com.intellij.execution.ui.ConsoleViewContentType;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
@@ -24,6 +29,10 @@ import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 public abstract class SltConsole implements SltComponent {
     private static final Logger log = LoggerFactory.getLogger(SltConsole.class);
@@ -33,6 +42,7 @@ public abstract class SltConsole implements SltComponent {
     protected LanguageConsoleView languageConsole;
     protected final JPanel content;
     protected final Project project;
+    private List<String> resultData = new ArrayList<>();
 
     protected String currentPackage = "COMMON-LISP-USER";
 
@@ -53,8 +63,23 @@ public abstract class SltConsole implements SltComponent {
     public TabInfo create() {
         languageConsole = new LanguageConsoleBuilder()
                 .build(project, SltCommonLispLanguage.INSTANCE);
-        Disposer.register(project, languageConsole);
+        Disposer.register(SltUIService.getInstance(project), languageConsole);
         languageConsole.setPrompt(currentPackage + "> ");
+        languageConsole.addMessageFilter((line, entireLength) -> {
+            if (!resultData.isEmpty()) {
+                if (line.trim().equals(resultData.get(0))) {
+                    int textStartOffset = entireLength - line.length();
+                    if (resultData.size() == 1)
+                        resultData.clear();
+                    else
+                        resultData = resultData.subList(1, resultData.size() - 1);
+                    HyperlinkInfo hyperlinkInfo = (project) -> openSymbolNavigator(project, getPackage() + "::*");
+                    ResultItem resultItem = new ResultItem(textStartOffset, textStartOffset + line.length() - 1, hyperlinkInfo);
+                    return new Result(Collections.singletonList(resultItem));
+                }
+            }
+            return null;
+        });
 
         ConsoleExecuteAction action = new ConsoleExecuteAction(languageConsole,
                 new SltConsoleExecuteActionHandler(languageConsole, this) {
@@ -76,12 +101,21 @@ public abstract class SltConsole implements SltComponent {
         return tabInfo;
     }
 
+    private void openSymbolNavigator(Project project, String symbol) {
+        SltProjectService.getInstance(project)
+                .showSymbol(symbol);
+    }
+
     protected void eval(String data) {
         try {
             if (StringUtils.isNotBlank(data)) {
                 String setToStar = String.format("(setf * %s)", data);
                 LispEnvironmentService.getInstance(project).sendToLisp(Eval.eval(setToStar, currentPackage,
-                        result -> languageConsole.print(result + "\n", ConsoleViewContentType.NORMAL_OUTPUT)));
+                        result -> {
+                            resultData.clear();
+                            resultData.addAll(Arrays.asList(result.split("\n")));
+                            languageConsole.print(result + "\n", ConsoleViewContentType.NORMAL_OUTPUT);
+                }));
             }
         } catch (Exception e) {
             log.warn(SltBundle.message("slt.error.start"), e);
@@ -101,11 +135,7 @@ public abstract class SltConsole implements SltComponent {
 
     @Override
     public void onPostStart() {
-        if (!LispEnvironmentService.getInstance(project).hasFeature(LispFeatures.REPL)) {
-            languageConsole.setEditable(false);
-        } else {
-            languageConsole.setEditable(true);
-        }
+        languageConsole.setEditable(LispEnvironmentService.getInstance(project).hasFeature(LispFeatures.REPL));
     }
 
     @Override

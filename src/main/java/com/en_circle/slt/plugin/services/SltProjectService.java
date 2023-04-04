@@ -2,6 +2,7 @@ package com.en_circle.slt.plugin.services;
 
 import com.en_circle.slt.plugin.SltBundle;
 import com.en_circle.slt.plugin.ui.SltHyperspecView;
+import com.en_circle.slt.plugin.ui.SltSymbolInspectorView;
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.DumbAware;
@@ -30,6 +31,7 @@ public class SltProjectService implements DumbAware, Disposable {
     }
 
     private SltHyperspecView hyperspecView;
+    private SltSymbolInspectorView inspectorView;
     private Map<String, String> symbolRefMap = null;
     private final Project project;
 
@@ -66,10 +68,11 @@ public class SltProjectService implements DumbAware, Disposable {
             String url = symbolRefMap.get(symbolName);
             if (url != null) {
                 ToolWindow toolWindow = ToolWindowManager.getInstance(project)
-                        .getToolWindow("CLHS");
+                        .getToolWindow("CLHS and Inspector");
                 assert toolWindow != null;
                 toolWindow.show(() -> {
                     if (hyperspecView != null) {
+                        hyperspecView.showContent();
                         hyperspecView.showUrl(url);
                     }
                 });
@@ -83,8 +86,24 @@ public class SltProjectService implements DumbAware, Disposable {
         }
     }
 
+    public void showSymbol(String symbolName) {
+        ToolWindow toolWindow = ToolWindowManager.getInstance(project)
+                .getToolWindow("CLHS and Inspector");
+        assert toolWindow != null;
+        toolWindow.show(() -> {
+            if (inspectorView != null) {
+                inspectorView.showContent();
+                inspectorView.setSymbolAndLoad(symbolName);
+            }
+        });
+    }
+
     public void setHyperspecView(SltHyperspecView hyperspecView) {
         this.hyperspecView = hyperspecView;
+    }
+
+    public void setInspectorView(SltSymbolInspectorView inspectorView) {
+        this.inspectorView = inspectorView;
     }
 
     @Override

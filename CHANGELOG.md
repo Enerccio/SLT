@@ -1,3 +1,8 @@
+## 0.5.1
+
+### Added
+- Symbol inspection
+
 ## 0.5.0 230319
 
 ### Added

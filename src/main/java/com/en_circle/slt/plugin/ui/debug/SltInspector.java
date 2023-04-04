@@ -11,6 +11,7 @@ import com.en_circle.slt.plugin.swank.debug.SltInspectedObject;
 import com.en_circle.slt.plugin.swank.debug.SltInspectedObject.SltInspectionElement;
 import com.en_circle.slt.plugin.swank.requests.InspectFrameVar;
 import com.en_circle.slt.plugin.swank.requests.InspectNth;
+import com.en_circle.slt.plugin.swank.requests.InspectSymbol;
 import com.en_circle.slt.plugin.swank.requests.InspectorAction;
 import com.en_circle.slt.plugin.swank.requests.InspectorAction.ActionType;
 import com.en_circle.slt.plugin.ui.debug.SltFrameInfo.Local;
@@ -71,6 +72,28 @@ public class SltInspector {
         try {
             LispEnvironmentService.getInstance(project)
                     .sendToLisp(InspectFrameVar.inspectVariable(BigInteger.valueOf(local.ix), frame, threadId,
+                            result -> ApplicationManager.getApplication().invokeLater(() -> processResult(result))));
+        } catch (Exception e) {
+            log.warn(SltBundle.message("slt.error.start"), e);
+            Messages.showErrorDialog(project, e.getMessage(), SltBundle.message("slt.ui.errors.lisp.start"));
+        }
+    }
+
+    public void loadSymbol(String symbolName, String packageName) {
+        try {
+            LispEnvironmentService.getInstance(project)
+                    .sendToLisp(InspectSymbol.inspectSymbol(symbolName, threadId, packageName,
+                            result -> ApplicationManager.getApplication().invokeLater(() -> processResult(result))));
+        } catch (Exception e) {
+            log.warn(SltBundle.message("slt.error.start"), e);
+            Messages.showErrorDialog(project, e.getMessage(), SltBundle.message("slt.ui.errors.lisp.start"));
+        }
+    }
+
+    public void loadSymbol(String symbolName) {
+        try {
+            LispEnvironmentService.getInstance(project)
+                    .sendToLisp(InspectSymbol.inspectSymbol(symbolName, threadId,
                             result -> ApplicationManager.getApplication().invokeLater(() -> processResult(result))));
         } catch (Exception e) {
             log.warn(SltBundle.message("slt.error.start"), e);

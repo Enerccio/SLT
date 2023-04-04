@@ -74,10 +74,10 @@
         <lang.documentationProvider language="Common Lisp"
                                     implementationClass="com.en_circle.slt.plugin.SltDocumentationProvider"/>
 
-        <toolWindow factoryClass="com.en_circle.slt.plugin.SltWindowFactory" id="Common Lisp"
+        <toolWindow factoryClass="com.en_circle.slt.plugin.SltMainBarToolWindowFactory" id="Common Lisp"
                     anchor="bottom" icon="/icons/fileicon.svg" />
 
-        <toolWindow factoryClass="com.en_circle.slt.plugin.SltHyperspecWindowFactory" id="CLHS"
+        <toolWindow factoryClass="com.en_circle.slt.plugin.SltSideBarToolWindowFactory" id="CLHS and Inspector"
                     anchor="right" icon="/icons/fileicon.svg" />
 
         <lang.syntaxHighlighter language="Common Lisp"

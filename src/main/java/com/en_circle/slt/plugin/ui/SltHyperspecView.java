@@ -5,9 +5,11 @@ import com.en_circle.slt.plugin.services.SltProjectService;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.actionSystem.*;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.ui.components.JBTextField;
+import com.intellij.ui.content.Content;
 import com.intellij.ui.jcef.JBCefBrowser;
 import com.intellij.ui.jcef.JBCefClient;
 import org.cef.browser.CefBrowser;
@@ -34,6 +36,7 @@ public class SltHyperspecView implements Disposable {
     private boolean hidden = true;
 
     private boolean loading = false;
+    private Content self;
 
     public SltHyperspecView(ToolWindow toolWindow) {
         this.toolWindow = toolWindow;
@@ -44,7 +47,7 @@ public class SltHyperspecView implements Disposable {
             @Override
             public void componentAdded(ContainerEvent e) {
                 if (hidden) {
-                    showRoot();
+                    ApplicationManager.getApplication().invokeLater(() -> showRoot());
                 }
                 hidden = false;
             }
@@ -97,6 +100,10 @@ public class SltHyperspecView implements Disposable {
         SltProjectService.getInstance(project).setHyperspecView(this);
     }
 
+    public void setSelf(Content self) {
+        this.self = self;
+    }
+
     @Override
     public void dispose() {
         browser.dispose();
@@ -128,6 +135,10 @@ public class SltHyperspecView implements Disposable {
 
     public void showUrl(String url) {
         browser.loadURL(url);
+    }
+
+    public void showContent() {
+        toolWindow.getContentManager().setSelectedContent(self, true);
     }
 
     private class GoBackAction extends AnAction {

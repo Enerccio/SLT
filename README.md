@@ -83,11 +83,13 @@ You can also open this as a project in Intellij Idea.
 * [x] Upload to marketplace when it has enough features
 * [x] Automatic indentation
 * [x] REPL
+  * [x] REPL return inspection
 * [x] Interactive debugging
 * [x] Argument help (Ctrl+P)
 * [x] Inspection
   * [x] Basic inspection
   * [x] Actions
+  * [x] Symbol inspector
   * [ ] Inspection eval
 * [x] Breakpoints
 * [x] Documentation 

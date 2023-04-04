@@ -1,6 +1,7 @@
 package com.en_circle.slt.plugin;
 
 import com.en_circle.slt.plugin.ui.SltHyperspecView;
+import com.en_circle.slt.plugin.ui.SltSymbolInspectorView;
 import com.en_circle.slt.plugin.ui.SltUIService;
 import com.intellij.openapi.project.DumbAware;
 import com.intellij.openapi.project.Project;
@@ -11,7 +12,7 @@ import com.intellij.ui.content.Content;
 import com.intellij.ui.content.ContentFactory;
 import org.jetbrains.annotations.NotNull;
 
-public class SltHyperspecWindowFactory implements ToolWindowFactory, DumbAware {
+public class SltSideBarToolWindowFactory implements ToolWindowFactory, DumbAware {
 
     @Override
     public void createToolWindowContent(@NotNull Project project, @NotNull ToolWindow toolWindow) {
@@ -20,9 +21,21 @@ public class SltHyperspecWindowFactory implements ToolWindowFactory, DumbAware {
             ContentFactory contentFactory = ContentFactory.getInstance();
             Content content = contentFactory.createContent(hyperspecView.getContent(),
                     SltBundle.message("slt.ui.clhs.title"), false);
+            hyperspecView.setSelf(content);
             toolWindow.getContentManager().addContent(content);
 
             Disposer.register(SltUIService.getInstance(project), hyperspecView);
+        }
+
+        {
+            SltSymbolInspectorView inspectorView = new SltSymbolInspectorView(toolWindow);
+            ContentFactory contentFactory = ContentFactory.getInstance();
+            Content content = contentFactory.createContent(inspectorView.getContent(),
+                    SltBundle.message("slt.ui.sideinspect.title"), false);
+            inspectorView.setSelf(content);
+            toolWindow.getContentManager().addContent(content);
+
+            Disposer.register(SltUIService.getInstance(project), inspectorView);
         }
     }
 
