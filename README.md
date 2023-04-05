@@ -20,6 +20,7 @@
 ![GitHub top language](https://img.shields.io/github/languages/top/Enerccio/SLT)
 [![(want-to-support-me? T NIL)](https://img.shields.io/liberapay/receives/Enerccio.svg?logo=liberapay)](https://liberapay.com/Enerccio)
 ![Liberapay patrons](https://img.shields.io/liberapay/patrons/Enerccio)
+[![Support me on Patreon](https://img.shields.io/endpoint.svg?url=https%3A%2F%2Fshieldsio-patreon.vercel.app%2Fapi%3Fusername%3Denerccio%26type%3Dpledges&style=flat)](https://patreon.com/enerccio)[![Support me on Patreon](https://img.shields.io/endpoint.svg?url=https%3A%2F%2Fshieldsio-patreon.vercel.app%2Fapi%3Fusername%3Denerccio%26type%3Dpatrons&style=flat)](https://patreon.com/enerccio)
 ![Maintenance](https://img.shields.io/maintenance/yes/2023)
 ![GitHub issues](https://img.shields.io/github/issues/Enerccio/SLT)
 ![GitHub branch checks state](https://img.shields.io/github/checks-status/Enerccio/SLT/master)
@@ -128,7 +129,8 @@ This project is licensed under [Apache License v2](LICENSE.txt).
 
 ## Donations
 
-If you feel like it, you can donate to support my work via [Liberapay](https://liberapay.com/Enerccio/donate).
+If you feel like it, you can donate to support my work via [Liberapay](https://liberapay.com/Enerccio/donate) or 
+[Patreon](https://www.patreon.com/enerccio).
 
 # What does SLT even mean?
 
