@@ -177,9 +177,9 @@ public class SltReference extends PsiPolyVariantReferenceBase<LispSymbol> {
                                     if (LispUtils.hasPValue(d, locationAccessor)) {
                                         SourceLocation sourceLocation = new SourceLocation(d);
                                         ResolveResult result = convertLocationToReference(sourceLocation, myElement.getName());
-                                        if (result != null) {
-                                            results.add(result);
-                                        }
+                                        results.add(result);
+                                    } else {
+                                        results.add(addNoReference(myElement.getName()));
                                     }
                                 }
                             }
@@ -195,14 +195,19 @@ public class SltReference extends PsiPolyVariantReferenceBase<LispSymbol> {
 
     private ResolveResult convertLocationToReference(SourceLocation location, String name) {
         if (!location.isPrecise())
-            return null;
+            return addNoReference(name);
         VirtualFile vf = LocalFileSystem.getInstance().findFileByIoFile(new File(location.getLocation()));
         if (vf == null)
-            return null;
+            return addNoReference(name);
         PsiFile f = PsiManager.getInstance(myElement.getProject()).findFile(vf);
         if (f == null)
-            return null;
+            return addNoReference(name);
         return new PsiElementResolveResult(new SltFakePsiElement(f, name, location.getPosition()));
+    }
+
+    private ResolveResult addNoReference(String name) {
+        SltNoFilePsiElement noReference = new SltNoFilePsiElement(getElement().getProject(), name);
+        return new PsiElementResolveResult(noReference);
     }
 
     @Override

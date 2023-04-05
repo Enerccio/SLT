@@ -3,6 +3,9 @@
 ### Added
 - Symbol inspection
 
+### Fixes
+- Added symbols with no file into all search places
+
 ## 0.5.0 230319
 
 ### Added

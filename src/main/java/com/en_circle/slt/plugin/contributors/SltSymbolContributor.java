@@ -5,6 +5,7 @@ import com.en_circle.slt.plugin.lisp.LispPotentialSymbolPresentation;
 import com.en_circle.slt.plugin.lisp.lisp.LispContainer;
 import com.en_circle.slt.plugin.lisp.lisp.LispElement;
 import com.en_circle.slt.plugin.lisp.lisp.LispString;
+import com.en_circle.slt.plugin.references.SltNoFilePsiElement;
 import com.en_circle.slt.plugin.services.lisp.LispEnvironmentService;
 import com.en_circle.slt.plugin.swank.components.SourceLocation;
 import com.en_circle.slt.plugin.swank.requests.CompleteSearch;
@@ -145,7 +146,7 @@ public class SltSymbolContributor implements ChooseByNameContributor {
                     s -> mkElement(project, s, packageNameFinal, l.getPosition()));
         }
 
-        return null;
+        return new SltNoFilePsiElement(project, name);
     }
 
     private NavigationItem mkElement(Project project, PsiNamedElement symbol, String packageName, int offset) {

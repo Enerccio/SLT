@@ -1,6 +1,7 @@
 package com.en_circle.slt.tools;
 
 import com.en_circle.slt.plugin.references.SltFakePsiElement;
+import com.en_circle.slt.plugin.references.SltNoFilePsiElement;
 import com.en_circle.slt.plugin.swank.components.SourceLocation;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.LocalFileSystem;
@@ -25,7 +26,7 @@ public class LocationUtils {
                 }
             }
         }
-        return null;
+        return converter.apply(new SltNoFilePsiElement(project, name));
     }
 
 }
