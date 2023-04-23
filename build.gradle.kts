@@ -1,10 +1,18 @@
 plugins {
     id("java")
-    id("org.jetbrains.intellij") version "1.12.0"
+    id("org.jetbrains.intellij") version "1.13.3"
+    id("idea")
 }
 
 group = "com.en_circle.slt"
 version = "0.5.1"
+
+idea {
+    module {
+        isDownloadJavadoc = true
+        isDownloadSources = true
+    }
+}
 
 repositories {
     mavenCentral()

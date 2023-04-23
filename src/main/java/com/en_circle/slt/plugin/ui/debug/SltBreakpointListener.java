@@ -2,12 +2,12 @@ package com.en_circle.slt.plugin.ui.debug;
 
 import com.en_circle.slt.plugin.services.lisp.LispEnvironmentService;
 import com.intellij.openapi.project.Project;
+import com.intellij.xdebugger.breakpoints.XBreakpoint;
 import com.intellij.xdebugger.breakpoints.XBreakpointListener;
-import com.intellij.xdebugger.breakpoints.XLineBreakpoint;
 import org.jetbrains.annotations.NotNull;
 
-@SuppressWarnings("DataFlowIssue")
-public class SltBreakpointListener implements XBreakpointListener<XLineBreakpoint<SltBreakpointProperties>> {
+@SuppressWarnings({"unchecked"})
+public class SltBreakpointListener implements XBreakpointListener<XBreakpoint<?>> {
 
     private final Project project;
 
@@ -16,25 +16,26 @@ public class SltBreakpointListener implements XBreakpointListener<XLineBreakpoin
     }
 
     @Override
-    public void breakpointAdded(@NotNull XLineBreakpoint<SltBreakpointProperties> breakpoint) {
+    public void breakpointAdded(@NotNull XBreakpoint<?> breakpoint) {
         if (breakpoint.getProperties() instanceof SltBreakpointProperties) {
             LispEnvironmentService.getInstance(project)
-                    .addBreakpoint(breakpoint);
+                    .addBreakpoint((XBreakpoint<SltBreakpointProperties>) breakpoint);
         }
     }
 
     @Override
-    public void breakpointRemoved(@NotNull XLineBreakpoint<SltBreakpointProperties> breakpoint) {
+    public void breakpointRemoved(@NotNull XBreakpoint<?> breakpoint) {
         if (breakpoint.getProperties() instanceof SltBreakpointProperties) {
             LispEnvironmentService.getInstance(project)
-                    .removeBreakpoint(breakpoint);
+                    .removeBreakpoint((XBreakpoint<SltBreakpointProperties>) breakpoint);
         }
     }
 
     @Override
-    public void breakpointChanged(@NotNull XLineBreakpoint<SltBreakpointProperties> breakpoint) {
+    public void breakpointChanged(@NotNull XBreakpoint<?> breakpoint) {
         if (breakpoint.getProperties() instanceof SltBreakpointProperties) {
-            LispEnvironmentService.getInstance(project).nativeBreakpointUpdated(breakpoint);
+            LispEnvironmentService.getInstance(project)
+                    .nativeBreakpointUpdated((XBreakpoint<SltBreakpointProperties>) breakpoint);
         }
     }
 }
