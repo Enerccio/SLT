@@ -2,6 +2,7 @@
 
 ### Added
 - Symbol inspection
+- Rainbow braces option
 
 ### Fixes
 - Added symbols with no file into all search places
