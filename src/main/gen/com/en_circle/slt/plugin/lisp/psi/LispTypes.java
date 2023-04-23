@@ -17,7 +17,9 @@ public interface LispTypes {
   IElementType EVALED = new LispElementType("EVALED");
   IElementType HEX_NUMBER = new LispElementType("HEX_NUMBER");
   IElementType INTEGER = new LispElementType("INTEGER");
+  IElementType LHASHPARENTHESIS = new LispElementType("LHASHPARENTHESIS");
   IElementType LIST = new LispElementType("LIST");
+  IElementType LPARENTHESIS = new LispElementType("LPARENTHESIS");
   IElementType NUMBER = new LispElementType("NUMBER");
   IElementType OCTAL_NUMBER = new LispElementType("OCTAL_NUMBER");
   IElementType PATHNAME = new LispElementType("PATHNAME");
@@ -25,6 +27,7 @@ public interface LispTypes {
   IElementType RATIO = new LispElementType("RATIO");
   IElementType REAL = new LispElementType("REAL");
   IElementType REAL_PAIR = new LispElementType("REAL_PAIR");
+  IElementType RPARENTHESIS = new LispElementType("RPARENTHESIS");
   IElementType SEXPR = new LispElementType("SEXPR");
   IElementType STRING = new LispElementType("STRING");
   IElementType STRUCTURE = new LispElementType("STRUCTURE");
@@ -98,8 +101,14 @@ public interface LispTypes {
       else if (type == INTEGER) {
         return new LispIntegerImpl(node);
       }
+      else if (type == LHASHPARENTHESIS) {
+        return new LispLhashparenthesisImpl(node);
+      }
       else if (type == LIST) {
         return new LispListImpl(node);
+      }
+      else if (type == LPARENTHESIS) {
+        return new LispLparenthesisImpl(node);
       }
       else if (type == NUMBER) {
         return new LispNumberImpl(node);
@@ -121,6 +130,9 @@ public interface LispTypes {
       }
       else if (type == REAL_PAIR) {
         return new LispRealPairImpl(node);
+      }
+      else if (type == RPARENTHESIS) {
+        return new LispRparenthesisImpl(node);
       }
       else if (type == SEXPR) {
         return new LispSexprImpl(node);

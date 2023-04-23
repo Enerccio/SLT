@@ -178,6 +178,18 @@ public class LispParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
+  // HASH_LPAREN
+  public static boolean lhashparenthesis(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "lhashparenthesis")) return false;
+    if (!nextTokenIs(b, HASH_LPAREN)) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, HASH_LPAREN);
+    exit_section_(b, m, LHASHPARENTHESIS, r);
+    return r;
+  }
+
+  /* ********************************************************** */
   // toplevel*
   static boolean lispFile(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "lispFile")) return false;
@@ -190,15 +202,15 @@ public class LispParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // LPAREN sexpr* RPAREN
+  // lparenthesis sexpr* rparenthesis
   public static boolean list(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "list")) return false;
     boolean r, p;
     Marker m = enter_section_(b, l, _NONE_, LIST, "<list>");
-    r = consumeToken(b, LPAREN);
+    r = lparenthesis(b, l + 1);
     r = r && list_1(b, l + 1);
     p = r; // pin = 2
-    r = r && consumeToken(b, RPAREN);
+    r = r && rparenthesis(b, l + 1);
     exit_section_(b, l, m, r, p, LispParser::list_recovery);
     return r || p;
   }
@@ -231,6 +243,18 @@ public class LispParser implements PsiParser, LightPsiParser {
     boolean r;
     r = sexpr(b, l + 1);
     if (!r) r = consumeToken(b, RPAREN);
+    return r;
+  }
+
+  /* ********************************************************** */
+  // LPAREN
+  public static boolean lparenthesis(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "lparenthesis")) return false;
+    if (!nextTokenIs(b, LPAREN)) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, LPAREN);
+    exit_section_(b, m, LPARENTHESIS, r);
     return r;
   }
 
@@ -313,17 +337,30 @@ public class LispParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // REAL_PAIR_START LPAREN real real RPAREN
+  // REAL_PAIR_START lparenthesis real real rparenthesis
   public static boolean real_pair(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "real_pair")) return false;
     if (!nextTokenIs(b, REAL_PAIR_START)) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = consumeTokens(b, 0, REAL_PAIR_START, LPAREN);
+    r = consumeToken(b, REAL_PAIR_START);
+    r = r && lparenthesis(b, l + 1);
     r = r && real(b, l + 1);
     r = r && real(b, l + 1);
-    r = r && consumeToken(b, RPAREN);
+    r = r && rparenthesis(b, l + 1);
     exit_section_(b, m, REAL_PAIR, r);
+    return r;
+  }
+
+  /* ********************************************************** */
+  // RPAREN
+  public static boolean rparenthesis(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "rparenthesis")) return false;
+    if (!nextTokenIs(b, RPAREN)) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, RPAREN);
+    exit_section_(b, m, RPARENTHESIS, r);
     return r;
   }
 
@@ -432,15 +469,15 @@ public class LispParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // HASH_LPAREN sexpr* RPAREN
+  // lhashparenthesis sexpr* rparenthesis
   public static boolean vector(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "vector")) return false;
     if (!nextTokenIs(b, HASH_LPAREN)) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = consumeToken(b, HASH_LPAREN);
+    r = lhashparenthesis(b, l + 1);
     r = r && vector_1(b, l + 1);
-    r = r && consumeToken(b, RPAREN);
+    r = r && rparenthesis(b, l + 1);
     exit_section_(b, m, VECTOR, r);
     return r;
   }

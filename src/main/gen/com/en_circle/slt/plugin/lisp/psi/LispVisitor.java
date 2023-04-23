@@ -44,8 +44,16 @@ public class LispVisitor extends PsiElementVisitor {
     visitPsiElement(o);
   }
 
+  public void visitLhashparenthesis(@NotNull LispLhashparenthesis o) {
+    visitPsiElement(o);
+  }
+
   public void visitList(@NotNull LispList o) {
     visitNavigatablePsiElement(o);
+  }
+
+  public void visitLparenthesis(@NotNull LispLparenthesis o) {
+    visitPsiElement(o);
   }
 
   public void visitNumber(@NotNull LispNumber o) {
@@ -73,6 +81,10 @@ public class LispVisitor extends PsiElementVisitor {
   }
 
   public void visitRealPair(@NotNull LispRealPair o) {
+    visitPsiElement(o);
+  }
+
+  public void visitRparenthesis(@NotNull LispRparenthesis o) {
     visitPsiElement(o);
   }
 

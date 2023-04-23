@@ -9,6 +9,12 @@ import java.util.List;
 public interface LispRealPair extends PsiElement {
 
   @NotNull
+  LispLparenthesis getLparenthesis();
+
+  @NotNull
   List<LispReal> getRealList();
+
+  @NotNull
+  LispRparenthesis getRparenthesis();
 
 }

@@ -125,6 +125,9 @@
         <annotator language="Common Lisp"
                    implementationClass="com.en_circle.slt.plugin.highlights.annotators.QuoteAnnotator"/>
 
+        <externalAnnotator language="Common Lisp"
+                   implementationClass="com.en_circle.slt.plugin.highlights.annotators.RainbowAnnotator"/>
+
         <gotoClassContributor implementation="com.en_circle.slt.plugin.contributors.SltClassContributor"/>
 
         <gotoSymbolContributor implementation="com.en_circle.slt.plugin.contributors.SltSymbolContributor"/>
@@ -136,6 +139,9 @@
 
         <completion.plainTextSymbol language="Common Lisp"
                                     implementationClass="com.en_circle.slt.plugin.SltPlainTextSymbolCompletionContributor"/>
+
+        <additionalTextAttributes scheme="Default" file="colorSchemes/SLT.xml"/>
+        <additionalTextAttributes scheme="Darcula" file="colorSchemes/SLTDarcula.xml"/>
     </extensions>
 
     <actions resource-bundle="messages.SltBundle">

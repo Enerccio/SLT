@@ -1,9 +1,7 @@
 // This is a generated file. Not intended for manual editing.
 package com.en_circle.slt.plugin.lisp.impl;
 
-import com.en_circle.slt.plugin.lisp.psi.LispReal;
-import com.en_circle.slt.plugin.lisp.psi.LispRealPair;
-import com.en_circle.slt.plugin.lisp.psi.LispVisitor;
+import com.en_circle.slt.plugin.lisp.psi.*;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElementVisitor;
@@ -30,8 +28,20 @@ public class LispRealPairImpl extends ASTWrapperPsiElement implements LispRealPa
 
   @Override
   @NotNull
+  public LispLparenthesis getLparenthesis() {
+    return findNotNullChildByClass(LispLparenthesis.class);
+  }
+
+  @Override
+  @NotNull
   public List<LispReal> getRealList() {
     return PsiTreeUtil.getChildrenOfTypeAsList(this, LispReal.class);
+  }
+
+  @Override
+  @NotNull
+  public LispRparenthesis getRparenthesis() {
+    return findNotNullChildByClass(LispRparenthesis.class);
   }
 
 }

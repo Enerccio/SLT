@@ -3,6 +3,7 @@ package com.en_circle.slt.plugin.ui.indentation;
 import com.en_circle.slt.plugin.SltBundle;
 import com.en_circle.slt.plugin.indentation.SltIndentationSettings;
 import com.en_circle.slt.plugin.indentation.SltProjectIndentationSettings;
+import com.intellij.codeInsight.daemon.DaemonCodeAnalyzer;
 import com.intellij.openapi.options.Configurable;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.project.Project;
@@ -23,6 +24,7 @@ public class SltProjectIndentationConfiguration implements Configurable {
     private JBTextField lambdaIndentation;
     private JBTextField bodyIndentation;
     private JBTextField tagbodyIndentation;
+    private JCheckBox rainbow;
 
     public SltProjectIndentationConfiguration(Project project) {
         this.project = project;
@@ -42,6 +44,7 @@ public class SltProjectIndentationConfiguration implements Configurable {
         lambdaIndentation = new JBTextField();
         bodyIndentation = new JBTextField();
         tagbodyIndentation = new JBTextField();
+        rainbow = new JCheckBox();
 
         return FormBuilder.createFormBuilder()
                 .addComponent(applyProject, 1)
@@ -51,6 +54,8 @@ public class SltProjectIndentationConfiguration implements Configurable {
                 .addLabeledComponent(SltBundle.message("slt.ui.settings.indent.type.lambda"), lambdaIndentation, 1, false)
                 .addLabeledComponent(SltBundle.message("slt.ui.settings.indent.type.body"), bodyIndentation, 1, false)
                 .addLabeledComponent(SltBundle.message("slt.ui.settings.indent.type.tagbody"), tagbodyIndentation, 1, false)
+                .addSeparator()
+                .addLabeledComponent(SltBundle.message("slt.ui.settings.indent.type.rainbow"), rainbow, 1, false)
                 .addComponentFillVertically(new JPanel(), 0)
                 .getPanel();
     }
@@ -73,7 +78,8 @@ public class SltProjectIndentationConfiguration implements Configurable {
                     settings.parameterIndentation != old.parameterIndentation ||
                     settings.lambdaIndentation != old.lambdaIndentation ||
                     settings.bodyIndentation != old.bodyIndentation ||
-                    settings.tagbodyIndentation != old.tagbodyIndentation;
+                    settings.tagbodyIndentation != old.tagbodyIndentation ||
+                    settings.rainbow != old.rainbow;
         } catch (NumberFormatException | AssertionError ignored) {
             return true;
         }
@@ -85,6 +91,7 @@ public class SltProjectIndentationConfiguration implements Configurable {
             SltProjectIndentationSettings settings = gather();
             SltProjectIndentationSettings old = SltProjectIndentationSettings.getInstance(project);
             old.loadState(settings);
+            DaemonCodeAnalyzer.getInstance(project).restart();
         } catch (NumberFormatException | AssertionError exception) {
             throw new ConfigurationException(SltBundle.message("slt.ui.settings.indent.invalid"));
         }
@@ -104,6 +111,7 @@ public class SltProjectIndentationConfiguration implements Configurable {
         assert(settings.bodyIndentation >= 0);
         settings.tagbodyIndentation = Integer.parseInt(tagbodyIndentation.getText());
         assert(settings.tagbodyIndentation >= 0);
+        settings.rainbow = rainbow.isSelected();
 
         SltProjectIndentationSettings projectIndentationSettings = new SltProjectIndentationSettings();
         projectIndentationSettings.copySettings(settings);
@@ -129,5 +137,6 @@ public class SltProjectIndentationConfiguration implements Configurable {
         lambdaIndentation.setText("" + settings.lambdaIndentation);
         bodyIndentation.setText("" + settings.bodyIndentation);
         tagbodyIndentation.setText("" + settings.tagbodyIndentation);
+        rainbow.setSelected(settings.rainbow);
     }
 }

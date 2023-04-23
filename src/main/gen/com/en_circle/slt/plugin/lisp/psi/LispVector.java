@@ -9,6 +9,12 @@ import java.util.List;
 public interface LispVector extends PsiElement {
 
   @NotNull
+  LispLhashparenthesis getLhashparenthesis();
+
+  @NotNull
+  LispRparenthesis getRparenthesis();
+
+  @NotNull
   List<LispSexpr> getSexprList();
 
 }

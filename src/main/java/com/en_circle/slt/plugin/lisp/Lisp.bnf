@@ -44,19 +44,25 @@ evaled ::= EVAL_VALUE sexpr
 
 pathname ::= PATHNAME_INDICATOR sexpr
 
-vector ::= HASH_LPAREN sexpr* RPAREN
+vector ::= lhashparenthesis sexpr* rparenthesis
 
 array ::= ARRAY_START list
 
 structure ::= STRUCTURE_TOKEN list
 
-list ::= LPAREN sexpr* RPAREN {
+list ::= lparenthesis sexpr* rparenthesis {
     pin = 2
     recoverWhile=list_recovery
     implements="com.intellij.psi.NavigatablePsiElement"
     methods=[getName getPresentation]
 }
 private list_recovery ::= !(sexpr | RPAREN)
+
+lparenthesis ::= LPAREN
+
+lhashparenthesis ::= HASH_LPAREN
+
+rparenthesis ::= RPAREN
 
 string ::= STRING_TOKEN {
     methods=[getName setName]
@@ -72,7 +78,7 @@ hex_number ::= HEX_NUMBER_TOKEN
 
 radix_number ::= RADIX_NUMBER_TOKEN
 
-real_pair ::= REAL_PAIR_START LPAREN real real RPAREN
+real_pair ::= REAL_PAIR_START lparenthesis real real rparenthesis
 
 real ::= REAL_NUMBER
 
