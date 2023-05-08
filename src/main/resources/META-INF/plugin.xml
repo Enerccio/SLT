@@ -145,6 +145,13 @@
     </extensions>
 
     <actions resource-bundle="messages.SltBundle">
+        <action id="slt.actions.eval.toplevel"
+                icon="/icons/fileicon.svg"
+                class="com.en_circle.slt.plugin.actions.EvalTopLevelAction">
+            <add-to-group group-id="EditorPopupMenu" anchor="last"/>
+            <keyboard-shortcut keymap="$default" first-keystroke="ctrl alt A"/>
+        </action>
+
         <action id="slt.actions.eval.region"
                 icon="/icons/fileicon.svg"
                 class="com.en_circle.slt.plugin.actions.EvalRegionAction">
