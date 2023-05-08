@@ -145,17 +145,42 @@
     </extensions>
 
     <actions resource-bundle="messages.SltBundle">
+        <group id="slt.actions.macroexpand.group"
+               class="com.en_circle.slt.plugin.actions.MacroexpandGroup"
+               icon="/icons/fileicon.svg"
+               popup="true">
+            <add-to-group group-id="EditorPopupMenu" anchor="last"/>
+        </group>
+
+        <action id="slt.actions.macroexpand.all"
+                class="com.en_circle.slt.plugin.actions.MacroexpandAllAction">
+            <keyboard-shortcut keymap="$default" first-keystroke="ctrl alt shift E"/>
+            <add-to-group group-id="slt.actions.macroexpand.group" anchor="last"/>
+        </action>
+
+        <action id="slt.actions.macroexpand.one"
+                class="com.en_circle.slt.plugin.actions.Macroexpand1Action">
+            <keyboard-shortcut keymap="$default" first-keystroke="ctrl alt shift R"/>
+            <add-to-group group-id="slt.actions.macroexpand.group" anchor="last"/>
+        </action>
+
+        <action id="slt.actions.macroexpand.normal"
+                class="com.en_circle.slt.plugin.actions.MacroexpandAction">
+            <keyboard-shortcut keymap="$default" first-keystroke="ctrl alt shift F"/>
+            <add-to-group group-id="slt.actions.macroexpand.group" anchor="last"/>
+        </action>
+
         <action id="slt.actions.eval.toplevel"
                 icon="/icons/fileicon.svg"
                 class="com.en_circle.slt.plugin.actions.EvalTopLevelAction">
-            <add-to-group group-id="EditorPopupMenu" anchor="last"/>
+            <add-to-group group-id="EditorPopupMenu" anchor="after" relative-to-action="slt.actions.macroexpand.group" />
             <keyboard-shortcut keymap="$default" first-keystroke="ctrl alt A"/>
         </action>
 
         <action id="slt.actions.eval.region"
                 icon="/icons/fileicon.svg"
                 class="com.en_circle.slt.plugin.actions.EvalRegionAction">
-            <add-to-group group-id="EditorPopupMenu" anchor="last"/>
+            <add-to-group group-id="EditorPopupMenu" anchor="after" relative-to-action="slt.actions.eval.toplevel" />
             <keyboard-shortcut keymap="$default" first-keystroke="ctrl alt R"/>
         </action>
 
@@ -209,13 +234,16 @@
     </projectListeners>
 
     <change-notes><![CDATA[
-<p>0.5.0 New features:</p><br />
-<p>Hyperspec embedded in the tool window (requires internet connection to see obviously)</p><br />
+<p>0.5.1 New features:</p><br />
+<p>Symbol inspection</p><br />
+<p>Rainbow braces option</p><br />
+<p>More CLHS browser options</p><br />
+<p>Evaluate top level action</p><br />
 <br />
-<p>0.5.0 Changes and fixes:</p><br />
-<p>Support for definitions under other expressions</p><br />
-<p>SltPlainTextSymbolCompletionContributor - to be used with git and such</p><br />
-
+<p>0.5.1 Changes and fixes:</p><br />
+<p>Macroexpand is now action and menu, no longer automatic!</p><br />
+<p>Added symbols with no file into all search places</p><br />
+<br />
 See CHANGELOG.md for more details
 ]]></change-notes>
 

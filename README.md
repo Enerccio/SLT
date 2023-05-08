@@ -95,26 +95,21 @@ You can also open this as a project in Intellij Idea.
 * [x] Breakpoints
 * [x] Documentation 
   * [x] Hyperspec intergration
-* [x] Macro expand in documentation
-  * Macro expand requires you to hover element twice for now
+* [x] Macro expand (all, 1, normal)
 * [x] Find function by symbol name
 * [x] Search for symbols
 * [x] Back references 
+* [x] Rainbow braces
 * [ ] Refactoring
 * [ ] List of quicklisp installed packages / ASDF packages
 * [ ] List of modified top level forms that are yet to be evaluated
 * [ ] Actually make an IDE, ie just plugin with dependencies as one application, not a plugin
-
-### Far futures / possible goals 
-
-* [x] SDK Support 
-  * not a true SDK because that is only available in Intellij and not in  (for instance) PyCharm, thus
-this is implemented manually.
-  * [x] Download SBCL and quicklisp for user
+* [x] SDK Support
+    * not a true SDK because that is only available in Intellij and not in  (for instance) PyCharm, thus
+      this is implemented manually.
+    * [x] Download SBCL and quicklisp for user
 * [x] Automatic download of lisp interpret and quicklisp
-* [x] Different lisp interpreter support 
-* [ ] Remote connections to interpreters
-* [ ] Rewrite everything into ABCL just for purity’s sake lol
+* [x] Different lisp interpreter support
 
 ## License
 

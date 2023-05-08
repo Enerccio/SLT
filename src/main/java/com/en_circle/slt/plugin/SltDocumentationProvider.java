@@ -1,9 +1,7 @@
 package com.en_circle.slt.plugin;
 
-import com.en_circle.slt.plugin.SymbolState.SymbolBinding;
 import com.en_circle.slt.plugin.environment.LispFeatures;
 import com.en_circle.slt.plugin.lisp.LispParserUtil;
-import com.en_circle.slt.plugin.lisp.psi.LispList;
 import com.en_circle.slt.plugin.lisp.psi.LispSymbol;
 import com.en_circle.slt.plugin.services.lisp.LispEnvironmentService;
 import com.intellij.lang.documentation.AbstractDocumentationProvider;
@@ -68,7 +66,7 @@ public class SltDocumentationProvider extends AbstractDocumentationProvider {
                 String text = element.getText();
                 String packageName = LispParserUtil.getPackage(element);
                 SymbolState state = LispEnvironmentService.getInstance(element.getProject()).refreshSymbolFromServer(packageName, text);
-                return asHtml(state, packageName, element);
+                return asHtml(state, element);
             }
         }
         return null;
@@ -82,31 +80,13 @@ public class SltDocumentationProvider extends AbstractDocumentationProvider {
         return originalElement;
     }
 
-    private String asHtml(SymbolState state, String packageName, PsiElement element) {
+    private String asHtml(SymbolState state, PsiElement element) {
         HtmlBuilder builder = new HtmlBuilder();
         if (LispEnvironmentService.getInstance(element.getProject()).hasFeature(LispFeatures.DOCUMENTATION)) {
             String documentation = StringUtils.replace(StringUtils.replace(escape(state.documentation), " ", "&nbsp;"),
                     "\n", HtmlChunk.br().toString());
             builder.append(documentation == null ? HtmlChunk.raw("") :
                     HtmlChunk.raw(documentation));
-        }
-
-        if (LispEnvironmentService.getInstance(element.getProject()).hasFeature(LispFeatures.MACROEXPAND)) {
-            LispList form = LispParserUtil.getIfHead(element);
-            if (form != null && state.binding == SymbolBinding.MACRO) {
-                String macroExpand = LispEnvironmentService.getInstance(element.getProject()).macroexpand(form, packageName);
-                if (macroExpand != null) {
-                    macroExpand = StringUtils.replace(StringUtils.replace(escape(macroExpand), " ", "&nbsp;"),
-                            "\n", HtmlChunk.br().toString());
-                    builder.append(HtmlChunk.hr());
-                    builder.append(HtmlChunk.text(SltBundle.message("slt.documentation.macroexpand")));
-                    builder.append(HtmlChunk.br());
-                    builder.append(HtmlChunk.raw(macroExpand));
-                } else {
-                    builder.append(HtmlChunk.hr());
-                    builder.append(HtmlChunk.text(SltBundle.message("slt.documentation.macroexpand.generating")));
-                }
-            }
         }
 
         String doc = builder.toString();

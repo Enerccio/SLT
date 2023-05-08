@@ -5,7 +5,6 @@ import com.en_circle.slt.plugin.environment.LispFeatures;
 import com.en_circle.slt.plugin.environment.SltLispEnvironment;
 import com.en_circle.slt.plugin.environment.SltLispEnvironment.SltLispOutputChangedListener;
 import com.en_circle.slt.plugin.lisp.lisp.LispElement;
-import com.en_circle.slt.plugin.lisp.psi.LispList;
 import com.en_circle.slt.plugin.services.lisp.components.SltBreakpoint;
 import com.en_circle.slt.plugin.services.lisp.components.SltLispEnvironmentSymbolCache.BatchedSymbolRefreshAction;
 import com.en_circle.slt.plugin.swank.SlimeListener.DebugInterface;
@@ -54,8 +53,6 @@ public interface LispEnvironmentService extends Disposable {
     LispEnvironmentState getState();
 
     SltLispEnvironment getEnvironment();
-
-    String macroexpand(LispList form, String packageName);
 
     void updateIndentation(LispElement element);
 

@@ -277,11 +277,39 @@ public class SwankPacket {
         return new SwankPacket(formatted);
     }
 
+    public static SwankPacket macroexpand1(String form, String packageName, BigInteger continuation) {
+        return macroexpand1(form, "T", packageName, continuation);
+    }
+
+    public static SwankPacket macroexpand1(String form, String threadId, String packageName, BigInteger continuation) {
+        form = StringUtils.replace(form, "\\", "\\\\");
+        form = StringUtils.replace(form, "\"", "\\\"");
+        packageName = StringUtils.replace(packageName, "\\", "\\\\");
+        packageName = StringUtils.replace(packageName, "\"", "\\\"");
+        String formatted = String.format("(:emacs-rex (swank:swank-macroexpand-1 \"%s\") \":%s\" %s %s)",
+                form, packageName, threadId, continuation);
+        return new SwankPacket(formatted);
+    }
+
     public static SwankPacket macroexpand(String form, String packageName, BigInteger continuation) {
         return macroexpand(form, "T", packageName, continuation);
     }
 
     public static SwankPacket macroexpand(String form, String threadId, String packageName, BigInteger continuation) {
+        form = StringUtils.replace(form, "\\", "\\\\");
+        form = StringUtils.replace(form, "\"", "\\\"");
+        packageName = StringUtils.replace(packageName, "\\", "\\\\");
+        packageName = StringUtils.replace(packageName, "\"", "\\\"");
+        String formatted = String.format("(:emacs-rex (swank:swank-macroexpand \"%s\") \":%s\" %s %s)",
+                form, packageName, threadId, continuation);
+        return new SwankPacket(formatted);
+    }
+
+    public static SwankPacket macroexpandAll(String form, String packageName, BigInteger continuation) {
+        return macroexpandAll(form, "T", packageName, continuation);
+    }
+
+    public static SwankPacket macroexpandAll(String form, String threadId, String packageName, BigInteger continuation) {
         form = StringUtils.replace(form, "\\", "\\\\");
         form = StringUtils.replace(form, "\"", "\\\"");
         packageName = StringUtils.replace(packageName, "\\", "\\\\");

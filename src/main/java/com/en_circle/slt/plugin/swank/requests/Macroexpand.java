@@ -9,17 +9,17 @@ import com.intellij.openapi.project.Project;
 
 import java.math.BigInteger;
 
-public class MacroexpandAll extends SlimeRequest {
+public class Macroexpand extends SlimeRequest {
 
     public static SlimeRequest macroexpand(String form, String module, Callback callback) {
-        return new MacroexpandAll(form, module, callback);
+        return new Macroexpand(form, module, callback);
     }
 
     private final Callback callback;
     private final String form;
     private final String module;
 
-    public MacroexpandAll(String form, String module, Callback callback) {
+    public Macroexpand(String form, String module, Callback callback) {
         this.form = form;
         this.module = module;
         this.callback = callback;
@@ -39,7 +39,7 @@ public class MacroexpandAll extends SlimeRequest {
 
     @Override
     public SwankPacket createPacket(BigInteger requestId, Project project) {
-        return SwankPacket.macroexpandAll(form, module, requestId);
+        return SwankPacket.macroexpand(form, module, requestId);
     }
 
     public interface Callback {

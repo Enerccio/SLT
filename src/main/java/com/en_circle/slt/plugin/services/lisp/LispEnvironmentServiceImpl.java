@@ -8,11 +8,13 @@ import com.en_circle.slt.plugin.environment.SltLispEnvironment.SltOutput;
 import com.en_circle.slt.plugin.environment.SltLispEnvironmentConfiguration;
 import com.en_circle.slt.plugin.lisp.lisp.LispContainer;
 import com.en_circle.slt.plugin.lisp.lisp.LispElement;
-import com.en_circle.slt.plugin.lisp.psi.LispList;
 import com.en_circle.slt.plugin.sdk.LispProjectSdk;
 import com.en_circle.slt.plugin.sdk.LispSdk;
 import com.en_circle.slt.plugin.sdk.SdkList;
-import com.en_circle.slt.plugin.services.lisp.components.*;
+import com.en_circle.slt.plugin.services.lisp.components.SltBreakpoint;
+import com.en_circle.slt.plugin.services.lisp.components.SltBreakpointContainer;
+import com.en_circle.slt.plugin.services.lisp.components.SltIndentationContainer;
+import com.en_circle.slt.plugin.services.lisp.components.SltLispEnvironmentSymbolCache;
 import com.en_circle.slt.plugin.services.lisp.components.SltLispEnvironmentSymbolCache.BatchedSymbolRefreshAction;
 import com.en_circle.slt.plugin.swank.SlimeListener;
 import com.en_circle.slt.plugin.swank.SlimeListener.DebugInterface;
@@ -63,7 +65,6 @@ public class LispEnvironmentServiceImpl implements LispEnvironmentService {
     private final Project project;
     private final SltIndentationContainer indentationContainer;
     private final SltLispEnvironmentSymbolCache symbolCache;
-    private final SltLispEnvironmentMacroExpandCache macroExpandCache;
     private final SltBreakpointContainer breakpointContainer;
 
     public LispEnvironmentServiceImpl(Project project) {
@@ -71,7 +72,6 @@ public class LispEnvironmentServiceImpl implements LispEnvironmentService {
         indentationContainer = new SltIndentationContainer();
         indentationContainer.init(project);
         symbolCache = new SltLispEnvironmentSymbolCache(project);
-        macroExpandCache = new SltLispEnvironmentMacroExpandCache();
         breakpointContainer = new SltBreakpointContainer(project);
         symbolCache.start();
 
@@ -331,22 +331,8 @@ public class LispEnvironmentServiceImpl implements LispEnvironmentService {
     }
 
     @Override
-    public String macroexpand(LispList form, String packageName) {
-        try {
-            return macroExpandCache.macroexpand(form, packageName);
-        } catch (Exception e) {
-            log.error(e.getMessage());
-            log.debug(e.getMessage(), e);
-        }
-        return null;
-    }
-
-    @Override
     public void updateIndentation(LispElement element) {
         indentationContainer.update((LispContainer) element);
-
-        // also clear macro cache since we get this hit on macro update
-        macroExpandCache.clear();
     }
 
     @Override

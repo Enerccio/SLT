@@ -1,10 +1,13 @@
-## 0.5.1
+## 0.5.1 230508
 
 ### Added
 - Symbol inspection
 - Rainbow braces option
 - More browser options
 - Evaluate top level action
+
+### Changes
+- Macroexpand is now action and menu, no longer automatic!
 
 ### Fixes
 - Added symbols with no file into all search places
