@@ -3,6 +3,8 @@
 ### Added
 - Symbol inspection
 - Rainbow braces option
+- More browser options
+- Evaluate top level action
 
 ### Fixes
 - Added symbols with no file into all search places
