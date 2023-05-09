@@ -75,6 +75,10 @@ tasks {
         }
     }
     sltZip.mustRunAfter(processResources)
+
+    instrumentedJar {
+        dependsOn(sltZip)
+    }
     jar {
         dependsOn(sltZip)
     }
