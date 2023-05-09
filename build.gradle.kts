@@ -5,7 +5,7 @@ plugins {
 }
 
 group = "com.en_circle.slt"
-version = "0.5.1"
+version = "0.5.1.1"
 
 idea {
     module {
@@ -75,6 +75,10 @@ tasks {
         }
     }
     sltZip.mustRunAfter(processResources)
+
+    instrumentedJar {
+        dependsOn(sltZip)
+    }
     jar {
         dependsOn(sltZip)
     }
