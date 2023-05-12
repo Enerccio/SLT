@@ -15,6 +15,7 @@ public interface LispTypes {
   IElementType DATUM = new LispElementType("DATUM");
   IElementType ENHANCEMENT = new LispElementType("ENHANCEMENT");
   IElementType EVALED = new LispElementType("EVALED");
+  IElementType FUNCTION_ENHANCEMENT = new LispElementType("FUNCTION_ENHANCEMENT");
   IElementType HEX_NUMBER = new LispElementType("HEX_NUMBER");
   IElementType INTEGER = new LispElementType("INTEGER");
   IElementType LHASHPARENTHESIS = new LispElementType("LHASHPARENTHESIS");
@@ -94,6 +95,9 @@ public interface LispTypes {
       }
       else if (type == EVALED) {
         return new LispEvaledImpl(node);
+      }
+      else if (type == FUNCTION_ENHANCEMENT) {
+        return new LispFunctionEnhancementImpl(node);
       }
       else if (type == HEX_NUMBER) {
         return new LispHexNumberImpl(node);

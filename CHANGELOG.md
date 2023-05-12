@@ -1,10 +1,12 @@
 ## 0.5.2
 
 ### Added
+- Refactor - extract lambda to function
 
 ### Changes
 
 ### Fixes
+- Fixed indentation issues
 
 ## 0.5.1 230508
 

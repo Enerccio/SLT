@@ -124,7 +124,7 @@ public class LispParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // REFERENCE_SET | TEST_SUCCESS | UNQUOTE | UNQUOTE_SPLICE | BACKQUOTE | QUOTE | FUNCTION
+  // REFERENCE_SET | TEST_SUCCESS | UNQUOTE | UNQUOTE_SPLICE | BACKQUOTE | QUOTE | functionEnhancement
   public static boolean enhancement(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "enhancement")) return false;
     boolean r;
@@ -135,7 +135,7 @@ public class LispParser implements PsiParser, LightPsiParser {
     if (!r) r = consumeToken(b, UNQUOTE_SPLICE);
     if (!r) r = consumeToken(b, BACKQUOTE);
     if (!r) r = consumeToken(b, QUOTE);
-    if (!r) r = consumeToken(b, FUNCTION);
+    if (!r) r = functionEnhancement(b, l + 1);
     exit_section_(b, l, m, r, false, null);
     return r;
   }
@@ -150,6 +150,18 @@ public class LispParser implements PsiParser, LightPsiParser {
     r = consumeToken(b, EVAL_VALUE);
     r = r && sexpr(b, l + 1);
     exit_section_(b, m, EVALED, r);
+    return r;
+  }
+
+  /* ********************************************************** */
+  // FUNCTION
+  public static boolean functionEnhancement(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "functionEnhancement")) return false;
+    if (!nextTokenIs(b, FUNCTION)) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, FUNCTION);
+    exit_section_(b, m, FUNCTION_ENHANCEMENT, r);
     return r;
   }
 

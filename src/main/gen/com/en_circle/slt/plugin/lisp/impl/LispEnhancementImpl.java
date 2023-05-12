@@ -2,11 +2,13 @@
 package com.en_circle.slt.plugin.lisp.impl;
 
 import com.en_circle.slt.plugin.lisp.psi.LispEnhancement;
+import com.en_circle.slt.plugin.lisp.psi.LispFunctionEnhancement;
 import com.en_circle.slt.plugin.lisp.psi.LispVisitor;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElementVisitor;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class LispEnhancementImpl extends ASTWrapperPsiElement implements LispEnhancement {
 
@@ -22,6 +24,12 @@ public class LispEnhancementImpl extends ASTWrapperPsiElement implements LispEnh
   public void accept(@NotNull PsiElementVisitor visitor) {
     if (visitor instanceof LispVisitor) accept((LispVisitor)visitor);
     else super.accept(visitor);
+  }
+
+  @Override
+  @Nullable
+  public LispFunctionEnhancement getFunctionEnhancement() {
+    return findChildByClass(LispFunctionEnhancement.class);
   }
 
 }

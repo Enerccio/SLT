@@ -224,6 +224,13 @@
                 class="com.en_circle.slt.plugin.actions.EvalFile">
             <add-to-group group-id="ProjectViewPopupMenuRunGroup" anchor="last"/>
         </action>
+
+        <!-- Refactor actions -->
+        <action id="slt.actions.refactor.extract"
+                icon="/icons/fileicon.svg"
+                class="com.en_circle.slt.plugin.actions.refactor.ExtractFunctionLambda">
+            <add-to-group group-id="RefactoringMenu" anchor="last"/>
+        </action>
     </actions>
 
     <projectListeners>

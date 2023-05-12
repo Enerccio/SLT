@@ -101,6 +101,7 @@ You can also open this as a project in Intellij Idea.
 * [x] Back references 
 * [x] Rainbow braces
 * [ ] Refactoring
+  * [x] Extracting lambda to function
 * [ ] List of quicklisp installed packages / ASDF packages
 * [ ] List of modified top level forms that are yet to be evaluated
 * [ ] Actually make an IDE, ie just plugin with dependencies as one application, not a plugin

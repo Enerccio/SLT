@@ -36,6 +36,10 @@ public class LispVisitor extends PsiElementVisitor {
     visitPsiElement(o);
   }
 
+  public void visitFunctionEnhancement(@NotNull LispFunctionEnhancement o) {
+    visitPsiElement(o);
+  }
+
   public void visitHexNumber(@NotNull LispHexNumber o) {
     visitPsiElement(o);
   }
