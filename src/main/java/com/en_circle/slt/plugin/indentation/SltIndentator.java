@@ -1,9 +1,6 @@
 package com.en_circle.slt.plugin.indentation;
 
 import com.en_circle.slt.plugin.SltCommonLispFileType;
-import com.en_circle.slt.plugin.lisp.psi.LispToplevel;
-import com.en_circle.slt.plugin.lisp.psi.LispTypes;
-import com.en_circle.slt.plugin.services.lisp.LispEnvironmentService;
 import com.en_circle.slt.plugin.ui.console.SltConsole;
 import com.intellij.codeInsight.editorActions.enter.EnterHandlerDelegate;
 import com.intellij.openapi.actionSystem.DataContext;
@@ -14,14 +11,13 @@ import com.intellij.openapi.editor.actionSystem.EditorActionManager;
 import com.intellij.openapi.editor.ex.util.EditorUIUtil;
 import com.intellij.openapi.editor.textarea.TextComponentEditor;
 import com.intellij.openapi.util.Ref;
-import com.intellij.psi.*;
-import com.intellij.psi.util.PsiTreeUtil;
+import com.intellij.psi.PsiDocumentManager;
+import com.intellij.psi.PsiFile;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
-import java.util.Objects;
 
 public class SltIndentator implements EnterHandlerDelegate {
 
@@ -53,70 +49,12 @@ public class SltIndentator implements EnterHandlerDelegate {
     }
 
     private Integer calculateIndentOffset(PsiFile file, Editor editor) {
-        boolean wasAfter = false;
         int offset = editor.getCaretModel().getOffset();
-
-        PsiElement element = file.findElementAt(offset);
-        while (element == null) {
-            if (offset == 0) {
-                return 0;
-            }
-            element = file.findElementAt(offset--);
-            wasAfter = true;
-        }
-
-        while (element instanceof PsiWhiteSpace) {
-            if (offset == 0) {
-                return 0;
-            }
-            element = file.findElementAt(offset--);
-            wasAfter = true;
-        }
-
-        if (element == null) {
-            return null;
-        }
-
-        if (element.getNode().getElementType() == LispTypes.LPAREN) {
-            // left parenthesis means we need to check if we are toplevel last next element
-            // in which case we are moving to new line
-            if (element.getParent() == file) {
-                // incomplete
-                PsiElement previousToplevel = element.getPrevSibling();
-                while (!(previousToplevel instanceof LispToplevel)) {
-                    if (previousToplevel == null)
-                        break;
-                    previousToplevel = previousToplevel.getPrevSibling();
-                }
-                if (previousToplevel != null) {
-                    if (previousToplevel.getNextSibling() == element ||
-                            PsiTreeUtil.firstChild(previousToplevel.getNextSibling()) == element) {
-                        // we are first ( of next toplevel
-                        return 0;
-                    }
-                }
-            } else {
-                PsiElement topLevel = PsiTreeUtil.getParentOfType(element, LispToplevel.class);
-                PsiManager manager = PsiManager.getInstance(element.getProject());
-                if (topLevel != null) {
-                    if (manager.areElementsEquivalent(topLevel.getFirstChild(), element)
-                            || manager.areElementsEquivalent(PsiTreeUtil.firstChild(topLevel), element)) {
-                        // we are first ( of next toplevel
-                        return 0;
-                    }
-                }
-            }
-        }
-
-        if (element.getNode().getElementType() == LispTypes.BLOCK_COMMENT) {
-            return null;
-        }
-
         String packageOverride = getPackageOverride(editor.getContentComponent());
 
-        return LispEnvironmentService.getInstance(Objects.requireNonNull(editor.getProject()))
-                .calculateOffset(element, file, wasAfter, editor.getDocument().getText(), editor.getCaretModel().getOffset(),
-                        packageOverride);
+        SltIndentCalculator calculator = new SltIndentCalculator(editor.getProject());
+        return calculator.calculateIndent(file, offset, editor.getDocument().getText(),
+                packageOverride);
     }
 
     private String getPackageOverride(JComponent contentComponent) {

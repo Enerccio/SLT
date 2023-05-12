@@ -198,8 +198,8 @@ public class SltIndentationContainer {
             }
 
             try {
-                String formText = documentText.substring(toplevel.getTextOffset(), offset);
-                boolean isUnfinished = false;
+                String formText = documentText.substring(toplevel.getTextOffset(),
+                        element.getTextOffset() + element.getTextLength() - (wasAfter ? 0 : 1));
                 LispList list = PsiTreeUtil.getParentOfType(element, LispList.class);
                 if (list != null) {
                     if (element.getNode().getElementType() == LispTypes.RPAREN) {
@@ -207,7 +207,6 @@ public class SltIndentationContainer {
                     }
                     if (list != null) {
                         if (list.getNextSibling() instanceof PsiErrorElement) {
-                            isUnfinished = true;
                             if (element.getNode().getElementType() == LispTypes.RPAREN) {
                                 if (numBraces > 0) {
                                     --numBraces;
@@ -216,11 +215,8 @@ public class SltIndentationContainer {
                         }
                     }
                 }
-                if (!wasAfter || isUnfinished) {
-                    // insert fake element at the end, so we identify correct form
-                    state.hasRealElement = false;
-                    formText += " 0";
-                }
+                state.hasRealElement = false;
+                formText += " 0";
                 formText += StringUtils.repeat(')', numBraces);
                 return calculateIndent(state, formText, file.getProject());
             } catch (Exception ignored) {

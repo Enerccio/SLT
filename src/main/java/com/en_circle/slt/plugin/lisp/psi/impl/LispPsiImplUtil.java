@@ -132,7 +132,7 @@ public class LispPsiImplUtil {
         return PsiTreeUtil.findChildOfType(file, LispString.class);
     }
 
-    private static LispFile createFile(Project project, String text) {
+    public static LispFile createFile(Project project, String text) {
         String name = "dummy.cl";
         return (LispFile) PsiFileFactory.getInstance(project).createFileFromText(name, SltCommonLispFileType.INSTANCE,
                 String.format("%s", text));
