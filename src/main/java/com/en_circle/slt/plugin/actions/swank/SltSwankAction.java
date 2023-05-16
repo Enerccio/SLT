@@ -12,7 +12,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
 
-public abstract class SltLispAction extends AnAction {
+public abstract class SltSwankAction extends AnAction {
 
     protected abstract boolean innerActionCheck(Editor editor, PsiFile file);
 
