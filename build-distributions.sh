@@ -8,12 +8,12 @@ export PRIVATE_KEY_PASSWORD=$PASSWORD
 
 expandedName() (
     # shellcheck disable=SC2125
-    UNEXPANDED=build/distributions/slt-*-signed.zip
+    UNEXPANDED=build/distributions/slt-signed.zip
     set +f
     echo $UNEXPANDED
 )
 
-DISTRIBUTIONS="CL GO IC IU PY PC RD"
+DISTRIBUTIONS="IC"
 for TARGET_IDE in ${DISTRIBUTIONS}; do
     echo Trying to build $TARGET_IDE
     export TARGET_IDE=$TARGET_IDE

@@ -168,8 +168,8 @@ public class ExtractFunctionLambda extends SltRefactorAction {
                 // we are first element, insert symbol
                 lambdaList.replace(symbol);
             } else {
-                PsiFile hashbanged = LispPsiImplUtil.createFile(editor.getProject(), "#'" + functionName);
-                LispSexpr s = PsiTreeUtil.findChildOfType(hashbanged, LispSexpr.class);
+                PsiFile hashquoted = LispPsiImplUtil.createFile(editor.getProject(), "#'" + functionName);
+                LispSexpr s = PsiTreeUtil.findChildOfType(hashquoted, LispSexpr.class);
                 assert s != null;
                 lambdaList.replace(s);
             }

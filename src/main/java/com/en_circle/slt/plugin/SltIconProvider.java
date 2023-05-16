@@ -8,6 +8,7 @@ import javax.swing.*;
 public class SltIconProvider {
 
     public static final Icon file = IconLoader.getIcon("/icons/fileicon.svg", SltIconProvider.class);
+    public static final Icon swank = IconLoader.getIcon("/icons/swank.svg", SltIconProvider.class);
     public static final Icon sbcl = IconLoader.getIcon("/icons/sbcl.png", SltIconProvider.class);
 
     public static final Icon darkTheme = IconLoader.getIcon("/icons/darkTheme.svg", SltIconProvider.class);

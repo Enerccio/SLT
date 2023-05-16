@@ -194,6 +194,10 @@ public class SlimeListener implements SwankClient.SwankReply {
             if (request instanceof InspectSymbol action) {
                 action.processReply((LispContainer) reply.getItems().get(1));
             }
+
+            if (request instanceof Disassemble disassemble) {
+                disassemble.processReply((LispContainer) reply.getItems().get(1));
+            }
         } finally {
             requests.remove(replyId.getValue());
         }

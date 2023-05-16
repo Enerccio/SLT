@@ -2,6 +2,7 @@
 
 ### Added
 - Refactor - extract lambda to function
+- Swank action - disassemble
 
 ### Changes
 

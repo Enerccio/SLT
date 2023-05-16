@@ -231,6 +231,20 @@
                 class="com.en_circle.slt.plugin.actions.refactor.ExtractFunctionLambda">
             <add-to-group group-id="RefactoringMenu" anchor="last"/>
         </action>
+
+        <!-- Swank actions -->
+        <group id="slt.actions.swank.group"
+               class="com.en_circle.slt.plugin.actions.swank.SwankGroup"
+               icon="/icons/swank.svg"
+               popup="true">
+            <add-to-group group-id="EditorPopupMenu" anchor="last"/>
+        </group>
+
+        <action id="slt.actions.swank.disassemble"
+                icon="/icons/swank.svg"
+                class="com.en_circle.slt.plugin.actions.swank.DisassembleAction">
+            <add-to-group group-id="slt.actions.swank.group" anchor="last"/>
+        </action>
     </actions>
 
     <projectListeners>
