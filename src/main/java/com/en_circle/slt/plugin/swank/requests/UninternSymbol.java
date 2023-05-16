@@ -6,23 +6,23 @@ import com.intellij.openapi.project.Project;
 
 import java.math.BigInteger;
 
-public class UndefineFunction extends SlimeRequest {
+public class UninternSymbol extends SlimeRequest {
 
-    public static SlimeRequest undefineFunction(String name, String packageName) {
-        return new UndefineFunction(name, packageName);
+    public static SlimeRequest uninternSymbol(String name, String packageName) {
+        return new UninternSymbol(name, packageName);
     }
 
     private final String symbol;
     private final String packageName;
 
-    private UndefineFunction(String symbol, String packageName) {
+    private UninternSymbol(String symbol, String packageName) {
         this.symbol = symbol;
         this.packageName = packageName;
     }
 
     @Override
     public SwankPacket createPacket(BigInteger requestId, Project project) {
-        return SwankPacket.undefineFunction(symbol, packageName, requestId);
+        return SwankPacket.uninternSymbol(symbol, packageName, requestId);
     }
 
 }

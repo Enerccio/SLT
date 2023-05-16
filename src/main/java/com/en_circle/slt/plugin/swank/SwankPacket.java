@@ -408,6 +408,17 @@ public class SwankPacket {
         return new SwankPacket(formatted);
     }
 
+    public static SwankPacket uninternSymbol(String symbol, String packageName, BigInteger continuation) {
+        symbol = StringUtils.replace(symbol, "\\", "\\\\");
+        symbol = StringUtils.replace(symbol, "\"", "\\\"");
+        packageName = StringUtils.replace(packageName, "\\", "\\\\");
+        packageName = StringUtils.replace(packageName, "\"", "\\\"");
+
+        String formatted = String.format("(:emacs-rex (swank:unintern-symbol \"%s\" \"%s\") \":CL-USER\" T %s)", symbol, packageName,
+                continuation);
+        return new SwankPacket(formatted);
+    }
+
     private int length;
     private String expressionSource;
 

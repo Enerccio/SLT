@@ -46,34 +46,4 @@ public class Disassemble extends SlimeRequest {
         void onResult(LispElement result);
     }
 
-    public enum XrefType {
-
-        CALLS(":calls"),
-        @Deprecated
-        CALLS_WHO(":calls-who"),
-        REFERENCES(":references"),
-        BINDS(":binds"),
-        @Deprecated
-        SETS(":sets"),
-        MACRO_EXPANDS(":macroexpands"),
-        SPECIALIZES(":specializes"),
-        @Deprecated
-        CALLERS(":callers"),
-        @Deprecated
-        CALLEES(":callees")
-
-        ;
-
-        private final String name;
-
-        XrefType(String name) {
-            this.name = name;
-        }
-
-        public String getName() {
-            return this.name;
-        }
-
-    }
-
 }

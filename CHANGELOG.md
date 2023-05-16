@@ -4,6 +4,7 @@
 - Refactor - extract lambda to function
 - Swank action - disassemble
 - Swank action - undefine function
+- Swank action - unintern symbol function
 
 ### Changes
 
