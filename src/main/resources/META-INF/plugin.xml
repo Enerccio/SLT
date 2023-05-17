@@ -257,6 +257,12 @@
                 class="com.en_circle.slt.plugin.actions.swank.UninternSymbolAction">
             <add-to-group group-id="slt.actions.swank.group" anchor="last"/>
         </action>
+
+        <action id="slt.actions.swank.reevaluatedefvar"
+                icon="/icons/swank.svg"
+                class="com.en_circle.slt.plugin.actions.swank.ReevaluateDefvarAction">
+            <add-to-group group-id="slt.actions.swank.group" anchor="last"/>
+        </action>
     </actions>
 
     <projectListeners>

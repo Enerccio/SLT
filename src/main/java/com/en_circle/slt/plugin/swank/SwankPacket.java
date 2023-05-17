@@ -419,6 +419,15 @@ public class SwankPacket {
         return new SwankPacket(formatted);
     }
 
+    public static SwankPacket reevaluteDefvar(String form, BigInteger continuation) {
+        form = StringUtils.replace(form, "\\", "\\\\");
+        form = StringUtils.replace(form, "\"", "\\\"");
+
+        String formatted = String.format("(:emacs-rex (swank:re-evaluate-defvar \"%s\" ) \":CL-USER\" T %s)", form,
+                continuation);
+        return new SwankPacket(formatted);
+    }
+
     private int length;
     private String expressionSource;
 

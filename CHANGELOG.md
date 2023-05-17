@@ -5,6 +5,7 @@
 - Swank action - disassemble
 - Swank action - undefine function
 - Swank action - unintern symbol function
+- Swank action - reevalute defvar
 
 ### Changes
 
