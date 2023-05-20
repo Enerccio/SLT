@@ -31,8 +31,8 @@ import java.awt.*;
 import java.util.Objects;
 import java.util.regex.Pattern;
 
-public class ExtractFunctionLambda extends SltRefactorAction {
-    private static final Logger log = LoggerFactory.getLogger(ExtractFunctionLambda.class);
+public class ExtractFunctionLambdaAction extends SltRefactorAction {
+    private static final Logger log = LoggerFactory.getLogger(ExtractFunctionLambdaAction.class);
 
     @Override
     public void actionPerformed(@NotNull AnActionEvent event) {
@@ -92,7 +92,7 @@ public class ExtractFunctionLambda extends SltRefactorAction {
                             CommandProcessor.getInstance().executeCommand(editor.getProject(),
                                     () -> ApplicationManager.getApplication().runWriteAction(() ->
                                             doRefactor(editor, editor.getDocument(), list, name.getText(), offset)),
-                                    event.getPresentation().getText(), ExtractFunctionLambda.class.getName());
+                                    event.getPresentation().getText(), ExtractFunctionLambdaAction.class.getName());
                         }
                     });
                 });

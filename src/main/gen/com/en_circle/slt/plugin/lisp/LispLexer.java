@@ -853,7 +853,7 @@ IElementType processBuffer(boolean unget) {
             // fall through
           case 102: break;
           case 49: 
-            { yybegin(STEP9); escapeCount++;
+            { tokenBuffer.append(yytext()); yybegin(STEP9); escapeCount++;
             } 
             // fall through
           case 103: break;
@@ -868,7 +868,7 @@ IElementType processBuffer(boolean unget) {
             // fall through
           case 105: break;
           case 52: 
-            { yybegin(STEP8); escapeCount++;
+            { tokenBuffer.append(yytext()); yybegin(STEP8); escapeCount++;
             } 
             // fall through
           case 106: break;

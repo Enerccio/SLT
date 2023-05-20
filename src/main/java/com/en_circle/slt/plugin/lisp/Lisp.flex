@@ -197,7 +197,7 @@ TERMINATING_MACRO_CHAR=[\"'\(\),;`]
 <STEP8> {
     {CONSTITUENT_CHARACTER} | "#" { tokenBuffer.append(yytext()); }
     \\ { yybegin(STEP8ESCAPE); }
-    "|" { yybegin(STEP9); escapeCount++; }
+    "|" { tokenBuffer.append(yytext()); yybegin(STEP9); escapeCount++; }
     {TERMINATING_MACRO_CHAR} { yybegin(YYINITIAL); return processBuffer(true); }
     {WHITESPACE_CHARACTER} { yybegin(YYINITIAL); return processBuffer(true); }
     <<EOF>> { yybegin(YYINITIAL); return processBuffer(false); }
@@ -211,7 +211,7 @@ TERMINATING_MACRO_CHAR=[\"'\(\),;`]
 <STEP9> {
     {CONSTITUENT_CHARACTER} | {TERMINATING_MACRO_CHAR} | {WHITESPACE_CHARACTER} | "#"  { tokenBuffer.append(yytext()); }
     \\ { yybegin(STEP9ESCAPE); }
-     "|" { yybegin(STEP8); escapeCount++; }
+     "|" { tokenBuffer.append(yytext()); yybegin(STEP8); escapeCount++; }
      <<EOF>> { yybegin(YYINITIAL); return TokenType.ERROR_ELEMENT; }
 }
 

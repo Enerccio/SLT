@@ -228,7 +228,13 @@
         <!-- Refactor actions -->
         <action id="slt.actions.refactor.extract"
                 icon="/icons/fileicon.svg"
-                class="com.en_circle.slt.plugin.actions.refactor.ExtractFunctionLambda">
+                class="com.en_circle.slt.plugin.actions.refactor.ExtractFunctionLambdaAction">
+            <add-to-group group-id="RefactoringMenu" anchor="last"/>
+        </action>
+
+        <action id="slt.actions.refactor.renamesymbol"
+                icon="/icons/fileicon.svg"
+                class="com.en_circle.slt.plugin.actions.refactor.RenameSymbolAction">
             <add-to-group group-id="RefactoringMenu" anchor="last"/>
         </action>
 

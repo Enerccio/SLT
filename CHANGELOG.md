@@ -2,6 +2,7 @@
 
 ### Added
 - Refactor - extract lambda to function
+- Refactor - rename symbol
 - Swank action - disassemble
 - Swank action - undefine function
 - Swank action - unintern symbol function
@@ -11,6 +12,7 @@
 
 ### Fixes
 - Fixed indentation issues
+- Fixed symbol parsing - |123| reported as number
 
 ## 0.5.1 230508
 

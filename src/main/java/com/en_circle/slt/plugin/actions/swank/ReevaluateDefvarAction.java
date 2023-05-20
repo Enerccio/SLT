@@ -65,7 +65,6 @@ public class ReevaluateDefvarAction extends SltSwankAction {
                 Messages.showErrorDialog(editor.getProject(), e.getMessage(), SltBundle.message("slt.ui.errors.lisp.start"));
             }
         }
-
     }
 
     @Override
