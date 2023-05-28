@@ -109,7 +109,7 @@ public abstract class SltConsole implements SltComponent {
     protected void eval(String data) {
         try {
             if (StringUtils.isNotBlank(data)) {
-                String setToStar = String.format("(setf * %s)", data);
+                String setToStar = String.format("(cl::setf cl::* %s)", data);
                 LispEnvironmentService.getInstance(project).sendToLisp(Eval.eval(setToStar, currentPackage,
                         result -> {
                             resultData.clear();
