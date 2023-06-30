@@ -18,6 +18,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
+import java.util.Objects;
 
 public class SltIndentator implements EnterHandlerDelegate {
 
@@ -102,6 +103,7 @@ public class SltIndentator implements EnterHandlerDelegate {
                     editor.getCaretModel().moveToOffset(caretOffset + s.length());
                     EditorModificationUtil.scrollToCaret(editor);
                     editor.getSelectionModel().removeSelection();
+                    PsiDocumentManager.getInstance(Objects.requireNonNull(editor.getProject())).commitDocument(document);
                 } catch (ReadOnlyFragmentModificationException e) {
                     EditorActionManager.getInstance().getReadonlyFragmentModificationHandler(doc).handle(e);
                 } finally {
