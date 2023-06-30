@@ -188,7 +188,11 @@ public class SltIndentationContainer {
         if (element.getParent() != file) {
             // we are in correct form
             LispToplevel toplevel = PsiTreeUtil.getParentOfType(element, LispToplevel.class);
-            assert toplevel != null;
+            if (toplevel == null) {
+                // something very wrong, like bad lisp code, do not indent
+                return 0;
+            }
+
             int numBraces = 0;
 
             LispList parent = PsiTreeUtil.getParentOfType(element, LispList.class);
@@ -422,7 +426,7 @@ public class SltIndentationContainer {
         if (indentation != null) {
             // we are not backtracking and we found the main rule
 
-            // since we actually matched head we consider this list "toplevel" with regards to indent
+            // since we actually matched head we consider this list "toplevel" in regard to indent
             topLevel = container;
 
             if (indentation.normalArgumentCount != null) {
