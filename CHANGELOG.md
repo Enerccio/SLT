@@ -1,4 +1,4 @@
-## 0.5.2
+## 0.5.2 230629
 
 ### Added
 - Refactor - extract lambda to function
@@ -7,8 +7,6 @@
 - Swank action - undefine function
 - Swank action - unintern symbol function
 - Swank action - reevalute defvar
-
-### Changes
 
 ### Fixes
 - Fixed indentation issues

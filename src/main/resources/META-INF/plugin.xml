@@ -279,17 +279,19 @@
     </projectListeners>
 
     <change-notes><![CDATA[
-<p>0.5.1 New features:</p><br />
-<p>Symbol inspection</p><br />
-<p>Rainbow braces option</p><br />
-<p>More CLHS browser options</p><br />
-<p>Evaluate top level action</p><br />
+<p>0.5.2 New features:</p><br />
+<p>Refactor - extract lambda to function</p><br />
+<p>Refactor - rename symbol</p><br />
+<p>Swank action - disassemble</p><br />
+<p>Swank action - undefine function</p><br />
+<p>Swank action - unintern symbol function</p><br />
+<p>Swank action - reevalute defvar</p><br />
 <br />
-<p>0.5.1 Changes and fixes:</p><br />
-<p>Macroexpand is now action and menu, no longer automatic!</p><br />
-<p>Added symbols with no file into all search places</p><br />
+<p>0.5.2 Changes and fixes:</p><br />
+<p>Fixed indentation issues</p><br />
+<p>Fixed symbol parsing - |123| reported as number</p><br />
+<p>Fixed #88, #83</p><br />
 <br />
 See CHANGELOG.md for more details
 ]]></change-notes>
-
 </idea-plugin>
