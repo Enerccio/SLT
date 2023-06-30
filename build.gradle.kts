@@ -5,7 +5,7 @@ plugins {
 }
 
 group = "com.en_circle.slt"
-version = "0.5.1.1"
+version = "0.5.2"
 
 idea {
     module {
@@ -21,7 +21,6 @@ repositories {
 dependencies {
     implementation("org.awaitility:awaitility:4.2.0")
     implementation("org.watertemplate:watertemplate-engine:1.2.2")
-    implementation("com.google.guava:guava:32.1.0-jre")
     implementation("org.rauschig:jarchivelib:1.2.0")
     implementation("org.jsoup:jsoup:1.16.1")
 

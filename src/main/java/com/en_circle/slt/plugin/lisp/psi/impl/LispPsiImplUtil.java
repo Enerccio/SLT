@@ -117,22 +117,22 @@ public class LispPsiImplUtil {
         return element;
     }
 
-    private static LispSymbol createSymbol(Project project, String name) {
+    public static LispSymbol createSymbol(Project project, String name) {
         LispFile file = createFile(project, name);
         return PsiTreeUtil.findChildOfType(file, LispSymbol.class);
     }
 
-    private static LispComment createComment(Project project, String name) {
+    public static LispComment createComment(Project project, String name) {
         LispFile file = createFile(project, name);
         return PsiTreeUtil.findChildOfType(file, LispComment.class);
     }
 
-    private static LispString createString(Project project, String name) {
+    public static LispString createString(Project project, String name) {
         LispFile file = createFile(project, name);
         return PsiTreeUtil.findChildOfType(file, LispString.class);
     }
 
-    private static LispFile createFile(Project project, String text) {
+    public static LispFile createFile(Project project, String text) {
         String name = "dummy.cl";
         return (LispFile) PsiFileFactory.getInstance(project).createFileFromText(name, SltCommonLispFileType.INSTANCE,
                 String.format("%s", text));

@@ -70,7 +70,7 @@ public abstract class MacroexpandActionBase extends AnAction {
                     JBPopup popup = JBPopupFactory.getInstance()
                             .createComponentPopupBuilder(textPanel, null)
                             .setProject(editor.getProject())
-                            .setTitle(SltBundle.message("slt.documentation.macroexpand"))
+                            .setTitle(SltBundle.message("slt.ui.macroexpand.title"))
                             .setShowBorder(true)
                             .setMovable(true)
                             .setFocusable(true)

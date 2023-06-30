@@ -1,3 +1,20 @@
+## 0.5.2
+
+### Added
+- Refactor - extract lambda to function
+- Refactor - rename symbol
+- Swank action - disassemble
+- Swank action - undefine function
+- Swank action - unintern symbol function
+- Swank action - reevalute defvar
+
+### Changes
+
+### Fixes
+- Fixed indentation issues
+- Fixed symbol parsing - |123| reported as number
+- Fixed #88, #83
+
 ## 0.5.1 230508
 
 ### Added

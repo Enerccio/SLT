@@ -31,7 +31,9 @@ comment ::= LINE_COMMENT | BLOCK_COMMENT {
     methods=[getName setName]
 }
 
-enhancement ::= REFERENCE_SET | TEST_SUCCESS | UNQUOTE | UNQUOTE_SPLICE | BACKQUOTE | QUOTE | FUNCTION
+enhancement ::= REFERENCE_SET | TEST_SUCCESS | UNQUOTE | UNQUOTE_SPLICE | BACKQUOTE | QUOTE | functionEnhancement
+
+functionEnhancement ::= FUNCTION
 
 datum ::= tested | evaled | pathname | UNDEFINED_SEQUENCE | BIT_ARRAY | CHARACTER | REFERENCE_LABEL
             | number | real_pair

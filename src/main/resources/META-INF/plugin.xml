@@ -224,6 +224,51 @@
                 class="com.en_circle.slt.plugin.actions.EvalFile">
             <add-to-group group-id="ProjectViewPopupMenuRunGroup" anchor="last"/>
         </action>
+
+        <!-- Refactor actions -->
+        <action id="slt.actions.refactor.extract"
+                icon="/icons/fileicon.svg"
+                class="com.en_circle.slt.plugin.actions.refactor.ExtractFunctionLambdaAction">
+            <add-to-group group-id="RefactoringMenu" anchor="last"/>
+        </action>
+
+        <action id="slt.actions.refactor.renamesymbol"
+                icon="/icons/fileicon.svg"
+                class="com.en_circle.slt.plugin.actions.refactor.RenameSymbolAction">
+            <add-to-group group-id="RefactoringMenu" anchor="last"/>
+        </action>
+
+        <!-- Swank actions -->
+        <group id="slt.actions.swank.group"
+               class="com.en_circle.slt.plugin.actions.swank.SwankGroup"
+               icon="/icons/swank.svg"
+               popup="true">
+            <add-to-group group-id="EditorPopupMenu" anchor="last"/>
+        </group>
+
+        <action id="slt.actions.swank.disassemble"
+                icon="/icons/swank.svg"
+                class="com.en_circle.slt.plugin.actions.swank.DisassembleAction">
+            <add-to-group group-id="slt.actions.swank.group" anchor="last"/>
+        </action>
+
+        <action id="slt.actions.swank.undefinefunction"
+                icon="/icons/swank.svg"
+                class="com.en_circle.slt.plugin.actions.swank.UndefineFunctionAction">
+            <add-to-group group-id="slt.actions.swank.group" anchor="last"/>
+        </action>
+
+        <action id="slt.actions.swank.uninternsymbol"
+                icon="/icons/swank.svg"
+                class="com.en_circle.slt.plugin.actions.swank.UninternSymbolAction">
+            <add-to-group group-id="slt.actions.swank.group" anchor="last"/>
+        </action>
+
+        <action id="slt.actions.swank.reevaluatedefvar"
+                icon="/icons/swank.svg"
+                class="com.en_circle.slt.plugin.actions.swank.ReevaluateDefvarAction">
+            <add-to-group group-id="slt.actions.swank.group" anchor="last"/>
+        </action>
     </actions>
 
     <projectListeners>
