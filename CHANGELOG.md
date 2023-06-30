@@ -13,6 +13,7 @@
 ### Fixes
 - Fixed indentation issues
 - Fixed symbol parsing - |123| reported as number
+- Fixed #88, #83
 
 ## 0.5.1 230508
 
