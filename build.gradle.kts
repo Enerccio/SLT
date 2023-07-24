@@ -24,7 +24,7 @@ dependencies {
     implementation("org.rauschig:jarchivelib:1.2.0")
     implementation("org.jsoup:jsoup:1.16.1")
 
-    testImplementation("org.junit.jupiter:junit-jupiter-api:5.9.3")
+    testImplementation("org.junit.jupiter:junit-jupiter-api:5.10.0")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.9.3")
 }
 
