@@ -279,6 +279,8 @@
     </projectListeners>
 
     <change-notes><![CDATA[
+<p>0.5.3 Changes and fixes:</p><br />
+<p>Fixed build for new version</p><br />
 <p>0.5.2 New features:</p><br />
 <p>Refactor - extract lambda to function</p><br />
 <p>Refactor - rename symbol</p><br />
