@@ -9,6 +9,7 @@ import com.intellij.openapi.editor.*;
 import com.intellij.openapi.editor.actionSystem.EditorActionHandler;
 import com.intellij.openapi.editor.actionSystem.EditorActionManager;
 import com.intellij.openapi.editor.ex.util.EditorUIUtil;
+import com.intellij.openapi.editor.ex.util.LexerEditorHighlighter.InvalidStateException;
 import com.intellij.openapi.editor.textarea.TextComponentEditor;
 import com.intellij.openapi.util.Ref;
 import com.intellij.psi.PsiDocumentManager;
@@ -99,7 +100,11 @@ public class SltIndentator implements EnterHandlerDelegate {
                     EditorModificationUtil.deleteSelectedText(editor);
                     int caretOffset = editor.getCaretModel().getOffset();
                     String s = "\n" + StringUtils.repeat(' ', additionalOffset);
-                    document.insertString(caretOffset, s);
+                    try {
+                        document.insertString(caretOffset, s);
+                    } catch (InvalidStateException ignored) {
+                        // lexer error is ignored
+                    }
                     editor.getCaretModel().moveToOffset(caretOffset + s.length());
                     EditorModificationUtil.scrollToCaret(editor);
                     editor.getSelectionModel().removeSelection();

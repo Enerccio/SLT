@@ -142,6 +142,8 @@
 
         <additionalTextAttributes scheme="Default" file="colorSchemes/SLT.xml"/>
         <additionalTextAttributes scheme="Darcula" file="colorSchemes/SLTDarcula.xml"/>
+
+        <postStartupActivity implementation="com.en_circle.slt.plugin.SltProjectActivity"/>
     </extensions>
 
     <actions resource-bundle="messages.SltBundle">
@@ -274,8 +276,6 @@
     <projectListeners>
         <listener class="com.en_circle.slt.plugin.ui.debug.SltBreakpointListener"
                   topic="com.intellij.xdebugger.breakpoints.XBreakpointListener" />
-        <listener class="com.en_circle.slt.plugin.SltProjectListener"
-                  topic="com.intellij.openapi.project.ProjectManagerListener" />
     </projectListeners>
 
     <change-notes><![CDATA[

@@ -32,7 +32,7 @@ import com.intellij.openapi.fileTypes.BinaryFileTypeDecompilers;
 import com.intellij.openapi.fileTypes.FileType;
 import com.intellij.openapi.fileTypes.FileTypes;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.startup.StartupActivity;
+import com.intellij.openapi.startup.ProjectActivity;
 import com.intellij.openapi.util.Key;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiBinaryFile;
@@ -44,6 +44,8 @@ import com.intellij.psi.util.PsiUtilBase;
 import com.intellij.util.Alarm;
 import com.intellij.util.containers.Stack;
 import com.intellij.util.text.CharArrayUtil;
+import kotlin.Unit;
+import kotlin.coroutines.Continuation;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -53,21 +55,23 @@ import java.util.Objects;
 
 // Copied from IJ source to implement highlight WITHOUT smart insertion!
 
-public class SltBraceHighlighter implements StartupActivity.DumbAware {
+public class SltBraceHighlighter implements ProjectActivity {
     private static final Key<List<RangeHighlighter>> BRACE_HIGHLIGHTERS_IN_EDITOR_VIEW_KEY = Key.create("BraceHighlighter.BRACE_HIGHLIGHTERS_IN_EDITOR_VIEW_KEY");
     private static final Key<RangeHighlighter> LINE_MARKER_IN_EDITOR_KEY = Key.create("BraceHighlighter.LINE_MARKER_IN_EDITOR_KEY");
 
     private final Alarm alarm = new Alarm();
 
+    @Nullable
     @Override
-    public void runActivity(@NotNull Project project) {
+    public Object execute(@NotNull Project project, @NotNull Continuation<? super Unit> continuation) {
         if (ApplicationManager.getApplication().isHeadlessEnvironment() && !ApplicationManager.getApplication().isUnitTestMode() ||
                 !IdentifierHighlighterPassFactory.isEnabled()) {
-            return;
+            return null;
         }
 
         Disposable activityDisposable = SltProjectService.getInstance(project);
         registerListeners(project, activityDisposable);
+        return null;
     }
 
     private void registerListeners(@NotNull Project project, @NotNull Disposable parentDisposable) {

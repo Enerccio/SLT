@@ -10,7 +10,6 @@ import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.EditorFactory;
 import com.intellij.openapi.editor.event.*;
 import com.intellij.openapi.editor.ex.EditorEx;
-import com.intellij.openapi.fileEditor.FileEditorManagerEvent;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Key;
 import com.intellij.openapi.util.NlsContexts.Label;
@@ -125,11 +124,6 @@ public class SltPackageWidget extends EditorBasedWidget
     @Override
     public void caretRemoved(@NotNull CaretEvent e) {
         updatePosition(e.getEditor());
-    }
-
-    @Override
-    public void selectionChanged(@NotNull FileEditorManagerEvent event) {
-        updatePosition(getEditor());
     }
 
     @Override
