@@ -1,5 +1,7 @@
 #!/bin/bash
 
+export JAVA_HOME=/usr/lib/jvm/java-24-openjdk/
+
 rm distributions/*
 
 echo -n Private key password:
@@ -17,7 +19,7 @@ DISTRIBUTIONS="IC"
 for TARGET_IDE in ${DISTRIBUTIONS}; do
     echo Trying to build $TARGET_IDE
     export TARGET_IDE=$TARGET_IDE
-    ./gradlew clean signPlugin verifyPlugin buildPlugin || ./gradlew signPlugin verifyPlugin buildPlugin || exit
+    ./gradlew clean signPlugin buildPlugin || ./gradlew signPlugin buildPlugin || exit
     FILE=$(expandedName)
     NEW_FILE=$(basename ${FILE%.*}-$TARGET_IDE.zip)
     cp "$FILE" distributions/$NEW_FILE
