@@ -1,3 +1,11 @@
+## 0.5.4 250624
+
+### Changed
+- Migrated build to IntelliJ Platform Gradle Plugin 2.x ([JetBrains docs](https://plugins.jetbrains.com/docs/intellij/tools-intellij-platform-gradle-plugin.html#configuration.repositories))
+- Updated build for compatibility with IntelliJ IDEA 2025.1
+- Upgraded Gradle wrapper to 8.14.2
+- Modernized Gradle task registration for Gradle 9.0 compatibility
+
 ## 0.5.3 230730
 
 ### Fixes
