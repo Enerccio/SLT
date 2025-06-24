@@ -80,15 +80,15 @@ public class SdkConfigurationSBCLProcess extends DialogWrapper {
         quicklispPath.getField().setText(instance.quickLispPath);
 
         TextFieldWithBrowseButton sbclExecutablePicker = new TextFieldWithBrowseButton(sbclExecutable.getField());
-        sbclExecutablePicker.addBrowseFolderListener(
-                SltBundle.message("slt.ui.settings.sdk.editor.sbcl.executable.select"), "", null, descriptor);
+        sbclExecutablePicker.addBrowseFolderListener(null,
+            descriptor.withTitle(SltBundle.message("slt.ui.settings.sdk.editor.sbcl.executable.select")).withDescription(""));
         TextFieldWithBrowseButton sbclCorePicker = new TextFieldWithBrowseButton(sbclCore.getField());
-        sbclCorePicker.addBrowseFolderListener(
-                SltBundle.message("slt.ui.settings.sdk.editor.sbcl.core.select"), "", null, descriptor);
+        sbclCorePicker.addBrowseFolderListener(null,
+            descriptor.withTitle(SltBundle.message("slt.ui.settings.sdk.editor.sbcl.core.select")).withDescription(""));
         TextFieldWithBrowseButton quicklispPathPicker = new TextFieldWithBrowseButton(quicklispPath.getField());
         //noinspection DialogTitleCapitalization
-        quicklispPathPicker.addBrowseFolderListener(
-                SltBundle.message("slt.ui.settings.sdk.editor.quicklisp.select"), "", null, descriptor);
+        quicklispPathPicker.addBrowseFolderListener(null,
+                descriptor.withTitle(SltBundle.message("slt.ui.settings.sdk.editor.quicklisp.select")).withDescription(""));
 
         return new FormBuilder()
                 .addLabeledComponent(SltBundle.message("slt.ui.settings.sdk.editor.name"), name, 1, false)

@@ -80,15 +80,15 @@ public class SdkConfigurationCCLProcess extends DialogWrapper {
         quicklispPath.getField().setText(instance.quickLispPath);
 
         TextFieldWithBrowseButton cclExecutablePicker = new TextFieldWithBrowseButton(cclExecutable.getField());
-        cclExecutablePicker.addBrowseFolderListener(
-                SltBundle.message("slt.ui.settings.sdk.editor.ccl.executable.select"), "", null, descriptor);
+        cclExecutablePicker.addBrowseFolderListener(null,
+            descriptor.withTitle(SltBundle.message("slt.ui.settings.sdk.editor.ccl.executable.select")).withDescription(""));
         TextFieldWithBrowseButton cclImagePicker = new TextFieldWithBrowseButton(cclImage.getField());
-        cclImagePicker.addBrowseFolderListener(
-                SltBundle.message("slt.ui.settings.sdk.editor.ccl.image.select"), "", null, descriptor);
+        cclImagePicker.addBrowseFolderListener(null,
+            descriptor.withTitle(SltBundle.message("slt.ui.settings.sdk.editor.ccl.image.select")).withDescription(""));
         TextFieldWithBrowseButton quicklispPathPicker = new TextFieldWithBrowseButton(quicklispPath.getField());
         //noinspection DialogTitleCapitalization
-        quicklispPathPicker.addBrowseFolderListener(
-                SltBundle.message("slt.ui.settings.sdk.editor.quicklisp.select"), "", null, descriptor);
+        quicklispPathPicker.addBrowseFolderListener(null,
+            descriptor.withTitle(SltBundle.message("slt.ui.settings.sdk.editor.quicklisp.select")).withDescription(""));
 
         return new FormBuilder()
                 .addLabeledComponent(SltBundle.message("slt.ui.settings.sdk.editor.name"), name, 1, false)

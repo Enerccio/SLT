@@ -261,6 +261,7 @@ public class SltBraceHighlighter implements ProjectActivity {
         highlightBraces(editor, brace2, brace1, matched, false, fileType);
     }
 
+    @SuppressWarnings("SameParameterValue")
     private void highlightLeftBrace(Editor editor, @NotNull HighlighterIterator iterator, boolean scopeHighlighting, @NotNull FileType fileType, Document document) {
         TextRange brace1Start = TextRange.create(iterator.getStart(), iterator.getEnd());
         boolean matched = matchBrace(document.getCharsSequence(), fileType, iterator, true);
@@ -483,6 +484,7 @@ public class SltBraceHighlighter implements ProjectActivity {
     }
 
 
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     private static boolean isPairBraces(@NotNull IElementType tokenType1, @NotNull IElementType tokenType2, @NotNull FileType fileType) {
         return (tokenType1.equals(LispTypes.LPAREN) && tokenType2.equals(LispTypes.RPAREN)) || (tokenType1.equals(LispTypes.RPAREN) && tokenType2.equals(LispTypes.LPAREN));
     }

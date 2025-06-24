@@ -6,6 +6,7 @@ import com.en_circle.slt.plugin.environment.LispFeatures;
 import com.en_circle.slt.plugin.lisp.LispParserUtil;
 import com.en_circle.slt.plugin.lisp.psi.LispList;
 import com.en_circle.slt.plugin.services.lisp.LispEnvironmentService;
+import com.en_circle.slt.tools.EscapeUtils;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
@@ -22,7 +23,6 @@ import com.intellij.psi.PsiDocumentManager;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.text.StringEscapeUtils;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
@@ -56,7 +56,7 @@ public abstract class MacroexpandActionBase extends AnAction {
                 String packageName = LispParserUtil.getPackage(psiFile, offset);
                 macroexpand(editor.getProject(), list, packageName, text -> SwingUtilities.invokeLater(() -> {
                     HtmlBuilder builder = new HtmlBuilder();
-                    String macroExpand = StringUtils.replace(StringUtils.replace(StringEscapeUtils.escapeHtml4(text), " ", "&nbsp;"),
+                    String macroExpand = StringUtils.replace(StringUtils.replace(EscapeUtils.escapeHtml4(text), " ", "&nbsp;"),
                             "\n", HtmlChunk.br().toString());
                     builder.append(HtmlChunk.raw(macroExpand));
 

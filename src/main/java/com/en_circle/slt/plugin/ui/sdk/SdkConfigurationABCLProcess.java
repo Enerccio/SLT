@@ -86,15 +86,15 @@ public class SdkConfigurationABCLProcess extends DialogWrapper {
         quicklispPath.getField().setText(instance.quickLispPath);
 
         TextFieldWithBrowseButton abclExecutablePicker = new TextFieldWithBrowseButton(jvmExecutable.getField());
-        abclExecutablePicker.addBrowseFolderListener(
-                SltBundle.message("slt.ui.settings.sdk.editor.jvm.select"), "", null, descriptor);
+        abclExecutablePicker.addBrowseFolderListener(null,
+            descriptor.withTitle(SltBundle.message("slt.ui.settings.sdk.editor.jvm.select")).withDescription(""));
         TextFieldWithBrowseButton abclJarPicker = new TextFieldWithBrowseButton(jar.getField());
-        abclJarPicker.addBrowseFolderListener(
-                SltBundle.message("slt.ui.settings.sdk.editor.abcl.select"), "", null, descriptorJar);
+        abclJarPicker.addBrowseFolderListener(null,
+                descriptor.withTitle(SltBundle.message("slt.ui.settings.sdk.editor.abcl.select")).withDescription(""));
         TextFieldWithBrowseButton quicklispPathPicker = new TextFieldWithBrowseButton(quicklispPath.getField());
         //noinspection DialogTitleCapitalization
-        quicklispPathPicker.addBrowseFolderListener(
-                SltBundle.message("slt.ui.settings.sdk.editor.quicklisp.select"), "", null, descriptor);
+        quicklispPathPicker.addBrowseFolderListener(null,
+                descriptor.withTitle(SltBundle.message("slt.ui.settings.sdk.editor.quicklisp.select")).withDescription(""));
 
         return new FormBuilder()
                 .addLabeledComponent(SltBundle.message("slt.ui.settings.sdk.editor.name"), name, 1, false)
