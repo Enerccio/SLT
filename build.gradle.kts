@@ -1,6 +1,6 @@
 plugins {
     id("java")
-    id("org.jetbrains.intellij") version "1.15.0"
+    id("org.jetbrains.intellij.platform") version "2.6.0"
     id("idea")
 }
 
@@ -16,15 +16,23 @@ idea {
 
 repositories {
     mavenCentral()
+    intellijPlatform {
+        defaultRepositories()
+    }
 }
 
 dependencies {
+    intellijPlatform {
+        intellijIdeaCommunity("2025.1")
+        // Add plugin dependencies here if needed
+    }
     implementation("org.awaitility:awaitility:4.2.0")
     implementation("org.watertemplate:watertemplate-engine:1.2.2")
     implementation("org.rauschig:jarchivelib:1.2.0")
     implementation("org.jsoup:jsoup:1.16.1")
 
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.10.0")
+    testImplementation("junit:junit:4.13.2")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.10.0")
 }
 
@@ -36,24 +44,8 @@ sourceSets {
     }
 }
 
-// Configure Gradle IntelliJ Plugin
-// Read more: https://plugins.jetbrains.com/docs/intellij/tools-gradle-intellij-plugin.html
-intellij {
-    version.set("2023.3")
-    pluginName.set("slt")
-    var ide = System.getenv("TARGET_IDE")
-    if (ide == null || "" == ide)
-        ide = extra["targetIDE"].toString()
-    type.set(ide) // Target IDE Platform
-
-    plugins.set(listOf(
-
-    /* Plugin Dependencies */))
-}
-
-
 tasks {
-    val sltZip = task("sltZip", Zip::class) {
+    val sltZip by registering(Zip::class) {
         from("src/main/lisp")
         archiveFileName.set("slt.zip")
         destinationDirectory.set(File("build/resources/main"))
@@ -73,12 +65,17 @@ tasks {
             false
         }
     }
-    sltZip.mustRunAfter(processResources)
+    sltZip.get().mustRunAfter(processResources)
 
     instrumentedJar {
         dependsOn(sltZip)
     }
     jar {
+        dependsOn(sltZip)
+    }
+
+    // Fix for Gradle 8+ task dependency validation
+    named("compileTestJava") {
         dependsOn(sltZip)
     }
 
@@ -89,8 +86,8 @@ tasks {
     }
 
     patchPluginXml {
-        sinceBuild.set("233")
-        untilBuild.set("243.*")
+        sinceBuild.set("251")
+        untilBuild.set("252.*")
     }
 
     signPlugin {
@@ -105,6 +102,11 @@ tasks {
 
     publishPlugin {
         token.set(System.getenv("PUBLISH_TOKEN"))
+    }
+
+    // Disable searchable options index build (not needed for this plugin)
+    buildSearchableOptions {
+        enabled = false
     }
 }
 
