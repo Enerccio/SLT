@@ -5,7 +5,7 @@ plugins {
 }
 
 group = "com.en_circle.slt"
-version = "0.5.3"
+version = "0.5.4"
 
 idea {
     module {
@@ -39,7 +39,7 @@ sourceSets {
 // Configure Gradle IntelliJ Plugin
 // Read more: https://plugins.jetbrains.com/docs/intellij/tools-gradle-intellij-plugin.html
 intellij {
-    version.set("2023.2")
+    version.set("2023.3")
     pluginName.set("slt")
     var ide = System.getenv("TARGET_IDE")
     if (ide == null || "" == ide)
@@ -89,8 +89,8 @@ tasks {
     }
 
     patchPluginXml {
-        sinceBuild.set("232")
-        untilBuild.set("242.*")
+        sinceBuild.set("233")
+        untilBuild.set("243.*")
     }
 
     signPlugin {

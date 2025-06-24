@@ -21,8 +21,8 @@ import com.intellij.openapi.util.text.HtmlChunk;
 import com.intellij.psi.PsiDocumentManager;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
-import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.text.StringEscapeUtils;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
@@ -56,7 +56,7 @@ public abstract class MacroexpandActionBase extends AnAction {
                 String packageName = LispParserUtil.getPackage(psiFile, offset);
                 macroexpand(editor.getProject(), list, packageName, text -> SwingUtilities.invokeLater(() -> {
                     HtmlBuilder builder = new HtmlBuilder();
-                    String macroExpand = StringUtils.replace(StringUtils.replace(StringEscapeUtils.escapeHtml(text), " ", "&nbsp;"),
+                    String macroExpand = StringUtils.replace(StringUtils.replace(StringEscapeUtils.escapeHtml4(text), " ", "&nbsp;"),
                             "\n", HtmlChunk.br().toString());
                     builder.append(HtmlChunk.raw(macroExpand));
 

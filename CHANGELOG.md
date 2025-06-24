@@ -1,3 +1,8 @@
+## 0.5.4
+
+### Fixes
+- updated and tested new version for later IDE
+
 ## 0.5.3 230730
 
 ### Fixes

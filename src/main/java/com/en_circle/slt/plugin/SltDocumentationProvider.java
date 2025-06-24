@@ -9,8 +9,8 @@ import com.intellij.openapi.util.text.HtmlBuilder;
 import com.intellij.openapi.util.text.HtmlChunk;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.util.PsiTreeUtil;
-import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.text.StringEscapeUtils;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.Nullable;
 
@@ -95,6 +95,6 @@ public class SltDocumentationProvider extends AbstractDocumentationProvider {
 
 
     private String escape(String s) {
-        return StringEscapeUtils.escapeHtml(s);
+        return StringEscapeUtils.escapeHtml4(s);
     }
 }
