@@ -9,10 +9,11 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.ui.content.Content;
-import com.intellij.ui.tabs.impl.JBTabsImpl;
+import com.intellij.ui.tabs.JBTabs;
+import com.intellij.ui.tabs.JBTabsFactory;
 
 import javax.swing.*;
-import java.awt.*;
+import java.awt.BorderLayout;
 import java.math.BigInteger;
 import java.util.*;
 
@@ -20,7 +21,7 @@ public class SltDebuggers implements DebugInterface, LispEnvironmentListener {
 
     private final ToolWindow toolWindow;
     private final JPanel content;
-    private final JBTabsImpl tabs;
+    private final JBTabs tabs;
 
     private final Map<BigInteger, SltDebugger> activeDebuggers = Collections.synchronizedMap(new HashMap<>());
     private final Set<BigInteger> toActivateDebuggers = Collections.synchronizedSet(new HashSet<>());
@@ -29,7 +30,7 @@ public class SltDebuggers implements DebugInterface, LispEnvironmentListener {
     public SltDebuggers(ToolWindow toolWindow) {
         this.toolWindow = toolWindow;
         this.content = new JPanel(new BorderLayout());
-        this.tabs = new JBTabsImpl(toolWindow.getProject());
+        this.tabs = JBTabsFactory.createTabs(toolWindow.getProject());
         this.content.add(this.tabs.getComponent());
 
         LispEnvironmentService.getInstance(toolWindow.getProject()).addServerListener(this);
@@ -65,7 +66,7 @@ public class SltDebuggers implements DebugInterface, LispEnvironmentListener {
             if (activeDebuggers.containsKey(debugId)) {
                 activeDebuggers.get(debugId).activate();
                 tabs.select(activeDebuggers.get(debugId).getTab(), true);
-                tabs.requestFocusInWindow();
+                ((JComponent) tabs).requestFocusInWindow();
                 toolWindow.getContentManager().setSelectedContent(self, true);
             } else {
                 toActivateDebuggers.add(debugId);

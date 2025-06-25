@@ -32,8 +32,9 @@ import com.intellij.ui.ScrollPaneFactory;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.components.JBTextArea;
 import com.intellij.ui.components.JBTextField;
+import com.intellij.ui.tabs.JBTabs;
+import com.intellij.ui.tabs.JBTabsFactory;
 import com.intellij.ui.tabs.TabInfo;
-import com.intellij.ui.tabs.impl.JBTabsImpl;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
@@ -263,9 +264,9 @@ public class SltDebuggerImpl implements SltDebugger, Disposable {
         singleFrameComponent = new JPanel(new BorderLayout());
         TabInfo singleFrame = new TabInfo(singleFrameComponent);
         singleFrame.setText(SltBundle.message("slt.ui.debugger.frame"));
-        JBTabsImpl singleFrameParent = new JBTabsImpl(parent.getProject());
+        JBTabs singleFrameParent = JBTabsFactory.createTabs(parent.getProject());
         singleFrameParent.addTab(singleFrame);
-        splitter.setSecondComponent(singleFrameParent);
+        splitter.setSecondComponent((JComponent) singleFrameParent);
     }
 
     private void enableStepping() {

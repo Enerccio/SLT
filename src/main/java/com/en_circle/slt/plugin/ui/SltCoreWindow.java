@@ -16,11 +16,13 @@ import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Disposer;
 import com.intellij.openapi.wm.ToolWindow;
-import com.intellij.ui.tabs.impl.JBTabsImpl;
+import com.intellij.ui.tabs.JBTabs;
+import com.intellij.ui.tabs.JBTabsFactory;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -30,7 +32,7 @@ public class SltCoreWindow implements LispEnvironmentListener, Disposable {
     private final Project project;
     private final JTextField process;
     private final JPanel content;
-    private final JBTabsImpl tabs;
+    private final JBTabs tabs;
     private final List<SltComponent> components = Collections.synchronizedList(new ArrayList<>());
 
 
@@ -67,7 +69,7 @@ public class SltCoreWindow implements LispEnvironmentListener, Disposable {
 
         content.add(processInfo, BorderLayout.NORTH);
 
-        tabs = new JBTabsImpl(toolWindow.getProject());
+        tabs = JBTabsFactory.createTabs(toolWindow.getProject());
         for (SltComponent component : components) {
             tabs.addTab(component.create());
         }
